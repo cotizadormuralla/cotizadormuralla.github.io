@@ -149,7 +149,7 @@
                             <th>Fecha</th>
                             <th>Cliente / WhatsApp</th>
                             <th>Medidas / Detalle</th>
-                            <th>Presupuesto (Obra)</th>
+                            <th>Presupuesto Cobrado</th>
                             <th>Desglose Operativo (Ventas Aprobadas)</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -212,15 +212,25 @@
                 let presupuestoObra = item.presupuesto_completo || 0;
                 let esVendido = item.estado_venta === 'aprobado';
 
+                // Costos base si no hay desglose guardado
+                let matFijo = item.desglose_materiales || (mMuralla * 102500);
+                let persFijo = item.desglose_personal || (mMuralla * 38800);
+                
+                // Lógica principal: Flete Real Editable
                 let logisticaReal = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMuralla * 10400);
 
+                // NUEVA FÓRMULA INTELIGENTE PARA LA GANANCIA NETA
+                // Ganancia Neta Real = Lo que cobró el cliente (Presupuesto Obra) - Materiales - Personal - Logística Real
+                let gananciaNetaReal = presupuestoObra - matFijo - persFijo - logisticaReal;
+
+                // Sumamos a las tarjetas generales si está aprobado en este mes
                 if (item.fecha && esVendido) {
                     let fechaItem = new Date(item.fecha);
                     if (fechaItem.getMonth() === mesActual && fechaItem.getFullYear() === anioActual) {
-                        sumaMateriales += item.desglose_materiales || (mMuralla * 102500);
-                        sumaPersonal += item.desglose_personal || (mMuralla * 38800);
+                        sumaMateriales += matFijo;
+                        sumaPersonal += persFijo;
                         sumaLogistica += logisticaReal;
-                        sumaGanancia += item.desglose_ganancia || (mMuralla * 188300);
+                        sumaGanancia += gananciaNetaReal;
                     }
                 }
 
@@ -232,17 +242,21 @@
 
                 let precioCompleto = presupuestoObra ? "Gs. " + presupuestoObra.toLocaleString('es-PY') : '-';
 
-                let dMat = item.desglose_materiales ? item.desglose_materiales.toLocaleString('es-PY') : 0;
-                let dPer = item.desglose_personal ? item.desglose_personal.toLocaleString('es-PY') : 0;
+                // Textos para la tabla
+                let dMat = matFijo.toLocaleString('es-PY');
+                let dPer = persFijo.toLocaleString('es-PY');
                 let dLog = logisticaReal.toLocaleString('es-PY');
-                let dGan = item.desglose_ganancia ? item.desglose_ganancia.toLocaleString('es-PY') : 0;
+                let dGan = gananciaNetaReal.toLocaleString('es-PY');
+
+                // Si la ganancia baja de cero, se pone en rojo
+                let colorGanancia = gananciaNetaReal >= 0 ? "var(--success)" : "var(--danger)";
 
                 let htmlDesglose = esVendido ? `
                     <div class="desglose-mini">
                         🧱 Mat: Gs. ${dMat}<br>
                         👷‍♂️ Pers: Gs. ${dPer}<br>
                         🚚 Log: Gs. ${dLog} <button class="btn-editar-flete" onclick="cambiarFlete('${id}', ${logisticaReal})">✏️ Editar</button><br>
-                        💰 <b>Neta: Gs. ${dGan}</b>
+                        💰 <b style="color: ${colorGanancia};">Neta: Gs. ${dGan}</b>
                     </div>
                 ` : `<span style="color: var(--text-muted); font-size: 0.75rem;">(Se calcula al aprobar venta)</span>`;
 
@@ -278,7 +292,6 @@
             document.getElementById('stat-ganancia').innerText = "Gs. " + sumaGanancia.toLocaleString('es-PY');
         });
 
-        // Modificar flete real
         window.cambiarFlete = function(id, fleteActual) {
             let nuevoFlete = prompt("Ingrese el costo real pagado en flete (Gs.):", fleteActual);
             if (nuevoFlete !== null && !isNaN(nuevoFlete) && nuevoFlete.trim() !== "") {
