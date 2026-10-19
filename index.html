@@ -6,11 +6,10 @@
     <title>Cotizador Inteligente de Murallas Prefabricadas</title>
     <style>
         :root {
-            --bg-card: rgba(30, 41, 59, 0.92);
+            --bg-card: rgba(15, 23, 42, 0.94);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #2563eb;
-            --success: #10b981;
             --border: #334155;
             --precio-1: #34d399; 
             --precio-2: #60a5fa; 
@@ -19,40 +18,35 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('fondo_muralla.jpg');
+            background: linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)), url('fondo_muralla.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
             min-height: 100vh;
         }
 
         .contenedor {
             background-color: var(--bg-card);
-            backdrop-filter: blur(8px);
-            width: 100%;
-            max-width: 480px;
-            padding: 30px;
-            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            width: 100%; max-width: 480px;
+            padding: 30px; border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.6);
             border: 1px solid var(--border);
             margin: 20px;
         }
 
         .encabezado { text-align: center; margin-bottom: 25px; }
-        .encabezado h1 { font-size: 1.5rem; color: #38bdf8; margin: 0 0 10px 0; }
-        .encabezado p { color: var(--text-muted); font-size: 0.9rem; margin: 0; line-height: 1.5; }
+        .encabezado h1 { font-size: 1.5rem; color: #38bdf8; margin: 0 0 8px 0; }
+        .encabezado p { color: var(--text-muted); font-size: 0.9rem; margin: 0; line-height: 1.4; }
 
         .grupo-input { margin-bottom: 15px; }
-        .grupo-input label { display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 600; color: #cbd5e1; }
+        .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #cbd5e1; }
         .grupo-input input, .grupo-input select {
             width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border);
-            background-color: rgba(15, 23, 42, 0.8); color: white; font-size: 1rem; box-sizing: border-box;
+            background-color: rgba(30, 41, 59, 0.8); color: white; font-size: 1rem; box-sizing: border-box;
         }
         .grupo-input input:focus, .grupo-input select:focus { outline: none; border-color: #38bdf8; }
 
@@ -68,39 +62,39 @@
         .btn-calcular {
             width: 100%; background-color: var(--primary); color: white; border: none;
             padding: 14px; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer;
-            margin-top: 10px; transition: background-color 0.3s;
+            margin-top: 10px; transition: background-color 0.2s;
         }
         .btn-calcular:hover { background-color: #1d4ed8; }
 
         #caja-resultado {
             display: none; margin-top: 25px; padding: 20px; background-color: rgba(15, 23, 42, 0.95);
-            border: 1px solid var(--primary); border-radius: 8px; animation: aparecer 0.5s ease-in-out;
+            border: 1px solid var(--primary); border-radius: 8px; animation: aparecer 0.4s ease-in-out;
         }
 
-        @keyframes aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes aparecer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        .resumen-metros { text-align: center; font-size: 1.1rem; color: #f8fafc; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .resumen-metros { text-align: center; font-size: 1.05rem; color: #f8fafc; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border); line-height: 1.5; }
         
         .caja-porton {
             background-color: rgba(56, 189, 248, 0.1); border: 1px dashed #38bdf8;
             padding: 12px; border-radius: 6px; margin-top: 10px; display: none;
         }
-        .caja-porton p { margin: 0; font-size: 0.85rem; color: #bae6fd; line-height: 1.4; text-align: left;}
+        .caja-porton p { margin: 0; font-size: 0.85rem; color: #bae6fd; line-height: 1.4; text-align: left; }
 
         .caja-precio { background-color: rgba(30, 41, 59, 0.8); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid var(--border); }
         .caja-precio.completo { border-left-color: var(--precio-1); }
         .caja-precio.flete { border-left-color: var(--precio-2); }
         .caja-precio.taller { border-left-color: var(--precio-3); }
 
-        .caja-precio-titulo { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
-        .precio-valor { font-size: 1.5rem; font-weight: bold; margin: 0; }
+        .caja-precio-titulo { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold; }
+        .precio-valor { font-size: 1.4rem; font-weight: bold; margin: 0; }
         .precio-valor.completo { color: var(--precio-1); }
         .precio-valor.flete { color: var(--precio-2); }
         .precio-valor.taller { color: var(--precio-3); }
 
         .avisos-finales {
             margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);
-            font-size: 0.8rem; color: #94a3b8; line-height: 1.6;
+            font-size: 0.8rem; color: #94a3b8; line-height: 1.5;
         }
         .alerta-iva { color: #fbbf24; font-weight: bold; }
 
@@ -130,7 +124,7 @@
                 <label>¿Cómo quieres calcular tu presupuesto?</label>
                 <select id="metodo-calculo" onchange="cambiarMetodoCalculo()">
                     <option value="terreno">Tengo las medidas del terreno (Frente x Fondo)</option>
-                    <option value="lineales">Solo sé los metros lineales totales</option>
+                    <option value="lineales">Solo sé los metros lineales totales (Ej: Frente)</option>
                 </select>
             </div>
 
@@ -149,28 +143,26 @@
 
                 <div class="grupo-input">
                     <label>¿Qué lados deseas cerrar?</label>
-                    <select id="tipo-cierre" onchange="cambiarTipoCierre()">
+                    <select id="tipo-cierre" onchange="cambiarTipoCierreTerreno()">
                         <option value="completo">Los 4 lados (Perímetro Completo)</option>
                         <option value="sin_frente">Solo 3 lados (Costados y Fondo)</option>
                     </select>
                 </div>
 
-                <!-- Selector de cantidad de portones -->
-                <div class="grupo-input" id="grupo-portones">
+                <div class="grupo-input" id="grupo-portones-terreno">
                     <label>🚪 ¿Cuántos portones frontales necesitas?</label>
-                    <select id="cantidad-portones" onchange="cambiarCantidadPortones()">
+                    <select id="cantidad-portones-terreno" onchange="cambiarCantidadPortonesTerreno()">
                         <option value="1">1 Portón estándar (3.5 metros)</option>
                         <option value="2">2 Portones para dúplex (7 metros)</option>
                         <option value="0">Ninguno (Cerrar todo con muralla ciega)</option>
                     </select>
                 </div>
 
-                <!-- Selector de TIPO de portón -->
-                <div class="grupo-input" id="grupo-tipo-porton">
+                <div class="grupo-input" id="grupo-tipo-porton-terreno">
                     <label>⚙️ Tipo de apertura del portón</label>
-                    <select id="tipo-porton">
-                        <option value="Corredizo">Corredizo (Requiere buen espacio lateral)</option>
-                        <option value="Basculante">Basculante / Levadizo (Ideal dúplex o poco espacio)</option>
+                    <select id="tipo-porton-terreno">
+                        <option value="Corredizo">Corredizo (Requiere espacio lateral)</option>
+                        <option value="Basculante">Basculante / Levadizo (Ideal dúplex)</option>
                     </select>
                 </div>
             </div>
@@ -179,7 +171,24 @@
             <div id="seccion-lineales" class="opcion-oculta">
                 <div class="grupo-input">
                     <label>📏 Total de Metros Lineales</label>
-                    <input type="number" id="metros-sueltos" placeholder="Ej: 15">
+                    <input type="number" id="metros-sueltos" placeholder="Ej: 12">
+                </div>
+
+                <div class="grupo-input">
+                    <label>🚪 ¿Deseas incluir portón en este tramo?</label>
+                    <select id="cantidad-portones-lineales" onchange="cambiarCantidadPortonesLineales()">
+                        <option value="0">Ninguno (Solo muralla ciega)</option>
+                        <option value="1">1 Portón estándar (3.5 metros)</option>
+                        <option value="2">2 Portones para dúplex (7 metros)</option>
+                    </select>
+                </div>
+
+                <div class="grupo-input opcion-oculta" id="grupo-tipo-porton-lineales">
+                    <label>⚙️ Tipo de apertura del portón</label>
+                    <select id="tipo-porton-lineales">
+                        <option value="Corredizo">Corredizo (Requiere espacio lateral)</option>
+                        <option value="Basculante">Basculante / Levadizo (Ideal dúplex)</option>
+                    </select>
                 </div>
             </div>
 
@@ -202,12 +211,10 @@
         <!-- RESULTADO -->
         <div id="caja-resultado">
             <div class="resumen-metros">
-                Muralla a construir: <b id="metros-totales">0</b> metros lineales
+                Metros totales a cerrar: <b id="metros-totales-general">0</b> m<br>
+                Muralla de concreto: <b id="metros-muralla-final">0</b> m
                 
-                <!-- Aviso del Portón -->
-                <div id="aviso-porton" class="caja-porton">
-                    <!-- El texto se inserta con Javascript -->
-                </div>
+                <div id="aviso-porton" class="caja-porton"></div>
             </div>
             
             <div class="caja-precio completo">
@@ -230,8 +237,8 @@
             
             <div class="avisos-finales">
                 <span class="alerta-iva">⚠️ Importante: Todos los precios expresados son SIN IVA.</span><br>
-                • Los precios de instalación son referenciales y válidos para Itauguá y ciudades aledañas.<br>
-                • Se requerirá una visita técnica previa para confirmar el terreno antes del inicio de obra.
+                • Precios de instalación válidos para Itauguá y ciudades aledañas.<br>
+                • Se realizará una visita técnica previa para confirmar el terreno.
             </div>
             
             <a href="video_muralla.mp4" target="_blank" class="btn-video">
@@ -248,36 +255,37 @@
         function cambiarMetodoCalculo() {
             const metodo = document.getElementById('metodo-calculo').value;
             if (metodo === 'terreno') {
-                document.getElementById('seccion-terreno').style.display = 'block';
-                document.getElementById('seccion-lineales').style.display = 'none';
+                document.getElementById('seccion-terreno').classList.remove('opcion-oculta');
+                document.getElementById('seccion-lineales').classList.add('opcion-oculta');
             } else {
-                document.getElementById('seccion-terreno').style.display = 'none';
-                document.getElementById('seccion-lineales').style.display = 'block';
+                document.getElementById('seccion-terreno').classList.add('opcion-oculta');
+                document.getElementById('seccion-lineales').classList.remove('opcion-oculta');
             }
         }
 
-        function cambiarTipoCierre() {
+        function cambiarTipoCierreTerreno() {
             const tipo = document.getElementById('tipo-cierre').value;
             if (tipo === 'completo') {
-                document.getElementById('grupo-portones').style.display = 'block';
-                cambiarCantidadPortones(); 
+                document.getElementById('grupo-portones-terreno').style.display = 'block';
+                cambiarCantidadPortonesTerreno(); 
             } else {
-                document.getElementById('grupo-portones').style.display = 'none';
-                document.getElementById('grupo-tipo-porton').style.display = 'none';
+                document.getElementById('grupo-portones-terreno').style.display = 'none';
+                document.getElementById('grupo-tipo-porton-terreno').style.display = 'none';
             }
         }
 
-        function cambiarCantidadPortones() {
-            const cantidad = parseInt(document.getElementById('cantidad-portones').value);
-            if (cantidad > 0) {
-                document.getElementById('grupo-tipo-porton').style.display = 'block';
-            } else {
-                document.getElementById('grupo-tipo-porton').style.display = 'none';
-            }
+        function cambiarCantidadPortonesTerreno() {
+            const cantidad = parseInt(document.getElementById('cantidad-portones-terreno').value);
+            document.getElementById('grupo-tipo-porton-terreno').style.display = cantidad > 0 ? 'block' : 'none';
+        }
+
+        function cambiarCantidadPortonesLineales() {
+            const cantidad = parseInt(document.getElementById('cantidad-portones-lineales').value);
+            document.getElementById('grupo-tipo-porton-lineales').style.display = cantidad > 0 ? 'block' : 'none';
         }
     </script>
 
-    <!-- Módulos de Firebase -->
+    <!-- Firebase Modules -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
@@ -300,13 +308,13 @@
             let nombre = document.getElementById('nombre').value.trim();
             let whatsapp = document.getElementById('whatsapp').value.trim();
             
-            let metrosLineales = 0;
-            let huboDescuentoPorton = false;
-            let costoPortonAgregado = 0;
+            let metrosTotalesGeneral = 0;
+            let metrosMurallaFinal = 0;
             let cantidadPortones = 0;
             let tipoApertura = "";
             let metrosPortonTotal = 0;
-            let precioMetroPorton = 1100000; // Por defecto (Corredizo)
+            let costoPortonAgregado = 0;
+            let precioMetroPorton = 1100000;
 
             if (!nombre || !whatsapp) {
                 alert("⚠️ Por favor, ingresa tu nombre y WhatsApp para ver los presupuestos.");
@@ -317,50 +325,54 @@
                 let frente = parseFloat(document.getElementById('frente').value);
                 let fondo = parseFloat(document.getElementById('fondo').value);
                 let tipoCierre = document.getElementById('tipo-cierre').value;
-                cantidadPortones = parseInt(document.getElementById('cantidad-portones').value);
 
                 if (!frente || !fondo) {
                     alert("⚠️ Ingresa las medidas del frente y fondo.");
                     return;
                 }
 
-                metrosLineales = (frente * 2) + (fondo * 2);
+                metrosTotalesGeneral = (frente * 2) + (fondo * 2);
 
                 if (tipoCierre === 'sin_frente') {
-                    metrosLineales = metrosLineales - frente;
-                    cantidadPortones = 0; 
-                } else if (tipoCierre === 'completo') {
-                    metrosPortonTotal = cantidadPortones * 3.5;
-                    metrosLineales = metrosLineales - metrosPortonTotal;
-                    huboDescuentoPorton = cantidadPortones > 0;
-                    
-                    if(huboDescuentoPorton) {
-                        tipoApertura = document.getElementById('tipo-porton').value;
-                        // NUEVA LÓGICA DE PRECIOS: Si es basculante, el metro sale a 1.250.000 Gs.
-                        if (tipoApertura === "Basculante") {
-                            precioMetroPorton = 1250000;
-                        }
+                    metrosTotalesGeneral -= frente;
+                    cantidadPortones = 0;
+                } else {
+                    cantidadPortones = parseInt(document.getElementById('cantidad-portones-terreno').value);
+                    if (cantidadPortones > 0) {
+                        tipoApertura = document.getElementById('tipo-porton-terreno').value;
                     }
-                    costoPortonAgregado = metrosPortonTotal * precioMetroPorton; 
                 }
-
             } else {
                 let metrosSueltos = parseFloat(document.getElementById('metros-sueltos').value);
                 if (!metrosSueltos) {
-                    alert("⚠️ Ingresa los metros lineales totales.");
+                    alert("⚠️ Ingresa el total de metros lineales.");
                     return;
                 }
-                metrosLineales = metrosSueltos;
+                metrosTotalesGeneral = metrosSueltos;
+                cantidadPortones = parseInt(document.getElementById('cantidad-portones-lineales').value);
+                if (cantidadPortones > 0) {
+                    tipoApertura = document.getElementById('tipo-porton-lineales').value;
+                }
             }
 
-            if (metrosLineales <= 0) {
-                alert("⚠️ Las medidas ingresadas no son válidas o los portones superan los metros.");
+            if (cantidadPortones > 0) {
+                metrosPortonTotal = cantidadPortones * 3.5;
+                if (tipoApertura === "Basculante") {
+                    precioMetroPorton = 1250000;
+                }
+                costoPortonAgregado = metrosPortonTotal * precioMetroPorton;
+            }
+
+            metrosMurallaFinal = metrosTotalesGeneral - metrosPortonTotal;
+
+            if (metrosMurallaFinal < 0) {
+                alert("⚠️ Los metros de portón superan el total ingresado. Revisa las medidas.");
                 return;
             }
 
-            let precio1_Completo = (metrosLineales * 340000) + costoPortonAgregado;
-            let precio2_Flete = (metrosLineales * 250000) + costoPortonAgregado;
-            let precio3_Taller = (metrosLineales * 180000) + costoPortonAgregado;
+            let precio1_Completo = (metrosMurallaFinal * 340000) + costoPortonAgregado;
+            let precio2_Flete = (metrosMurallaFinal * 250000) + costoPortonAgregado;
+            let precio3_Taller = (metrosMurallaFinal * 180000) + costoPortonAgregado;
 
             const idProspecto = "lead_" + Date.now();
             const prospectoRef = ref(db, 'clientes_muralla_directos/' + idProspecto);
@@ -369,28 +381,29 @@
                 nombre: nombre,
                 telefono: whatsapp,
                 metodo_calculo: metodo,
-                metros_finales: metrosLineales,
+                metros_totales: metrosTotalesGeneral,
+                metros_muralla: metrosMurallaFinal,
                 presupuesto_completo: precio1_Completo,
                 presupuesto_flete: precio2_Flete,
                 presupuesto_taller: precio3_Taller,
                 cantidad_portones: cantidadPortones,
                 tipo_apertura: tipoApertura,
-                incluye_porton: huboDescuentoPorton,
+                incluye_porton: cantidadPortones > 0,
                 fecha: new Date().toISOString()
             }).then(() => {
-                
                 document.getElementById('formulario-cotizacion').style.display = 'none';
                 document.getElementById('caja-resultado').style.display = 'block';
 
-                document.getElementById('metros-totales').innerText = metrosLineales;
-                
-                if (huboDescuentoPorton) {
+                document.getElementById('metros-totales-general').innerText = metrosTotalesGeneral;
+                document.getElementById('metros-muralla-final').innerText = metrosMurallaFinal;
+
+                if (cantidadPortones > 0) {
                     let textPorton = cantidadPortones === 1 ? "1 Portón" : "2 Portones";
-                    let precioFormateadoParaAviso = precioMetroPorton.toLocaleString('es-PY');
+                    let precioFormateado = precioMetroPorton.toLocaleString('es-PY');
                     document.getElementById('aviso-porton').innerHTML = `
                         <p>
                             <strong style="color: #38bdf8;">🚪 + ${textPorton} tipo ${tipoApertura} (${metrosPortonTotal}m)</strong><br>
-                            Se ha agregado el costo correspondiente a Gs. ${precioFormateadoParaAviso} por metro lineal.
+                            Se descontaron ${metrosPortonTotal}m a la muralla y se sumó el portón (Gs. ${precioFormateado}/m).
                         </p>
                     `;
                     document.getElementById('aviso-porton').style.display = 'block';
@@ -402,13 +415,11 @@
                 document.getElementById('precio-flete').innerText = "Gs. " + precio2_Flete.toLocaleString('es-PY');
                 document.getElementById('precio-taller').innerText = "Gs. " + precio3_Taller.toLocaleString('es-PY');
 
-                // Mensaje de WhatsApp Dinámico
                 let miNumeroFabrica = "595991224697"; 
-                let textoPortonWa = "";
-                if(cantidadPortones === 1) textoPortonWa = ` + 1 Portón (${tipoApertura})`;
-                if(cantidadPortones === 2) textoPortonWa = ` + 2 Portones Dúplex (${tipoApertura})`;
+                let textoPortonWa = cantidadPortones > 0 ? ` + ${cantidadPortones} Portón/es (${tipoApertura})` : "";
 
-                let mensajeWa = `Hola! Usé el cotizador para ${metrosLineales}m lineales de muralla${textoPortonWa}. Me interesan estas opciones (SIN IVA):\n1. Obra terminada: Gs. ${precio1_Completo.toLocaleString('es-PY')}\n2. Con flete: Gs. ${precio2_Flete.toLocaleString('es-PY')}\n3. Retirar de taller: Gs. ${precio3_Taller.toLocaleString('es-PY')}\nQuiero más información.`;
+                let mensajeWa = `Hola! Coticé en la web ${metrosTotalesGeneral}m totales (${metrosMurallaFinal}m muralla${textoPortonWa}).\nPresupuestos (SIN IVA):\n1. Obra terminada: Gs. ${precio1_Completo.toLocaleString('es-PY')}\n2. Con flete: Gs. ${precio2_Flete.toLocaleString('es-PY')}\n3. Retirar de taller: Gs. ${precio3_Taller.toLocaleString('es-PY')}\nMi nombre es ${nombre}. Quiero más información.`;
+                
                 document.getElementById('btn-wa-directo').href = `https://wa.me/${miNumeroFabrica}?text=${encodeURIComponent(mensajeWa)}`;
 
             }).catch((error) => {
