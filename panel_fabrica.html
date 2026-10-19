@@ -230,18 +230,20 @@
                 let presupuestoObra = item.presupuesto_completo || 0;
                 let esVendido = item.estado_venta === 'aprobado';
 
-                // --- CÁLCULO DE PRODUCCIÓN (CORREGIDO A 5 PLACAS) ---
+                // --- CÁLCULO DE PRODUCCIÓN EXACTO ---
+                // Cada módulo = 1,65m. Al final sumamos 0,15m de la última columna.
+                // Usamos Math.ceil para redondear siempre hacia arriba y asegurar las piezas de los cortes.
                 let modulos = 0;
                 let columnas = 0;
                 let placas = 0;
                 
                 if (mMuralla > 0.15) {
-                    modulos = Math.ceil((mMuralla - 0.15) / 1.65); // Módulos a usar
-                    columnas = modulos + 1; // 1 columna extra para el cierre
-                    placas = modulos * 5; // <-- 5 placas de 0.40m para llegar a los 2 metros
+                    modulos = Math.ceil((mMuralla - 0.15) / 1.65); // Redondeo hacia arriba para cortes
+                    columnas = modulos + 1; // Columna de inicio + final
+                    placas = modulos * 5; // 5 placas (0,40m) por módulo para altura de 2m
                 } else if (mMuralla > 0) {
-                    columnas = 2; 
-                    placas = 5; 
+                    columnas = 2; // Mínimo 2 columnas
+                    placas = 5; // Mínimo 5 placas para 2 metros
                 }
 
                 // --- CÁLCULO FINANCIERO ---
