@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Financiero | Fábrica de Murallas</title>
+    <title>Panel Financiero & Producción | Fábrica de Murallas</title>
     <style>
         :root {
             --bg-body: #0b0f17;
@@ -16,6 +16,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --purple: #a855f7;
+            --indigo: #6366f1;
         }
 
         body {
@@ -25,7 +26,7 @@
             margin: 0; padding: 25px;
         }
 
-        .container { max-width: 1250px; margin: 0 auto; }
+        .container { max-width: 1350px; margin: 0 auto; }
 
         .header {
             display: flex; justify-content: space-between; align-items: center;
@@ -55,11 +56,21 @@
             padding: 15px 20px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
+        .toolbar-right {
+            display: flex; gap: 10px; align-items: center;
+        }
         .toolbar input {
             background: #0b0f17; border: 1px solid var(--border);
             padding: 8px 12px; border-radius: 6px; color: white; font-size: 0.85rem; width: 250px;
         }
         .toolbar input:focus { outline: none; border-color: var(--accent); }
+
+        .btn-exportar {
+            background-color: #10b981; color: white; border: none; padding: 8px 15px;
+            border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-exportar:hover { background-color: #059669; }
 
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
         th { background-color: #0d1420; color: var(--text-muted); font-weight: 600; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.72rem; text-transform: uppercase; }
@@ -71,6 +82,7 @@
             font-size: 0.72rem; font-weight: 600; background: #1e293b; color: #cbd5e1;
         }
         .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .badge.prod { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); margin-top: 4px; }
 
         .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; }
         .btn-wa:hover { text-decoration: underline; }
@@ -100,6 +112,7 @@
         .btn-borrar:hover { background: var(--danger); color: white; }
 
         .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: 4px; }
+        .produccion-info { font-size: 0.75rem; color: #a5b4fc; line-height: 1.4; font-weight: 500; }
         .vacio { padding: 40px; text-align: center; color: var(--text-muted); }
     </style>
 </head>
@@ -109,7 +122,7 @@
         <div class="header">
             <div>
                 <h1>Panel Financiero & Producción | Murallas Prefabricadas</h1>
-                <p>Distribución de costos operativos y ganancias netas del mes actual (Fletes ajustables).</p>
+                <p>Control de ganancias y cálculo automático de piezas a fabricar por obra.</p>
             </div>
         </div>
 
@@ -138,25 +151,29 @@
 
         <div class="card-tabla">
             <div class="toolbar">
-                <span style="font-weight: 600; font-size: 0.9rem;">Historial de Prospectos & Ventas</span>
-                <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar por nombre o teléfono...">
+                <span style="font-weight: 600; font-size: 0.9rem;">Historial de Prospectos, Ventas & Producción</span>
+                <div class="toolbar-right">
+                    <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar por nombre o teléfono...">
+                    <button class="btn-exportar" onclick="exportarExcel()">📥 Descargar Balance</button>
+                </div>
             </div>
 
             <div style="overflow-x: auto;">
-                <table>
+                <table id="tabla-prospectos">
                     <thead>
                         <tr>
                             <th>Fecha</th>
                             <th>Cliente / WhatsApp</th>
                             <th>Medidas / Detalle</th>
+                            <th>A Fabricar (Piezas)</th>
                             <th>Presupuesto Cobrado</th>
-                            <th>Desglose Operativo (Ventas Aprobadas)</th>
+                            <th>Finanzas (Ventas Aprobadas)</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>Acc.</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-body">
-                        <tr><td colspan="7" class="vacio">Cargando cotizaciones...</td></tr>
+                        <tr><td colspan="8" class="vacio">Cargando cotizaciones...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -180,15 +197,17 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
+        
+        window.datosCotizaciones = [];
         const tablaBody = document.getElementById('tabla-body');
 
         onValue(ref(db, 'clientes_muralla_directos'), (snapshot) => {
             const data = snapshot.val();
             tablaBody.innerHTML = '';
+            window.datosCotizaciones = []; 
 
             if (!data) {
-                tablaBody.innerHTML = '<tr><td colspan="7" class="vacio">No hay cotizaciones registradas aún.</td></tr>';
+                tablaBody.innerHTML = '<tr><td colspan="8" class="vacio">No hay cotizaciones registradas aún.</td></tr>';
                 document.getElementById('stat-materiales').innerText = 'Gs. 0';
                 document.getElementById('stat-personal').innerText = 'Gs. 0';
                 document.getElementById('stat-logistica').innerText = 'Gs. 0';
@@ -203,7 +222,6 @@
 
             const mesActual = new Date().getMonth();
             const anioActual = new Date().getFullYear();
-
             const listaOrdenada = Object.entries(data).reverse();
 
             listaOrdenada.forEach(([id, item]) => {
@@ -212,18 +230,44 @@
                 let presupuestoObra = item.presupuesto_completo || 0;
                 let esVendido = item.estado_venta === 'aprobado';
 
-                // Costos base si no hay desglose guardado
+                // --- CÁLCULO DE PRODUCCIÓN (CORREGIDO A 5 PLACAS) ---
+                let modulos = 0;
+                let columnas = 0;
+                let placas = 0;
+                
+                if (mMuralla > 0.15) {
+                    modulos = Math.ceil((mMuralla - 0.15) / 1.65); // Módulos a usar
+                    columnas = modulos + 1; // 1 columna extra para el cierre
+                    placas = modulos * 5; // <-- 5 placas de 0.40m para llegar a los 2 metros
+                } else if (mMuralla > 0) {
+                    columnas = 2; 
+                    placas = 5; 
+                }
+
+                // --- CÁLCULO FINANCIERO ---
                 let matFijo = item.desglose_materiales || (mMuralla * 102500);
                 let persFijo = item.desglose_personal || (mMuralla * 38800);
-                
-                // Lógica principal: Flete Real Editable
                 let logisticaReal = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMuralla * 10400);
-
-                // NUEVA FÓRMULA INTELIGENTE PARA LA GANANCIA NETA
-                // Ganancia Neta Real = Lo que cobró el cliente (Presupuesto Obra) - Materiales - Personal - Logística Real
                 let gananciaNetaReal = presupuestoObra - matFijo - persFijo - logisticaReal;
 
-                // Sumamos a las tarjetas generales si está aprobado en este mes
+                // Guardar para Excel
+                window.datosCotizaciones.push({
+                    Fecha: item.fecha ? new Date(item.fecha).toLocaleDateString('es-PY') : 'Sin Fecha',
+                    Cliente: item.nombre || 'Desconocido',
+                    WhatsApp: item.telefono || '',
+                    Estado: esVendido ? 'Vendido' : 'Pendiente',
+                    MetrosTotales: mTotales,
+                    MetrosMuralla: mMuralla,
+                    TienePorton: item.cantidad_portones > 0 ? `Sí (${item.cantidad_portones})` : 'No',
+                    Columnas: columnas,
+                    Placas: placas,
+                    PresupuestoCobrado: presupuestoObra,
+                    GastoMateriales: esVendido ? matFijo : 0,
+                    GastoPersonal: esVendido ? persFijo : 0,
+                    GastoLogistica: esVendido ? logisticaReal : 0,
+                    GananciaNeta: esVendido ? gananciaNetaReal : 0
+                });
+
                 if (item.fecha && esVendido) {
                     let fechaItem = new Date(item.fecha);
                     if (fechaItem.getMonth() === mesActual && fechaItem.getFullYear() === anioActual) {
@@ -235,37 +279,40 @@
                 }
 
                 let fechaFormateada = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
-
+                
                 let detallePorton = item.cantidad_portones > 0 ? 
-                    `<span class="badge porton">+${item.cantidad_portones} Portón (${item.tipo_apertura || 'Std'})</span>` : 
+                    `<span class="badge porton">+${item.cantidad_portones} Portón</span>` : 
                     '<span class="badge">Solo muralla</span>';
+                
+                let htmlProduccion = `
+                    <div class="produccion-info">
+                        🏗️ <b>${columnas}</b> Columnas (H)<br>
+                        🧱 <b>${placas}</b> Placas (1.50m)
+                    </div>
+                `;
 
                 let precioCompleto = presupuestoObra ? "Gs. " + presupuestoObra.toLocaleString('es-PY') : '-';
-
-                // Textos para la tabla
                 let dMat = matFijo.toLocaleString('es-PY');
                 let dPer = persFijo.toLocaleString('es-PY');
                 let dLog = logisticaReal.toLocaleString('es-PY');
                 let dGan = gananciaNetaReal.toLocaleString('es-PY');
-
-                // Si la ganancia baja de cero, se pone en rojo
                 let colorGanancia = gananciaNetaReal >= 0 ? "var(--success)" : "var(--danger)";
 
                 let htmlDesglose = esVendido ? `
                     <div class="desglose-mini">
                         🧱 Mat: Gs. ${dMat}<br>
                         👷‍♂️ Pers: Gs. ${dPer}<br>
-                        🚚 Log: Gs. ${dLog} <button class="btn-editar-flete" onclick="cambiarFlete('${id}', ${logisticaReal})">✏️ Editar</button><br>
+                        🚚 Log: Gs. ${dLog} <button class="btn-editar-flete" onclick="cambiarFlete('${id}', ${logisticaReal})">✏️</button><br>
                         💰 <b style="color: ${colorGanancia};">Neta: Gs. ${dGan}</b>
                     </div>
-                ` : `<span style="color: var(--text-muted); font-size: 0.75rem;">(Se calcula al aprobar venta)</span>`;
+                ` : `<span style="color: var(--text-muted); font-size: 0.75rem;">(Finanzas bloqueadas hasta aprobar)</span>`;
 
                 let textoBotonEstado = esVendido ? "✅ Aprobado" : "⏳ Pendiente";
                 let claseBotonEstado = esVendido ? "btn-estado aprobado" : "btn-estado";
 
                 let fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td style="color: var(--text-muted); font-size: 0.78rem;">${fechaFormateada}</td>
+                    <td style="color: var(--text-muted); font-size: 0.75rem;">${fechaFormateada}</td>
                     <td>
                         <strong style="color: white;">${item.nombre || 'Sin nombre'}</strong><br>
                         <a href="https://wa.me/595${item.telefono}" target="_blank" class="btn-wa">💬 ${item.telefono}</a>
@@ -273,6 +320,9 @@
                     <td>
                         <b>${mTotales}m</b> total (${mMuralla}m muralla)<br>
                         ${detallePorton}
+                    </td>
+                    <td style="background-color: rgba(99, 102, 241, 0.05); border-left: 1px solid rgba(99, 102, 241, 0.2); border-right: 1px solid rgba(99, 102, 241, 0.2);">
+                        ${htmlProduccion}
                     </td>
                     <td><strong style="color: #34d399;">${precioCompleto}</strong></td>
                     <td>${htmlDesglose}</td>
@@ -321,6 +371,47 @@
                 let texto = filas[i].innerText.toLowerCase();
                 filas[i].style.display = texto.includes(input) ? "" : "none";
             }
+        };
+
+        window.exportarExcel = function() {
+            if (window.datosCotizaciones.length === 0) {
+                alert("No hay datos para exportar.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Fecha,Cliente,WhatsApp,Estado,Metros_Totales,Metros_Muralla,Porton,Piezas_Columnas,Piezas_Placas,Presupuesto_Cobrado,Fondo_Materiales,Fondo_Personal,Fondo_Logistica,Ganancia_Neta\r\n";
+
+            window.datosCotizaciones.forEach(function(rowArray) {
+                let fila = [
+                    rowArray.Fecha,
+                    rowArray.Cliente,
+                    rowArray.WhatsApp,
+                    rowArray.Estado,
+                    rowArray.MetrosTotales,
+                    rowArray.MetrosMuralla,
+                    rowArray.TienePorton,
+                    rowArray.Columnas,
+                    rowArray.Placas,
+                    rowArray.PresupuestoCobrado,
+                    rowArray.GastoMateriales,
+                    rowArray.GastoPersonal,
+                    rowArray.GastoLogistica,
+                    rowArray.GananciaNeta
+                ].join(",");
+                csvContent += fila + "\r\n";
+            });
+
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            
+            let fechaHoy = new Date().toLocaleDateString('es-PY').replace(/\//g, "-");
+            link.setAttribute("download", "Balance_y_Produccion_" + fechaHoy + ".csv");
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
     </script>
 </body>
