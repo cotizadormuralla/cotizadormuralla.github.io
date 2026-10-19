@@ -82,7 +82,6 @@
             font-size: 0.72rem; font-weight: 600; background: #1e293b; color: #cbd5e1;
         }
         .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
-        .badge.prod { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); margin-top: 4px; }
 
         .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; }
         .btn-wa:hover { text-decoration: underline; }
@@ -112,7 +111,7 @@
         .btn-borrar:hover { background: var(--danger); color: white; }
 
         .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: 4px; }
-        .produccion-info { font-size: 0.75rem; color: #a5b4fc; line-height: 1.4; font-weight: 500; }
+        .produccion-info { font-size: 0.78rem; color: #a5b4fc; line-height: 1.4; font-weight: 500; }
         .vacio { padding: 40px; text-align: center; color: var(--text-muted); }
     </style>
 </head>
@@ -122,7 +121,7 @@
         <div class="header">
             <div>
                 <h1>Panel Financiero & Producción | Murallas Prefabricadas</h1>
-                <p>Control de ganancias y cálculo automático de piezas a fabricar por obra.</p>
+                <p>Cálculo con optimización inteligente de cortes de placa (Menos desperdicio).</p>
             </div>
         </div>
 
@@ -230,23 +229,40 @@
                 let presupuestoObra = item.presupuesto_completo || 0;
                 let esVendido = item.estado_venta === 'aprobado';
 
-                // --- CÁLCULO DE PRODUCCIÓN EXACTO ---
-                // Cada módulo = 1,65m. Al final sumamos 0,15m de la última columna.
-                // Usamos Math.ceil para redondear siempre hacia arriba y asegurar las piezas de los cortes.
-                let modulos = 0;
+                // --- CÁLCULO INTELIGENTE DE PRODUCCIÓN Y CORTES ---
                 let columnas = 0;
                 let placas = 0;
+                let detalleCorte = "";
                 
                 if (mMuralla > 0.15) {
-                    modulos = Math.ceil((mMuralla - 0.15) / 1.65); // Redondeo hacia arriba para cortes
-                    columnas = modulos + 1; // Columna de inicio + final
-                    placas = modulos * 5; // 5 placas (0,40m) por módulo para altura de 2m
+                    let L = mMuralla - 0.15; // Descontamos columna de cierre final
+                    let modulosEnteros = Math.floor(L / 1.65); // Módulos completos
+                    let resto = L - (modulosEnteros * 1.65); // Lo que sobra para el último módulo
+                    
+                    columnas = modulosEnteros + 1; // Columnas base
+                    placas = modulosEnteros * 5; // 5 placas por módulo entero
+                    
+                    if (resto > 0.05) { 
+                        columnas += 1; // Se necesita 1 columna extra para atajar el corte
+                        
+                        // Calculamos el tamaño del corte de la placa
+                        let cortePlaca = resto > 0.15 ? resto - 0.15 : resto; 
+                        
+                        // ¿Cuántas piezas de ese corte saco de 1 placa entera de 1.50m?
+                        let piezasPorPlaca = Math.floor(1.50 / cortePlaca);
+                        if (piezasPorPlaca < 1) piezasPorPlaca = 1; 
+                        
+                        // Si necesito 5 piezas, ¿cuántas placas enteras debo sacrificar?
+                        let placasParaCortes = Math.ceil(5 / piezasPorPlaca);
+                        placas += placasParaCortes; // Sumo solo las necesarias (Ej: 2 placas para sacar 5 de 35cm)
+                        
+                        detalleCorte = `<br><span style="font-size: 0.70rem; color: #818cf8; font-weight: bold;">+1 Módulo corto (Corte: ${Math.round(cortePlaca * 100)} cm)</span>`;
+                    }
                 } else if (mMuralla > 0) {
-                    columnas = 2; // Mínimo 2 columnas
-                    placas = 5; // Mínimo 5 placas para 2 metros
+                    columnas = 2; placas = 5; 
                 }
 
-                // --- CÁLCULO FINANCIERO ---
+                // --- FINANZAS ---
                 let matFijo = item.desglose_materiales || (mMuralla * 102500);
                 let persFijo = item.desglose_personal || (mMuralla * 38800);
                 let logisticaReal = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMuralla * 10400);
@@ -290,6 +306,7 @@
                     <div class="produccion-info">
                         🏗️ <b>${columnas}</b> Columnas (H)<br>
                         🧱 <b>${placas}</b> Placas (1.50m)
+                        ${detalleCorte}
                     </div>
                 `;
 
