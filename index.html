@@ -362,13 +362,12 @@
                 return;
             }
 
-            // Desglose Operativo por metro de muralla
+            // Desglose Operativo base por metro
             let costoMaterialesTotal = metrosMurallaFinal * 102500;
             let costoPersonalTotal = metrosMurallaFinal * 38800;
-            let costoLogisticaTotal = metrosMurallaFinal * 10400;
+            let costoLogisticaTotal = Math.max(550000, metrosMurallaFinal * 10400); // Mínimo un flete real de 550mil o proporcional
             let gananciaNetaMuralla = metrosMurallaFinal * 188300;
 
-            // Ganancia aproximada estimada para portones (asumiendo 30% limpio o se suma al total)
             let gananciaPorton = costoPortonAgregado * 0.35; 
             let costoPorton = costoPortonAgregado - gananciaPorton;
 
@@ -391,7 +390,6 @@
                 cantidad_portones: cantidadPortones,
                 tipo_apertura: tipoApertura,
                 incluye_porton: cantidadPortones > 0,
-                // Guardamos el desglose exacto para cuando se apruebe la venta:
                 desglose_materiales: costoMaterialesTotal + costoPorton,
                 desglose_personal: costoPersonalTotal,
                 desglose_logistica: costoLogisticaTotal,

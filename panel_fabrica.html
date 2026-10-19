@@ -86,6 +86,12 @@
         }
         .btn-estado:hover { opacity: 0.85; }
 
+        .btn-editar-flete {
+            background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #d8b4fe; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: 4px;
+        }
+        .btn-editar-flete:hover { background: var(--purple); color: white; }
+
         .btn-borrar {
             background: transparent; border: 1px solid rgba(239, 68, 68, 0.3);
             color: var(--danger); padding: 5px 8px; border-radius: 4px;
@@ -93,7 +99,7 @@
         }
         .btn-borrar:hover { background: var(--danger); color: white; }
 
-        .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; margin-top: 4px; }
+        .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: 4px; }
         .vacio { padding: 40px; text-align: center; color: var(--text-muted); }
     </style>
 </head>
@@ -103,7 +109,7 @@
         <div class="header">
             <div>
                 <h1>Panel Financiero & Producción | Murallas Prefabricadas</h1>
-                <p>Distribución automática de costos operativos y ganancias netas del mes actual.</p>
+                <p>Distribución de costos operativos y ganancias netas del mes actual (Fletes ajustables).</p>
             </div>
         </div>
 
@@ -121,7 +127,7 @@
             <div class="stat-card" style="border-left: 4px solid var(--purple);">
                 <div class="titulo">🚚 Fondo Logística</div>
                 <div class="valor" id="stat-logistica">Gs. 0</div>
-                <div class="sub">Fletes y transporte</div>
+                <div class="sub">Fletes reales pagados</div>
             </div>
             <div class="stat-card" style="border-left: 4px solid var(--success);">
                 <div class="titulo">💰 Tu Ganancia Neta</div>
@@ -144,7 +150,7 @@
                             <th>Cliente / WhatsApp</th>
                             <th>Medidas / Detalle</th>
                             <th>Presupuesto (Obra)</th>
-                            <th>Desglose Estimado (Ventas Aprobadas)</th>
+                            <th>Desglose Operativo (Ventas Aprobadas)</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -206,13 +212,14 @@
                 let presupuestoObra = item.presupuesto_completo || 0;
                 let esVendido = item.estado_venta === 'aprobado';
 
-                // Si está aprobado y es del mes en curso, sumamos a los fondos del mes
+                let logisticaReal = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMuralla * 10400);
+
                 if (item.fecha && esVendido) {
                     let fechaItem = new Date(item.fecha);
                     if (fechaItem.getMonth() === mesActual && fechaItem.getFullYear() === anioActual) {
                         sumaMateriales += item.desglose_materiales || (mMuralla * 102500);
                         sumaPersonal += item.desglose_personal || (mMuralla * 38800);
-                        sumaLogistica += item.desglose_logistica || (mMuralla * 10400);
+                        sumaLogistica += logisticaReal;
                         sumaGanancia += item.desglose_ganancia || (mMuralla * 188300);
                     }
                 }
@@ -225,17 +232,16 @@
 
                 let precioCompleto = presupuestoObra ? "Gs. " + presupuestoObra.toLocaleString('es-PY') : '-';
 
-                // Desglose individual para la tablita
                 let dMat = item.desglose_materiales ? item.desglose_materiales.toLocaleString('es-PY') : 0;
                 let dPer = item.desglose_personal ? item.desglose_personal.toLocaleString('es-PY') : 0;
-                let dLog = item.desglose_logistica ? item.desglose_logistica.toLocaleString('es-PY') : 0;
+                let dLog = logisticaReal.toLocaleString('es-PY');
                 let dGan = item.desglose_ganancia ? item.desglose_ganancia.toLocaleString('es-PY') : 0;
 
                 let htmlDesglose = esVendido ? `
                     <div class="desglose-mini">
                         🧱 Mat: Gs. ${dMat}<br>
                         👷‍♂️ Pers: Gs. ${dPer}<br>
-                        🚚 Log: Gs. ${dLog}<br>
+                        🚚 Log: Gs. ${dLog} <button class="btn-editar-flete" onclick="cambiarFlete('${id}', ${logisticaReal})">✏️ Editar</button><br>
                         💰 <b>Neta: Gs. ${dGan}</b>
                     </div>
                 ` : `<span style="color: var(--text-muted); font-size: 0.75rem;">(Se calcula al aprobar venta)</span>`;
@@ -271,6 +277,16 @@
             document.getElementById('stat-logistica').innerText = "Gs. " + sumaLogistica.toLocaleString('es-PY');
             document.getElementById('stat-ganancia').innerText = "Gs. " + sumaGanancia.toLocaleString('es-PY');
         });
+
+        // Modificar flete real
+        window.cambiarFlete = function(id, fleteActual) {
+            let nuevoFlete = prompt("Ingrese el costo real pagado en flete (Gs.):", fleteActual);
+            if (nuevoFlete !== null && !isNaN(nuevoFlete) && nuevoFlete.trim() !== "") {
+                update(ref(db, 'clientes_muralla_directos/' + id), {
+                    desglose_logistica: parseFloat(nuevoFlete)
+                });
+            }
+        };
 
         window.alternarEstado = function(id, estadoActual) {
             let nuevoEstado = (estadoActual === 'aprobado') ? 'pendiente' : 'aprobado';
