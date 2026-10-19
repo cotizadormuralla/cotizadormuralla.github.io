@@ -19,23 +19,15 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)), url('fondo_muralla.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: var(--text-main); margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
         .contenedor {
-            background-color: var(--bg-card);
-            backdrop-filter: blur(10px);
-            width: 100%; max-width: 480px;
-            padding: 30px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            border: 1px solid var(--border);
-            margin: 20px;
+            background-color: var(--bg-card); backdrop-filter: blur(10px);
+            width: 100%; max-width: 480px; padding: 30px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 1px solid var(--border); margin: 20px;
         }
 
         .encabezado { text-align: center; margin-bottom: 25px; }
@@ -124,7 +116,7 @@
                 <label>¿Cómo quieres calcular tu presupuesto?</label>
                 <select id="metodo-calculo" onchange="cambiarMetodoCalculo()">
                     <option value="terreno">Tengo las medidas del terreno (Frente x Fondo)</option>
-                    <option value="lineales">Solo sé los metros lineales totales (Ej: Frente)</option>
+                    <option value="lineales">Solo sé los metros lineales totales</option>
                 </select>
             </div>
 
@@ -285,7 +277,7 @@
         }
     </script>
 
-    <!-- Firebase Modules -->
+    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
@@ -366,9 +358,19 @@
             metrosMurallaFinal = metrosTotalesGeneral - metrosPortonTotal;
 
             if (metrosMurallaFinal < 0) {
-                alert("⚠️ Los metros de portón superan el total ingresado. Revisa las medidas.");
+                alert("⚠️ Los metros de portón superan el total ingresado.");
                 return;
             }
+
+            // Desglose Operativo por metro de muralla
+            let costoMaterialesTotal = metrosMurallaFinal * 102500;
+            let costoPersonalTotal = metrosMurallaFinal * 38800;
+            let costoLogisticaTotal = metrosMurallaFinal * 10400;
+            let gananciaNetaMuralla = metrosMurallaFinal * 188300;
+
+            // Ganancia aproximada estimada para portones (asumiendo 30% limpio o se suma al total)
+            let gananciaPorton = costoPortonAgregado * 0.35; 
+            let costoPorton = costoPortonAgregado - gananciaPorton;
 
             let precio1_Completo = (metrosMurallaFinal * 340000) + costoPortonAgregado;
             let precio2_Flete = (metrosMurallaFinal * 250000) + costoPortonAgregado;
@@ -389,6 +391,11 @@
                 cantidad_portones: cantidadPortones,
                 tipo_apertura: tipoApertura,
                 incluye_porton: cantidadPortones > 0,
+                // Guardamos el desglose exacto para cuando se apruebe la venta:
+                desglose_materiales: costoMaterialesTotal + costoPorton,
+                desglose_personal: costoPersonalTotal,
+                desglose_logistica: costoLogisticaTotal,
+                desglose_ganancia: gananciaNetaMuralla + gananciaPorton,
                 fecha: new Date().toISOString()
             }).then(() => {
                 document.getElementById('formulario-cotizacion').style.display = 'none';

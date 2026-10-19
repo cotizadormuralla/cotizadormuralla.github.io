@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración | Fábrica de Murallas</title>
+    <title>Panel Financiero | Fábrica de Murallas</title>
     <style>
         :root {
             --bg-body: #0b0f17;
@@ -14,6 +14,8 @@
             --accent: #38bdf8;
             --danger: #ef4444;
             --success: #10b981;
+            --warning: #f59e0b;
+            --purple: #a855f7;
         }
 
         body {
@@ -23,7 +25,7 @@
             margin: 0; padding: 25px;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; }
+        .container { max-width: 1250px; margin: 0 auto; }
 
         .header {
             display: flex; justify-content: space-between; align-items: center;
@@ -33,15 +35,16 @@
         .header p { margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted); }
 
         .grid-stats {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 15px; margin-bottom: 25px;
         }
         .stat-card {
             background-color: var(--bg-card); border: 1px solid var(--border);
             padding: 18px; border-radius: 8px;
         }
-        .stat-card .titulo { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-        .stat-card .valor { font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-top: 6px; }
+        .stat-card .titulo { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .stat-card .valor { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 6px; }
+        .stat-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
 
         .card-tabla {
             background-color: var(--bg-card); border: 1px solid var(--border);
@@ -50,7 +53,7 @@
         
         .toolbar {
             padding: 15px 20px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
         .toolbar input {
             background: #0b0f17; border: 1px solid var(--border);
@@ -58,29 +61,39 @@
         }
         .toolbar input:focus { outline: none; border-color: var(--accent); }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
-        th { background-color: #0d1420; color: var(--text-muted); font-weight: 600; padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+        th { background-color: #0d1420; color: var(--text-muted); font-weight: 600; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.72rem; text-transform: uppercase; }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: rgba(255,255,255,0.02); }
 
         .badge {
             display: inline-block; padding: 3px 8px; border-radius: 4px;
-            font-size: 0.75rem; font-weight: 600; background: #1e293b; color: #cbd5e1;
+            font-size: 0.72rem; font-weight: 600; background: #1e293b; color: #cbd5e1;
         }
         .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
 
-        .btn-wa {
-            color: #34d399; text-decoration: none; font-weight: 600;
-        }
+        .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; }
         .btn-wa:hover { text-decoration: underline; }
 
+        .btn-estado {
+            background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4);
+            color: var(--warning); padding: 5px 10px; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-estado.aprobado {
+            background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4);
+            color: var(--success);
+        }
+        .btn-estado:hover { opacity: 0.85; }
+
         .btn-borrar {
-            background: transparent; border: 1px solid rgba(239, 68, 68, 0.4);
-            color: var(--danger); padding: 5px 10px; border-radius: 4px;
-            font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+            background: transparent; border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger); padding: 5px 8px; border-radius: 4px;
+            font-size: 0.72rem; cursor: pointer; transition: all 0.2s; margin-left: 4px;
         }
         .btn-borrar:hover { background: var(--danger); color: white; }
 
+        .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; margin-top: 4px; }
         .vacio { padding: 40px; text-align: center; color: var(--text-muted); }
     </style>
 </head>
@@ -89,29 +102,37 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>Gestión de Cotizaciones | Murallas Prefabricadas</h1>
-                <p>Registro automático de consultas e interés de clientes.</p>
+                <h1>Panel Financiero & Producción | Murallas Prefabricadas</h1>
+                <p>Distribución automática de costos operativos y ganancias netas del mes actual.</p>
             </div>
         </div>
 
         <div class="grid-stats">
-            <div class="stat-card">
-                <div class="titulo">Total Consultas</div>
-                <div class="valor" id="stat-total">0</div>
+            <div class="stat-card" style="border-left: 4px solid var(--warning);">
+                <div class="titulo">🧱 Fondo Materiales</div>
+                <div class="valor" id="stat-materiales">Gs. 0</div>
+                <div class="sub">Cemento, arena, varilla, pintura</div>
             </div>
-            <div class="stat-card">
-                <div class="titulo">Metros Solicitados</div>
-                <div class="valor" id="stat-metros">0 m</div>
+            <div class="stat-card" style="border-left: 4px solid var(--accent);">
+                <div class="titulo">👷‍♂️ Fondo Personal</div>
+                <div class="valor" id="stat-personal">Gs. 0</div>
+                <div class="sub">Jornales ayudantes y peones</div>
             </div>
-            <div class="stat-card">
-                <div class="titulo">Último Cliente</div>
-                <div class="valor" id="stat-ultimo" style="font-size: 1.1rem; line-height: 2rem;">-</div>
+            <div class="stat-card" style="border-left: 4px solid var(--purple);">
+                <div class="titulo">🚚 Fondo Logística</div>
+                <div class="valor" id="stat-logistica">Gs. 0</div>
+                <div class="sub">Fletes y transporte</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--success);">
+                <div class="titulo">💰 Tu Ganancia Neta</div>
+                <div class="valor" id="stat-ganancia" style="color: var(--success);">Gs. 0</div>
+                <div class="sub">Bolsillo limpio (Mes actual)</div>
             </div>
         </div>
 
         <div class="card-tabla">
             <div class="toolbar">
-                <span style="font-weight: 600; font-size: 0.9rem;">Historial de Prospectos</span>
+                <span style="font-weight: 600; font-size: 0.9rem;">Historial de Prospectos & Ventas</span>
                 <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar por nombre o teléfono...">
             </div>
 
@@ -123,11 +144,13 @@
                             <th>Cliente / WhatsApp</th>
                             <th>Medidas / Detalle</th>
                             <th>Presupuesto (Obra)</th>
+                            <th>Desglose Estimado (Ventas Aprobadas)</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-body">
-                        <tr><td colspan="5" class="vacio">Cargando cotizaciones...</td></tr>
+                        <tr><td colspan="7" class="vacio">Cargando cotizaciones...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -137,7 +160,7 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s",
@@ -154,31 +177,45 @@
 
         const tablaBody = document.getElementById('tabla-body');
 
-        // Escuchar Firebase
         onValue(ref(db, 'clientes_muralla_directos'), (snapshot) => {
             const data = snapshot.val();
             tablaBody.innerHTML = '';
 
             if (!data) {
-                tablaBody.innerHTML = '<tr><td colspan="5" class="vacio">No hay cotizaciones registradas aún.</td></tr>';
-                document.getElementById('stat-total').innerText = '0';
-                document.getElementById('stat-metros').innerText = '0 m';
-                document.getElementById('stat-ultimo').innerText = '-';
+                tablaBody.innerHTML = '<tr><td colspan="7" class="vacio">No hay cotizaciones registradas aún.</td></tr>';
+                document.getElementById('stat-materiales').innerText = 'Gs. 0';
+                document.getElementById('stat-personal').innerText = 'Gs. 0';
+                document.getElementById('stat-logistica').innerText = 'Gs. 0';
+                document.getElementById('stat-ganancia').innerText = 'Gs. 0';
                 return;
             }
 
-            let totalCotizaciones = 0;
-            let totalMetros = 0;
-            let ultimoCliente = "-";
+            let sumaMateriales = 0;
+            let sumaPersonal = 0;
+            let sumaLogistica = 0;
+            let sumaGanancia = 0;
+
+            const mesActual = new Date().getMonth();
+            const anioActual = new Date().getFullYear();
 
             const listaOrdenada = Object.entries(data).reverse();
 
-            listaOrdenada.forEach(([id, item], idx) => {
-                totalCotizaciones++;
+            listaOrdenada.forEach(([id, item]) => {
                 let mTotales = item.metros_totales || item.metros_finales || 0;
-                totalMetros += parseFloat(mTotales);
+                let mMuralla = item.metros_muralla || mTotales;
+                let presupuestoObra = item.presupuesto_completo || 0;
+                let esVendido = item.estado_venta === 'aprobado';
 
-                if (idx === 0) ultimoCliente = item.nombre || "Cliente";
+                // Si está aprobado y es del mes en curso, sumamos a los fondos del mes
+                if (item.fecha && esVendido) {
+                    let fechaItem = new Date(item.fecha);
+                    if (fechaItem.getMonth() === mesActual && fechaItem.getFullYear() === anioActual) {
+                        sumaMateriales += item.desglose_materiales || (mMuralla * 102500);
+                        sumaPersonal += item.desglose_personal || (mMuralla * 38800);
+                        sumaLogistica += item.desglose_logistica || (mMuralla * 10400);
+                        sumaGanancia += item.desglose_ganancia || (mMuralla * 188300);
+                    }
+                }
 
                 let fechaFormateada = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
 
@@ -186,48 +223,71 @@
                     `<span class="badge porton">+${item.cantidad_portones} Portón (${item.tipo_apertura || 'Std'})</span>` : 
                     '<span class="badge">Solo muralla</span>';
 
-                let precioCompleto = item.presupuesto_completo ? "Gs. " + item.presupuesto_completo.toLocaleString('es-PY') : '-';
+                let precioCompleto = presupuestoObra ? "Gs. " + presupuestoObra.toLocaleString('es-PY') : '-';
+
+                // Desglose individual para la tablita
+                let dMat = item.desglose_materiales ? item.desglose_materiales.toLocaleString('es-PY') : 0;
+                let dPer = item.desglose_personal ? item.desglose_personal.toLocaleString('es-PY') : 0;
+                let dLog = item.desglose_logistica ? item.desglose_logistica.toLocaleString('es-PY') : 0;
+                let dGan = item.desglose_ganancia ? item.desglose_ganancia.toLocaleString('es-PY') : 0;
+
+                let htmlDesglose = esVendido ? `
+                    <div class="desglose-mini">
+                        🧱 Mat: Gs. ${dMat}<br>
+                        👷‍♂️ Pers: Gs. ${dPer}<br>
+                        🚚 Log: Gs. ${dLog}<br>
+                        💰 <b>Neta: Gs. ${dGan}</b>
+                    </div>
+                ` : `<span style="color: var(--text-muted); font-size: 0.75rem;">(Se calcula al aprobar venta)</span>`;
+
+                let textoBotonEstado = esVendido ? "✅ Aprobado" : "⏳ Pendiente";
+                let claseBotonEstado = esVendido ? "btn-estado aprobado" : "btn-estado";
 
                 let fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td style="color: var(--text-muted); font-size: 0.8rem;">${fechaFormateada}</td>
+                    <td style="color: var(--text-muted); font-size: 0.78rem;">${fechaFormateada}</td>
                     <td>
                         <strong style="color: white;">${item.nombre || 'Sin nombre'}</strong><br>
                         <a href="https://wa.me/595${item.telefono}" target="_blank" class="btn-wa">💬 ${item.telefono}</a>
                     </td>
                     <td>
-                        <b>${mTotales}m</b> total (${item.metros_muralla || mTotales}m muralla)<br>
+                        <b>${mTotales}m</b> total (${mMuralla}m muralla)<br>
                         ${detallePorton}
                     </td>
                     <td><strong style="color: #34d399;">${precioCompleto}</strong></td>
+                    <td>${htmlDesglose}</td>
                     <td>
-                        <button class="btn-borrar" onclick="eliminarCotizacion('${id}')">🗑️ Eliminar</button>
+                        <button class="${claseBotonEstado}" onclick="alternarEstado('${id}', '${item.estado_venta || 'pendiente'}')">${textoBotonEstado}</button>
+                    </td>
+                    <td>
+                        <button class="btn-borrar" onclick="eliminarCotizacion('${id}')">🗑️</button>
                     </td>
                 `;
                 tablaBody.appendChild(fila);
             });
 
-            document.getElementById('stat-total').innerText = totalCotizaciones;
-            document.getElementById('stat-metros').innerText = totalMetros + " m";
-            document.getElementById('stat-ultimo').innerText = ultimoCliente;
+            document.getElementById('stat-materiales').innerText = "Gs. " + sumaMateriales.toLocaleString('es-PY');
+            document.getElementById('stat-personal').innerText = "Gs. " + sumaPersonal.toLocaleString('es-PY');
+            document.getElementById('stat-logistica').innerText = "Gs. " + sumaLogistica.toLocaleString('es-PY');
+            document.getElementById('stat-ganancia').innerText = "Gs. " + sumaGanancia.toLocaleString('es-PY');
         });
 
-        // Función global para eliminar registros
+        window.alternarEstado = function(id, estadoActual) {
+            let nuevoEstado = (estadoActual === 'aprobado') ? 'pendiente' : 'aprobado';
+            update(ref(db, 'clientes_muralla_directos/' + id), {
+                estado_venta: nuevoEstado
+            });
+        };
+
         window.eliminarCotizacion = function(id) {
-            if (confirm("¿Estás seguro de que deseas borrar esta cotización de la base de datos?")) {
-                remove(ref(db, 'clientes_muralla_directos/' + id)).then(() => {
-                    console.log("Registro eliminado correctamente.");
-                }).catch(err => {
-                    alert("Error al eliminar el registro.");
-                });
+            if (confirm("¿Borrar esta cotización?")) {
+                remove(ref(db, 'clientes_muralla_directos/' + id));
             }
         };
 
-        // Filtro de búsqueda
         window.filtrarTabla = function() {
             let input = document.getElementById("buscador").value.toLowerCase();
             let filas = tablaBody.getElementsByTagName("tr");
-
             for (let i = 0; i < filas.length; i++) {
                 let texto = filas[i].innerText.toLowerCase();
                 filas[i].style.display = texto.includes(input) ? "" : "none";
