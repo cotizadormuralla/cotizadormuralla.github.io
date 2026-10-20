@@ -56,9 +56,7 @@
             padding: 15px 20px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
-        .toolbar-right {
-            display: flex; gap: 10px; align-items: center;
-        }
+        .toolbar-right { display: flex; gap: 10px; align-items: center; }
         .toolbar input {
             background: #0b0f17; border: 1px solid var(--border);
             padding: 8px 12px; border-radius: 6px; color: white; font-size: 0.85rem; width: 250px;
@@ -99,7 +97,7 @@
 
         .btn-editar-flete {
             background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4);
-            color: #d8b4fe; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: 4px;
+            color: #d8b4fe; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; cursor: pointer; margin-left: 4px;
         }
         .btn-editar-flete:hover { background: var(--purple); color: white; }
 
@@ -110,9 +108,49 @@
         }
         .btn-borrar:hover { background: var(--danger); color: white; }
 
-        .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: 4px; }
+        .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
         .produccion-info { font-size: 0.78rem; color: #a5b4fc; line-height: 1.4; font-weight: 500; }
         .vacio { padding: 40px; text-align: center; color: var(--text-muted); }
+
+        /* ========================================= */
+        /* ADAPTACIÓN PARA CELULARES (DISEÑO APP)    */
+        /* ========================================= */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { flex-direction: column; text-align: center; gap: 10px; }
+            .toolbar, .toolbar-right { flex-direction: column; width: 100%; align-items: stretch; gap: 10px;}
+            .toolbar input { width: 100%; box-sizing: border-box; margin: 0; }
+            .btn-exportar { width: 100%; justify-content: center; }
+            
+            /* Convertir Tabla en Tarjetas */
+            table, thead, tbody, th, td, tr { display: block; width: 100%; box-sizing: border-box; }
+            thead tr { display: none; } /* Ocultamos los títulos originales de la tabla */
+            
+            tr { 
+                border: 1px solid var(--border); border-radius: 8px; 
+                margin-bottom: 15px; background: rgba(255,255,255,0.02); 
+            }
+            
+            td { 
+                border-bottom: 1px solid var(--border); 
+                position: relative; 
+                padding: 12px 12px 12px 40%; /* Dejamos espacio a la izquierda para el título */
+                text-align: right; 
+                min-height: 25px;
+            }
+            td:last-child { border-bottom: none; }
+            
+            /* Creamos los títulos de las columnas dinámicamente a la izquierda */
+            td::before {
+                content: attr(data-label);
+                position: absolute; left: 12px; top: 12px;
+                width: 35%; text-align: left; font-weight: 700;
+                color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;
+            }
+
+            .desglose-mini, .produccion-info { text-align: right; }
+            td[style*="background-color"] { background-color: transparent !important; border: none !important; border-bottom: 1px solid var(--border) !important; }
+        }
     </style>
 </head>
 <body>
@@ -121,7 +159,7 @@
         <div class="header">
             <div>
                 <h1>Panel Financiero & Producción | Murallas Prefabricadas</h1>
-                <p>Cálculo con optimización inteligente de cortes de placa (Menos desperdicio).</p>
+                <p>Cálculo de materiales, personal y logística totalmente editables por obra.</p>
             </div>
         </div>
 
@@ -134,7 +172,7 @@
             <div class="stat-card" style="border-left: 4px solid var(--accent);">
                 <div class="titulo">👷‍♂️ Fondo Personal</div>
                 <div class="valor" id="stat-personal">Gs. 0</div>
-                <div class="sub">Jornales ayudantes y peones</div>
+                <div class="sub">Jornales ayudantes e instalación</div>
             </div>
             <div class="stat-card" style="border-left: 4px solid var(--purple);">
                 <div class="titulo">🚚 Fondo Logística</div>
@@ -166,7 +204,7 @@
                             <th>Medidas / Detalle</th>
                             <th>A Fabricar (Piezas)</th>
                             <th>Presupuesto Cobrado</th>
-                            <th>Finanzas (Ventas Aprobadas)</th>
+                            <th>Desglose (Aprobados)</th>
                             <th>Estado</th>
                             <th>Acc.</th>
                         </tr>
@@ -229,42 +267,35 @@
                 let presupuestoObra = item.presupuesto_completo || 0;
                 let esVendido = item.estado_venta === 'aprobado';
 
-                // --- CÁLCULO INTELIGENTE DE PRODUCCIÓN Y CORTES ---
+                // --- CÁLCULO DE PRODUCCIÓN ---
                 let columnas = 0;
                 let placas = 0;
                 let detalleCorte = "";
                 
                 if (mMuralla > 0.15) {
-                    let L = mMuralla - 0.15; // Descontamos columna de cierre final
-                    let modulosEnteros = Math.floor(L / 1.65); // Módulos completos
-                    let resto = L - (modulosEnteros * 1.65); // Lo que sobra para el último módulo
+                    let L = mMuralla - 0.15; 
+                    let modulosEnteros = Math.floor(L / 1.65); 
+                    let resto = L - (modulosEnteros * 1.65); 
                     
-                    columnas = modulosEnteros + 1; // Columnas base
-                    placas = modulosEnteros * 5; // 5 placas por módulo entero
+                    columnas = modulosEnteros + 1; 
+                    placas = modulosEnteros * 5; 
                     
                     if (resto > 0.05) { 
-                        columnas += 1; // Se necesita 1 columna extra para atajar el corte
-                        
-                        // Calculamos el tamaño del corte de la placa
+                        columnas += 1; 
                         let cortePlaca = resto > 0.15 ? resto - 0.15 : resto; 
-                        
-                        // ¿Cuántas piezas de ese corte saco de 1 placa entera de 1.50m?
                         let piezasPorPlaca = Math.floor(1.50 / cortePlaca);
                         if (piezasPorPlaca < 1) piezasPorPlaca = 1; 
-                        
-                        // Si necesito 5 piezas, ¿cuántas placas enteras debo sacrificar?
                         let placasParaCortes = Math.ceil(5 / piezasPorPlaca);
-                        placas += placasParaCortes; // Sumo solo las necesarias (Ej: 2 placas para sacar 5 de 35cm)
-                        
+                        placas += placasParaCortes; 
                         detalleCorte = `<br><span style="font-size: 0.70rem; color: #818cf8; font-weight: bold;">+1 Módulo corto (Corte: ${Math.round(cortePlaca * 100)} cm)</span>`;
                     }
                 } else if (mMuralla > 0) {
                     columnas = 2; placas = 5; 
                 }
 
-                // --- FINANZAS ---
-                let matFijo = item.desglose_materiales || (mMuralla * 102500);
-                let persFijo = item.desglose_personal || (mMuralla * 38800);
+                // --- FINANZAS EDITABLES ---
+                let matFijo = item.desglose_materiales !== undefined ? item.desglose_materiales : (mMuralla * 86000);
+                let persFijo = item.desglose_personal !== undefined ? item.desglose_personal : (mMuralla * 38800);
                 let logisticaReal = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMuralla * 10400);
                 let gananciaNetaReal = presupuestoObra - matFijo - persFijo - logisticaReal;
 
@@ -276,9 +307,6 @@
                     Estado: esVendido ? 'Vendido' : 'Pendiente',
                     MetrosTotales: mTotales,
                     MetrosMuralla: mMuralla,
-                    TienePorton: item.cantidad_portones > 0 ? `Sí (${item.cantidad_portones})` : 'No',
-                    Columnas: columnas,
-                    Placas: placas,
                     PresupuestoCobrado: presupuestoObra,
                     GastoMateriales: esVendido ? matFijo : 0,
                     GastoPersonal: esVendido ? persFijo : 0,
@@ -317,11 +345,12 @@
                 let dGan = gananciaNetaReal.toLocaleString('es-PY');
                 let colorGanancia = gananciaNetaReal >= 0 ? "var(--success)" : "var(--danger)";
 
+                // BOTONES DE EDICIÓN EN CADA RUBRO
                 let htmlDesglose = esVendido ? `
                     <div class="desglose-mini">
-                        🧱 Mat: Gs. ${dMat}<br>
-                        👷‍♂️ Pers: Gs. ${dPer}<br>
-                        🚚 Log: Gs. ${dLog} <button class="btn-editar-flete" onclick="cambiarFlete('${id}', ${logisticaReal})">✏️</button><br>
+                        🧱 Mat: Gs. ${dMat} <button class="btn-editar-flete" onclick="cambiarMonto('${id}', 'desglose_materiales', ${matFijo})">✏️ Editar</button><br>
+                        👷‍♂️ Pers: Gs. ${dPer} <button class="btn-editar-flete" onclick="cambiarMonto('${id}', 'desglose_personal', ${persFijo})">✏️ Editar</button><br>
+                        🚚 Log: Gs. ${dLog} <button class="btn-editar-flete" onclick="cambiarMonto('${id}', 'desglose_logistica', ${logisticaReal})">✏️ Editar</button><br>
                         💰 <b style="color: ${colorGanancia};">Neta: Gs. ${dGan}</b>
                     </div>
                 ` : `<span style="color: var(--text-muted); font-size: 0.75rem;">(Finanzas bloqueadas hasta aprobar)</span>`;
@@ -329,27 +358,28 @@
                 let textoBotonEstado = esVendido ? "✅ Aprobado" : "⏳ Pendiente";
                 let claseBotonEstado = esVendido ? "btn-estado aprobado" : "btn-estado";
 
+                // LA MAGIA MÓVIL ESTÁ EN LOS data-label
                 let fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td style="color: var(--text-muted); font-size: 0.75rem;">${fechaFormateada}</td>
-                    <td>
+                    <td data-label="Fecha" style="color: var(--text-muted); font-size: 0.75rem;">${fechaFormateada}</td>
+                    <td data-label="Cliente">
                         <strong style="color: white;">${item.nombre || 'Sin nombre'}</strong><br>
                         <a href="https://wa.me/595${item.telefono}" target="_blank" class="btn-wa">💬 ${item.telefono}</a>
                     </td>
-                    <td>
+                    <td data-label="Medidas / Detalle">
                         <b>${mTotales}m</b> total (${mMuralla}m muralla)<br>
                         ${detallePorton}
                     </td>
-                    <td style="background-color: rgba(99, 102, 241, 0.05); border-left: 1px solid rgba(99, 102, 241, 0.2); border-right: 1px solid rgba(99, 102, 241, 0.2);">
+                    <td data-label="A Fabricar (Piezas)" style="background-color: rgba(99, 102, 241, 0.05); border-left: 1px solid rgba(99, 102, 241, 0.2); border-right: 1px solid rgba(99, 102, 241, 0.2);">
                         ${htmlProduccion}
                     </td>
-                    <td><strong style="color: #34d399;">${precioCompleto}</strong></td>
-                    <td>${htmlDesglose}</td>
-                    <td>
+                    <td data-label="Presupuesto Cobrado"><strong style="color: #34d399;">${precioCompleto}</strong></td>
+                    <td data-label="Desglose (Editable)">${htmlDesglose}</td>
+                    <td data-label="Estado">
                         <button class="${claseBotonEstado}" onclick="alternarEstado('${id}', '${item.estado_venta || 'pendiente'}')">${textoBotonEstado}</button>
                     </td>
-                    <td>
-                        <button class="btn-borrar" onclick="eliminarCotizacion('${id}')">🗑️</button>
+                    <td data-label="Acciones">
+                        <button class="btn-borrar" onclick="eliminarCotizacion('${id}')">🗑️ Borrar</button>
                     </td>
                 `;
                 tablaBody.appendChild(fila);
@@ -361,12 +391,13 @@
             document.getElementById('stat-ganancia').innerText = "Gs. " + sumaGanancia.toLocaleString('es-PY');
         });
 
-        window.cambiarFlete = function(id, fleteActual) {
-            let nuevoFlete = prompt("Ingrese el costo real pagado en flete (Gs.):", fleteActual);
-            if (nuevoFlete !== null && !isNaN(nuevoFlete) && nuevoFlete.trim() !== "") {
-                update(ref(db, 'clientes_muralla_directos/' + id), {
-                    desglose_logistica: parseFloat(nuevoFlete)
-                });
+        // Función universal para editar cualquier costo
+        window.cambiarMonto = function(id, campoFirebase, montoActual) {
+            let nuevoMonto = prompt("Ingrese el costo real pagado (Gs.):", montoActual);
+            if (nuevoMonto !== null && !isNaN(nuevoMonto) && nuevoMonto.trim() !== "") {
+                let actualizacion = {};
+                actualizacion[campoFirebase] = parseFloat(nuevoMonto);
+                update(ref(db, 'clientes_muralla_directos/' + id), actualizacion);
             }
         };
 
@@ -393,44 +424,18 @@
         };
 
         window.exportarExcel = function() {
-            if (window.datosCotizaciones.length === 0) {
-                alert("No hay datos para exportar.");
-                return;
-            }
-
+            if (window.datosCotizaciones.length === 0) return alert("No hay datos para exportar.");
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Fecha,Cliente,WhatsApp,Estado,Metros_Totales,Metros_Muralla,Porton,Piezas_Columnas,Piezas_Placas,Presupuesto_Cobrado,Fondo_Materiales,Fondo_Personal,Fondo_Logistica,Ganancia_Neta\r\n";
-
+            csvContent += "Fecha,Cliente,WhatsApp,Estado,Metros_Totales,Metros_Muralla,Presupuesto_Cobrado,Fondo_Materiales,Fondo_Personal,Fondo_Logistica,Ganancia_Neta\r\n";
             window.datosCotizaciones.forEach(function(rowArray) {
-                let fila = [
-                    rowArray.Fecha,
-                    rowArray.Cliente,
-                    rowArray.WhatsApp,
-                    rowArray.Estado,
-                    rowArray.MetrosTotales,
-                    rowArray.MetrosMuralla,
-                    rowArray.TienePorton,
-                    rowArray.Columnas,
-                    rowArray.Placas,
-                    rowArray.PresupuestoCobrado,
-                    rowArray.GastoMateriales,
-                    rowArray.GastoPersonal,
-                    rowArray.GastoLogistica,
-                    rowArray.GananciaNeta
-                ].join(",");
+                let fila = [rowArray.Fecha, rowArray.Cliente, rowArray.WhatsApp, rowArray.Estado, rowArray.MetrosTotales, rowArray.MetrosMuralla, rowArray.PresupuestoCobrado, rowArray.GastoMateriales, rowArray.GastoPersonal, rowArray.GastoLogistica, rowArray.GananciaNeta].join(",");
                 csvContent += fila + "\r\n";
             });
-
             var encodedUri = encodeURI(csvContent);
             var link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            
-            let fechaHoy = new Date().toLocaleDateString('es-PY').replace(/\//g, "-");
-            link.setAttribute("download", "Balance_y_Produccion_" + fechaHoy + ".csv");
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.setAttribute("download", "Balance_" + new Date().toLocaleDateString('es-PY').replace(/\//g, "-") + ".csv");
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
     </script>
 </body>
