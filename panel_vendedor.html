@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal del Vendedor | Murallas Prefabricadas</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --muted: #94a3b8; --primary: #3b82f6; --success: #10b981; --pink: #ec4899; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        
+        h2 { margin-top: 0; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        label { display: block; margin: 12px 0 5px; font-size: 0.85rem; color: var(--muted); font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 1rem; }
+        input:focus { outline: none; border-color: var(--primary); }
+        
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-top: 15px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+
+        .comision-box { background: rgba(236, 72, 153, 0.1); border: 1px dashed var(--pink); padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; }
+        .comision-box p { margin: 0; font-size: 0.8rem; color: #fbcfe8; }
+        .comision-box h3 { margin: 5px 0 0; color: var(--pink); font-size: 1.8rem; }
+
+        .lista-ventas { margin-top: 15px; }
+        .venta-item { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .venta-info h4 { margin: 0 0 4px; font-size: 0.9rem; }
+        .venta-info p { margin: 0; font-size: 0.75rem; color: var(--muted); }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        .badge.aprobado { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge.pendiente { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Identificación -->
+        <div class="card" id="seccion-perfil">
+            <h2>👤 Mi Perfil de Vendedor</h2>
+            <label>Tu Nombre Completo</label>
+            <input type="text" id="nombre-vendedor" placeholder="Ej: Carlos Ramírez" onkeyup="guardarNombre()">
+        </div>
+
+        <!-- Carga de Nueva Venta -->
+        <div class="card" id="seccion-carga" style="display: none;">
+            <h2>📝 Registrar Nueva Venta</h2>
+            
+            <label>Nombre del Cliente</label>
+            <input type="text" id="cli-nombre" placeholder="Nombre y Apellido">
+            
+            <label>WhatsApp del Cliente</label>
+            <input type="tel" id="cli-wa" placeholder="Ej: 0981 123 456">
+            
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>Metros (Muralla)</label>
+                    <input type="number" id="cli-metros" placeholder="Ej: 15" onkeyup="calcularComisionEnVivo()">
+                </div>
+                <div style="flex: 1;">
+                    <label>Portones</label>
+                    <select id="cli-portones" onchange="calcularComisionEnVivo()">
+                        <option value="0">0 Portones</option>
+                        <option value="1">1 Portón</option>
+                        <option value="2">2 Portones</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="comision-box">
+                <p>Tu comisión por esta obra será:</p>
+                <h3 id="comision-estimada">Gs. 0</h3>
+            </div>
+
+            <button onclick="registrarVenta()">Enviar a Fábrica</button>
+        </div>
+
+        <!-- Historial del Vendedor -->
+        <div class="card" id="seccion-historial" style="display: none;">
+            <h2>📊 Mis Ventas del Mes</h2>
+            <div class="lista-ventas" id="lista-ventas-body">
+                <p style="text-align: center; color: var(--muted); font-size: 0.8rem;">Cargando tus ventas...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", authDomain: "gestorinmobiliario-d68b3.firebaseapp.com", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Recordar nombre del vendedor
+        window.onload = function() {
+            let guardado = localStorage.getItem("vendedor_nombre");
+            if (guardado) {
+                document.getElementById('nombre-vendedor').value = guardado;
+                mostrarPaneles();
+            }
+        };
+
+        window.guardarNombre = function() {
+            let nom = document.getElementById('nombre-vendedor').value.trim();
+            if (nom.length > 2) {
+                localStorage.setItem("vendedor_nombre", nom);
+                mostrarPaneles();
+            } else {
+                document.getElementById('seccion-carga').style.display = 'none';
+                document.getElementById('seccion-historial').style.display = 'none';
+            }
+        };
+
+        function mostrarPaneles() {
+            document.getElementById('seccion-carga').style.display = 'block';
+            document.getElementById('seccion-historial').style.display = 'block';
+            cargarHistorial();
+        }
+
+        window.calcularComisionEnVivo = function() {
+            let m = parseFloat(document.getElementById('cli-metros').value) || 0;
+            let p = parseInt(document.getElementById('cli-portones').value) || 0;
+            let comision = (m * 15000) + (p * 100000);
+            document.getElementById('comision-estimada').innerText = "Gs. " + comision.toLocaleString('es-PY');
+        };
+
+        window.registrarVenta = function() {
+            let vendedor = document.getElementById('nombre-vendedor').value.trim();
+            let nombre = document.getElementById('cli-nombre').value.trim();
+            let wa = document.getElementById('cli-wa').value.trim();
+            let metrosMuralla = parseFloat(document.getElementById('cli-metros').value);
+            let portones = parseInt(document.getElementById('cli-portones').value);
+
+            if (!nombre || !wa || !metrosMuralla) return alert("Completa los datos del cliente y los metros.");
+
+            // Calcular Presupuestos para el panel del jefe
+            let costoPortonAgregado = portones * (3.5 * 1100000); 
+            let precio_completo = (metrosMuralla * 340000) + costoPortonAgregado;
+            let metrosTotales = metrosMuralla + (portones * 3.5);
+
+            const idProspecto = "lead_" + Date.now();
+            set(ref(db, 'clientes_muralla_directos/' + idProspecto), {
+                vendedor: vendedor,
+                nombre: nombre,
+                telefono: wa,
+                metros_totales: metrosTotales,
+                metros_muralla: metrosMuralla,
+                cantidad_portones: portones,
+                presupuesto_completo: precio_completo,
+                estado_venta: 'pendiente',
+                fecha: new Date().toISOString()
+            }).then(() => {
+                alert("✅ Venta registrada y enviada a fábrica con éxito.");
+                document.getElementById('cli-nombre').value = '';
+                document.getElementById('cli-wa').value = '';
+                document.getElementById('cli-metros').value = '';
+                document.getElementById('cli-portones').value = '0';
+                calcularComisionEnVivo();
+            });
+        };
+
+        function cargarHistorial() {
+            onValue(ref(db, 'clientes_muralla_directos'), (snapshot) => {
+                let vendedorActual = document.getElementById('nombre-vendedor').value.trim().toLowerCase();
+                let contenedor = document.getElementById('lista-ventas-body');
+                contenedor.innerHTML = '';
+                let hayVentas = false;
+
+                snapshot.forEach((child) => {
+                    let item = child.val();
+                    if (item.vendedor && item.vendedor.toLowerCase() === vendedorActual) {
+                        hayVentas = true;
+                        let m = parseFloat(item.metros_muralla) || 0;
+                        let p = parseInt(item.cantidad_portones) || 0;
+                        let comi = (m * 15000) + (p * 100000);
+                        let estadoClase = item.estado_venta === 'aprobado' ? 'aprobado' : 'pendiente';
+                        let estadoTexto = item.estado_venta === 'aprobado' ? 'Aprobado (Cobrar)' : 'En revisión';
+
+                        contenedor.innerHTML = `
+                            <div class="venta-item">
+                                <div class="venta-info">
+                                    <h4>${item.nombre}</h4>
+                                    <p>${m}m muralla | Gs. ${comi.toLocaleString('es-PY')}</p>
+                                </div>
+                                <span class="badge ${estadoClase}">${estadoTexto}</span>
+                            </div>
+                        ` + contenedor.innerHTML;
+                    }
+                });
+
+                if (!hayVentas) contenedor.innerHTML = '<p style="text-align:center; color:gray; font-size:0.8rem;">Aún no tienes ventas registradas.</p>';
+            });
+        }
+    </script>
+</body>
+</html>
