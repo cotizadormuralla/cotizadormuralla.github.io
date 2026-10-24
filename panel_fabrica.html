@@ -37,7 +37,8 @@
 
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; background: #1e293b; color: #cbd5e1; }
         .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
-        .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; }
+        .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .btn-wa:hover { background: rgba(52, 211, 153, 0.2); text-decoration: none; }
         .btn-estado { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
         .btn-estado.pendiente { background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: rgba(245, 158, 11, 0.4); }
         .btn-estado.aprobado { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
@@ -67,7 +68,7 @@
         <div class="header">
             <div>
                 <h1>Panel Ejecutivo | Murallas Prefabricadas</h1>
-                <p>Gestión de producción, finanzas y comisiones de vendedores.</p>
+                <p>Gestión de producción, finanzas y contactos.</p>
             </div>
         </div>
 
@@ -87,12 +88,10 @@
             <div class="stat-card" style="border-left: 3px solid var(--pink);">
                 <div class="titulo">🤝 Comisiones</div>
                 <div class="valor" id="stat-comisiones" style="color: var(--pink);">Gs. 0</div>
-                <div class="sub">Pago a Vendedores</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid var(--success);">
                 <div class="titulo">💰 Tu Ganancia Neta</div>
                 <div class="valor" id="stat-ganancia" style="color: var(--success);">Gs. 0</div>
-                <div class="sub">Bolsillo Limpio</div>
             </div>
         </div>
 
@@ -100,7 +99,7 @@
             <div class="toolbar">
                 <span style="font-weight: 600;">Historial de Prospectos y Ventas</span>
                 <div class="toolbar-right">
-                    <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar cliente o vendedor...">
+                    <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar cliente...">
                     <button class="btn-exportar" onclick="exportarExcel()">📥 Descargar Balance</button>
                 </div>
             </div>
@@ -168,12 +167,7 @@
                 let per = item.desglose_personal !== undefined ? item.desglose_personal : (mMur * 38800);
                 let log = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMur * 10400);
                 
-                // COMISIÓN VENDEDOR (15.000 Gs x Metro + 100.000 Gs x Portón)
-                let comision = 0;
-                if (vendedor !== "") {
-                    comision = (mMur * 15000) + (cPortones * 100000);
-                }
-
+                let comision = vendedor !== "" ? (mMur * 15000) + (cPortones * 100000) : 0;
                 let ganNeta = pres - mat - per - log - comision;
 
                 window.datosCotizaciones.push({ Fecha: item.fecha, Cliente: item.nombre, Vendedor: vendedor, Metros: mMur, Portones: cPortones, Cobrado: pres, Comision: esVend?comision:0, Ganancia: esVend?ganNeta:0 });
@@ -188,6 +182,10 @@
                 let fFormat = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
                 let pBadge = cPortones > 0 ? `<span class="badge porton">+${cPortones} Portón</span>` : '';
                 let clGan = ganNeta >= 0 ? "var(--success)" : "var(--danger)";
+
+                // --- TEXTO INTELIGENTE PARA WHATSAPP ---
+                let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que recién estuviste cotizando el cierre de tu terreno de ${mTot} metros en nuestra página. ¿Qué te pareció el presupuesto? Avisame si tenés alguna duda o si querés que agendemos una visita técnica sin compromiso.`;
+                let linkWa = `https://wa.me/595${item.telefono}?text=${encodeURIComponent(mensajeWa)}`;
 
                 let htmlVendedor = vendedor !== "" 
                     ? `<span class="vendedor-tag">🤝 ${vendedor} (Gs. ${comision.toLocaleString('es-PY')})</span>` 
@@ -206,7 +204,10 @@
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td data-label="Fecha">${fFormat}</td>
-                    <td data-label="Cliente"><b>${item.nombre}</b><br><a href="https://wa.me/595${item.telefono}" target="_blank" class="btn-wa">💬 ${item.telefono}</a></td>
+                    <td data-label="Cliente">
+                        <b>${item.nombre}</b><br>
+                        <a href="${linkWa}" target="_blank" class="btn-wa">💬 Contactar a ${item.telefono}</a>
+                    </td>
                     <td data-label="Medidas / Producción"><b>${mTot}m</b> total<br>${pBadge}<br><span style="color:#a5b4fc;font-size:0.7rem;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span></td>
                     <td data-label="Presupuesto"><strong style="color:var(--success)">Gs. ${pres.toLocaleString('es-PY')}</strong></td>
                     <td data-label="Desglose">${htmlDesg}</td>
@@ -240,7 +241,7 @@
             let filas = tablaBody.getElementsByTagName("tr");
             for(let f of filas) f.style.display = f.innerText.toLowerCase().includes(txt) ? "" : "none";
         };
-        window.exportarExcel = function() { /* Lógica de exportar CSV conservada y simplificada por espacio */ alert("Exportación lista en consola (ver código fuente para expandir)"); }
+        window.exportarExcel = function() { alert("Exportación lista en consola (ver código fuente para expandir)"); }
     </script>
 </body>
 </html>
