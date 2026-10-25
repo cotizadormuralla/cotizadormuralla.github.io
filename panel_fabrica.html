@@ -35,7 +35,7 @@
         tr:hover { background-color: rgba(255,255,255,0.02); }
 
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; background: #1e293b; color: #cbd5e1; }
-        .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); display: inline-block; margin-top: 5px; margin-bottom: 5px; }
         .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; border: 1px solid rgba(52, 211, 153, 0.3); }
         .btn-wa:hover { background: rgba(52, 211, 153, 0.2); text-decoration: none; }
         .btn-estado { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
@@ -142,7 +142,10 @@
                 let pres = parseFloat(item.presupuesto_completo) || 0;
                 let esVend = item.estado_venta === 'aprobado';
                 let vendedor = item.vendedor || "";
-                let ciudad = item.ciudad || "No especificada"; // Ciudad capturada
+                let ciudad = item.ciudad || "No especificada";
+
+                // El nuevo texto de dimensiones (ej: Terreno 12x30m)
+                let detalleMedida = item.detalle_medidas ? `<span style="font-size: 0.75rem; color: #cbd5e1; display: block; margin-top: 3px;">📏 ${item.detalle_medidas}</span>` : '';
 
                 let cols = 0, placs = 0;
                 if (mMur > 0.15) {
@@ -166,7 +169,7 @@
                 }
 
                 let fFormat = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
-                let pBadge = cPortones > 0 ? `<span class="badge porton">+${cPortones} Portón</span>` : '';
+                let pBadge = cPortones > 0 ? `<span class="badge porton">+${cPortones} Portón</span><br>` : '';
                 let clGan = ganNeta >= 0 ? "var(--success)" : "var(--danger)";
 
                 let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que recién estuviste cotizando el cierre de tu terreno en ${ciudad} (${mTot} metros). ¿Qué te pareció el presupuesto? Avisame si tenés alguna duda o si querés que agendemos una visita técnica.`;
@@ -194,7 +197,12 @@
                         <span style="font-size: 0.75rem; color: #38bdf8;">📍 ${ciudad}</span><br>
                         <a href="${linkWa}" target="_blank" class="btn-wa">💬 Contactar a ${item.telefono}</a>
                     </td>
-                    <td data-label="Medidas / Producción"><b>${mTot}m</b> total<br>${pBadge}<br><span style="color:#a5b4fc;font-size:0.7rem;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span></td>
+                    <td data-label="Medidas / Producción">
+                        <b>${mTot}m</b> total
+                        ${detalleMedida}
+                        ${pBadge}
+                        <span style="color:#a5b4fc;font-size:0.7rem; display:block; margin-top:2px;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span>
+                    </td>
                     <td data-label="Presupuesto"><strong style="color:var(--success)">Gs. ${pres.toLocaleString('es-PY')}</strong></td>
                     <td data-label="Desglose">${htmlDesg}</td>
                     <td data-label="Estado">

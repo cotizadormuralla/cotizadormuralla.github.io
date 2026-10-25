@@ -312,18 +312,15 @@
             let whatsapp = document.getElementById('whatsapp').value.trim();
             let vendedorAsignado = obtenerVendedorDeURL();
             
-            // --- VALIDACIONES ESTRICTAS ---
             if (!nombre || !whatsapp || !ciudad) {
                 alert("⚠️ Por favor, completa tu nombre, ciudad y WhatsApp.");
                 return;
             }
 
-            // Validar que el número de WhatsApp sea real (mínimo 9 dígitos y empiece con 09)
             if (whatsapp.length < 9 || !whatsapp.startsWith('09')) {
                 alert("⚠️ Ingresa un número de WhatsApp válido (Ej: 0981123456).");
                 return;
             }
-            // ------------------------------
 
             let metrosTotalesGeneral = 0;
             let metrosMurallaFinal = 0;
@@ -332,6 +329,9 @@
             let metrosPortonTotal = 0;
             let costoPortonAgregado = 0;
             let precioMetroPorton = 1100000;
+            
+            // NUEVO: Variable para guardar el detalle descriptivo para tu panel
+            let textoDetalleMedidas = ""; 
 
             if (metodo === 'terreno') {
                 let frente = parseFloat(document.getElementById('frente').value);
@@ -348,11 +348,13 @@
                 if (tipoCierre === 'sin_frente') {
                     metrosTotalesGeneral -= frente;
                     cantidadPortones = 0;
+                    textoDetalleMedidas = `Terreno: ${frente}x${fondo}m (3 Lados)`;
                 } else {
                     cantidadPortones = parseInt(document.getElementById('cantidad-portones-terreno').value);
                     if (cantidadPortones > 0) {
                         tipoApertura = document.getElementById('tipo-porton-terreno').value;
                     }
+                    textoDetalleMedidas = `Terreno: ${frente}x${fondo}m (4 Lados)`;
                 }
             } else {
                 let metrosSueltos = parseFloat(document.getElementById('metros-sueltos').value);
@@ -365,6 +367,7 @@
                 if (cantidadPortones > 0) {
                     tipoApertura = document.getElementById('tipo-porton-lineales').value;
                 }
+                textoDetalleMedidas = `Metros lineales sueltos`;
             }
 
             if (cantidadPortones > 0) {
@@ -401,6 +404,7 @@
                 ciudad: ciudad,
                 telefono: whatsapp,
                 vendedor: vendedorAsignado,
+                detalle_medidas: textoDetalleMedidas, // NUEVO: Enviamos el detalle de terreno
                 estado_venta: 'pendiente',
                 metodo_calculo: metodo,
                 metros_totales: metrosTotalesGeneral,
@@ -418,7 +422,6 @@
                 fecha: new Date().toISOString()
             }).then(() => {
                 
-                // Alerta al correo
                 fetch("https://formsubmit.co/ajax/f7e44a1b2f747e764812273d58b604bb", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -427,6 +430,7 @@
                         Nombre: nombre,
                         Ciudad: ciudad,
                         Telefono: whatsapp,
+                        Detalles: textoDetalleMedidas,
                         Metros_Totales: metrosTotalesGeneral + " metros",
                         Presupuesto_LlaveEnMano: "Gs. " + precio1_Completo.toLocaleString('es-PY')
                     })
