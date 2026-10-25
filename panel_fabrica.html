@@ -36,6 +36,8 @@
 
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; background: #1e293b; color: #cbd5e1; }
         .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); display: inline-block; margin-top: 5px; margin-bottom: 5px; }
+        .badge.peso { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); display: inline-block; margin-top: 4px; }
+        
         .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; border: 1px solid rgba(52, 211, 153, 0.3); }
         .btn-wa:hover { background: rgba(52, 211, 153, 0.2); text-decoration: none; }
         .btn-estado { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
@@ -66,7 +68,7 @@
                 <div class="valor" id="stat-materiales">Gs. 0</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid var(--accent);">
-                <div class="titulo">👷‍♂️ Personal</div>
+                <div class="titulo">👷‍♂️ Personal (Base)</div>
                 <div class="valor" id="stat-personal">Gs. 0</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid var(--purple);">
@@ -78,7 +80,7 @@
                 <div class="valor" id="stat-comisiones" style="color: var(--pink);">Gs. 0</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid var(--success);">
-                <div class="titulo">💰 Tu Ganancia Neta</div>
+                <div class="titulo">💰 Tu Ganancia (Trabajando)</div>
                 <div class="valor" id="stat-ganancia" style="color: var(--success);">Gs. 0</div>
             </div>
         </div>
@@ -97,9 +99,9 @@
                         <tr>
                             <th>Fecha</th>
                             <th>Cliente / Contacto</th>
-                            <th>Medidas / Producción</th>
+                            <th>Medidas / Producción y Peso</th>
                             <th>Presupuesto</th>
-                            <th>Desglose y Vendedor</th>
+                            <th>Desglose Estratégico</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
@@ -144,7 +146,6 @@
                 let vendedor = item.vendedor || "";
                 let ciudad = item.ciudad || "No especificada";
 
-                // El nuevo texto de dimensiones (ej: Terreno 12x30m)
                 let detalleMedida = item.detalle_medidas ? `<span style="font-size: 0.75rem; color: #cbd5e1; display: block; margin-top: 3px;">📏 ${item.detalle_medidas}</span>` : '';
 
                 let cols = 0, placs = 0;
@@ -154,40 +155,77 @@
                     if ((mMur - 0.15) - (modE * 1.65) > 0.05) { cols += 1; placs += Math.ceil(5 / Math.floor(1.50 / ((mMur - 0.15) - (modE * 1.65)))); }
                 } else if (mMur > 0) { cols=2; placs=5; }
 
+                // --- CÁLCULO DE PESO TOTAL DEL PEDIDO (Placas: 55kg, Columnas: 95kg) ---
+                let pesoPlacasKg = placs * 55;
+                let pesoColumnasKg = cols * 95;
+                let pesoTotalKg = pesoPlacasKg + pesoColumnasKg;
+                let textoPeso = pesoTotalKg >= 1000 
+                    ? `⚖️ ${(pesoTotalKg / 1000).toFixed(2)} Toneladas (${pesoTotalKg.toLocaleString('es-PY')} kg)` 
+                    : `⚖️ ${pesoTotalKg.toLocaleString('es-PY')} kg`;
+                // ---------------------------------------------------------------------
+
                 let mat = item.desglose_materiales !== undefined ? item.desglose_materiales : (mMur * 86000);
-                let per = item.desglose_personal !== undefined ? item.desglose_personal : (mMur * 38800);
                 let log = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMur * 10400);
-                
                 let comision = vendedor !== "" ? (mMur * 15000) + (cPortones * 100000) : 0;
-                let ganNeta = pres - mat - per - log - comision;
+                
+                let diasObra = Math.max(1, Math.ceil(mMur / 15)); 
+                let costoFleteCarga = 720000; 
+                
+                let per_A = costoFleteCarga + (diasObra * 150000); 
+                let per_B = costoFleteCarga + (diasObra * 300000); 
+
+                let ganNeta_A = pres - mat - log - comision - per_A;
+                let ganNeta_B = pres - mat - log - comision - per_B;
 
                 if (item.fecha && esVend) {
                     let f = new Date(item.fecha);
                     if (f.getMonth() === mesActual && f.getFullYear() === anioActual) {
-                        sMat+=mat; sPer+=per; sLog+=log; sCom+=comision; sGan+=ganNeta;
+                        sMat+=mat; 
+                        sPer+=per_A; 
+                        sLog+=log; 
+                        sCom+=comision; 
+                        sGan+=ganNeta_A; 
                     }
                 }
 
                 let fFormat = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
                 let pBadge = cPortones > 0 ? `<span class="badge porton">+${cPortones} Portón</span><br>` : '';
-                let clGan = ganNeta >= 0 ? "var(--success)" : "var(--danger)";
+                
+                let clGan_A = ganNeta_A >= 0 ? "var(--success)" : "var(--danger)";
+                let clGan_B = ganNeta_B >= 0 ? "var(--success)" : "var(--danger)";
 
                 let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que recién estuviste cotizando el cierre de tu terreno en ${ciudad} (${mTot} metros). ¿Qué te pareció el presupuesto? Avisame si tenés alguna duda o si querés que agendemos una visita técnica.`;
                 let linkWa = `https://wa.me/595${item.telefono}?text=${encodeURIComponent(mensajeWa)}`;
 
                 let htmlVendedor = vendedor !== "" 
-                    ? `<span class="vendedor-tag">🤝 ${vendedor} (Gs. ${comision.toLocaleString('es-PY')})</span>` 
+                    ? `<span class="vendedor-tag">🤝 ${vendedor} (Comisión: Gs. ${comision.toLocaleString('es-PY')})</span>` 
                     : `<span style="color:var(--text-muted)">Venta Directa</span>`;
 
                 let htmlDesg = esVend ? `
                     <div class="desglose-mini">
                         🧱 Mat: ${mat.toLocaleString('es-PY')} <button class="btn-accion" onclick="editar('${id}','desglose_materiales',${mat})">✏️</button><br>
-                        👷‍♂️ Per: ${per.toLocaleString('es-PY')} <button class="btn-accion" onclick="editar('${id}','desglose_personal',${per})">✏️</button><br>
                         🚚 Log: ${log.toLocaleString('es-PY')} <button class="btn-accion" onclick="editar('${id}','desglose_logistica',${log})">✏️</button><br>
-                        ${htmlVendedor} <button class="btn-accion" onclick="asignarVendedor('${id}','${vendedor}')">👤 Asignar</button><br>
-                        💰 <b style="color:${clGan}">Neta: ${ganNeta.toLocaleString('es-PY')}</b>
+                        ${htmlVendedor} <button class="btn-accion" style="margin-bottom:8px;" onclick="asignarVendedor('${id}','${vendedor}')">👤 Asignar</button>
+                        
+                        <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: 6px; border-left: 3px solid var(--accent); margin-top: 5px;">
+                            <div style="font-size:0.7rem; color:var(--accent); margin-bottom:6px; font-weight:bold;">
+                                ⏱️ Obra: ${diasObra} días aprox | 🏗️ Carga: 720.000 Gs (6 peones)
+                            </div>
+                            
+                            <div style="margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:6px;">
+                                👷‍♂️ <b>Trabajás Vos + 1 Ayudante</b><br>
+                                <span style="font-size:0.65rem; color:var(--text-muted);">Costo Per: ${per_A.toLocaleString()}</span><br>
+                                💰 <b style="color:${clGan_A}; font-size:0.9rem;">Neta: Gs. ${ganNeta_A.toLocaleString('es-PY')}</b>
+                            </div>
+                            
+                            <div>
+                                🏖️ <b>Vos Libre + 2 Ayudantes</b><br>
+                                <span style="font-size:0.65rem; color:var(--text-muted);">Costo Per: ${per_B.toLocaleString()}</span><br>
+                                💰 <b style="color:${clGan_B}; font-size:0.9rem;">Neta: Gs. ${ganNeta_B.toLocaleString('es-PY')}</b>
+                            </div>
+                        </div>
                     </div>
-                ` : `<span style="color:var(--text-muted); font-size:0.7rem;">(Aprobar para ver desglose)</span><br><button class="btn-accion" onclick="asignarVendedor('${id}','${vendedor}')">👤 Vendedor: ${vendedor||'Ninguno'}</button>`;
+                ` : `<span style="color:var(--text-muted); font-size:0.7rem;">(Aprobar para ver desglose de ganancias)</span><br><button class="btn-accion" onclick="asignarVendedor('${id}','${vendedor}')">👤 Vendedor: ${vendedor||'Ninguno'}</button>`;
 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -202,9 +240,10 @@
                         ${detalleMedida}
                         ${pBadge}
                         <span style="color:#a5b4fc;font-size:0.7rem; display:block; margin-top:2px;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span>
+                        <span class="badge peso">${textoPeso}</span>
                     </td>
                     <td data-label="Presupuesto"><strong style="color:var(--success)">Gs. ${pres.toLocaleString('es-PY')}</strong></td>
-                    <td data-label="Desglose">${htmlDesg}</td>
+                    <td data-label="Desglose Estratégico" style="min-width: 220px;">${htmlDesg}</td>
                     <td data-label="Estado">
                         <button class="btn-estado ${esVend?'aprobado':'pendiente'}" onclick="alternar('${id}','${item.estado_venta}')">${esVend?'✅ Aprobado':'⏳ Pendiente'}</button><br>
                         <button class="btn-accion" style="margin-top:5px; color:var(--danger)" onclick="borrar('${id}')">🗑️ Borrar</button>
@@ -228,7 +267,7 @@
             let n = prompt("Nombre del vendedor (dejar vacío si es venta directa tuya):", actual);
             if (n !== null) { update(ref(db, 'clientes_muralla_directos/'+id), {vendedor: n.trim()}); }
         };
-        window.alternar = function(id, est) { update(ref(db, 'clientes_muralla_directos/'+id), {estado_venta: est==='aprobado'?'pendiente':'aprobado'}); };
+        window.alternar = function(id, est) { update(ref(db, 'clientes_murallas_directos/'+id), {estado_venta: est==='aprobado'?'pendiente':'aprobado'}); };
         window.borrar = function(id) { if(confirm("¿Borrar?")) remove(ref(db, 'clientes_muralla_directos/'+id)); };
         window.filtrarTabla = function() {
             let txt = document.getElementById("buscador").value.toLowerCase();

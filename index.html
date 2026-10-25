@@ -329,8 +329,6 @@
             let metrosPortonTotal = 0;
             let costoPortonAgregado = 0;
             let precioMetroPorton = 1100000;
-            
-            // NUEVO: Variable para guardar el detalle descriptivo para tu panel
             let textoDetalleMedidas = ""; 
 
             if (metodo === 'terreno') {
@@ -385,7 +383,12 @@
                 return;
             }
 
-            let costoMaterialesTotal = metrosMurallaFinal * 86000; 
+            // --- MATERIALES BLINDADOS (Fábrica + Cemento de pozos y áridos de obra) ---
+            let costoMaterialesFabrica = metrosMurallaFinal * 86000; 
+            let costoMaterialesInstalacion = metrosMurallaFinal * 23000; // Cemento para pozos + áridos/arena/piedra
+            let costoMaterialesTotal = costoMaterialesFabrica + costoMaterialesInstalacion;
+            // ------------------------------------------------------------------------
+
             let costoPersonalTotal = metrosMurallaFinal * 38800; 
             let costoLogisticaTotal = Math.max(550000, metrosMurallaFinal * 10400); 
             let gananciaNetaMuralla = (metrosMurallaFinal * 340000) - costoMaterialesTotal - costoPersonalTotal - (metrosMurallaFinal * 10400);
@@ -404,7 +407,7 @@
                 ciudad: ciudad,
                 telefono: whatsapp,
                 vendedor: vendedorAsignado,
-                detalle_medidas: textoDetalleMedidas, // NUEVO: Enviamos el detalle de terreno
+                detalle_medidas: textoDetalleMedidas,
                 estado_venta: 'pendiente',
                 metodo_calculo: metodo,
                 metros_totales: metrosTotalesGeneral,
@@ -415,7 +418,7 @@
                 cantidad_portones: cantidadPortones,
                 tipo_apertura: tipoApertura,
                 incluye_porton: cantidadPortones > 0,
-                desglose_materiales: costoMaterialesTotal + costoPorton,
+                desglose_materiales: costoMaterialesTotal + (costoPorton || 0),
                 desglose_personal: costoPersonalTotal,
                 desglose_logistica: costoLogisticaTotal,
                 desglose_ganancia: gananciaNetaMuralla + gananciaPorton,
@@ -426,7 +429,7 @@
                     method: "POST",
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
-                        Alerta: "🚨 NUEVA COTIZACIÓN DE MURALLA",
+                        Alerta: "🚨 NUEVA COTIZACIÓN DE MURALLA (MATERIALES BLINDADOS)",
                         Nombre: nombre,
                         Ciudad: ciudad,
                         Telefono: whatsapp,
