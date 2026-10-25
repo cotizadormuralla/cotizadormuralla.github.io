@@ -155,14 +155,12 @@
                     if ((mMur - 0.15) - (modE * 1.65) > 0.05) { cols += 1; placs += Math.ceil(5 / Math.floor(1.50 / ((mMur - 0.15) - (modE * 1.65)))); }
                 } else if (mMur > 0) { cols=2; placs=5; }
 
-                // --- CÁLCULO DE PESO TOTAL DEL PEDIDO (Placas: 55kg, Columnas: 95kg) ---
                 let pesoPlacasKg = placs * 55;
                 let pesoColumnasKg = cols * 95;
                 let pesoTotalKg = pesoPlacasKg + pesoColumnasKg;
                 let textoPeso = pesoTotalKg >= 1000 
                     ? `⚖️ ${(pesoTotalKg / 1000).toFixed(2)} Toneladas (${pesoTotalKg.toLocaleString('es-PY')} kg)` 
                     : `⚖️ ${pesoTotalKg.toLocaleString('es-PY')} kg`;
-                // ---------------------------------------------------------------------
 
                 let mat = item.desglose_materiales !== undefined ? item.desglose_materiales : (mMur * 86000);
                 let log = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMur * 10400);
@@ -267,7 +265,9 @@
             let n = prompt("Nombre del vendedor (dejar vacío si es venta directa tuya):", actual);
             if (n !== null) { update(ref(db, 'clientes_muralla_directos/'+id), {vendedor: n.trim()}); }
         };
-        window.alternar = function(id, est) { update(ref(db, 'clientes_murallas_directos/'+id), {estado_venta: est==='aprobado'?'pendiente':'aprobado'}); };
+        // CORREGIDO: clientes_muralla_directos (sin la 's' extra)
+        window.alternar = function(id, est) { update(ref(db, 'clientes_muralla_directos/'+id), {estado_venta: est==='aprobado'?'pendiente':'aprobado'}); };
+        
         window.borrar = function(id) { if(confirm("¿Borrar?")) remove(ref(db, 'clientes_muralla_directos/'+id)); };
         window.filtrarTabla = function() {
             let txt = document.getElementById("buscador").value.toLowerCase();
