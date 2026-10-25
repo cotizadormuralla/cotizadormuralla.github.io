@@ -48,8 +48,11 @@
             <label>Nombre del Cliente</label>
             <input type="text" id="cli-nombre" placeholder="Nombre y Apellido">
             
-            <label>WhatsApp del Cliente</label>
-            <input type="tel" id="cli-wa" placeholder="Ej: 0981 123 456">
+            <label>📍 Ciudad de Instalación</label>
+            <input type="text" id="cli-ciudad" placeholder="Ej: Itauguá, Capiatá, San Lorenzo...">
+
+            <label>WhatsApp del Cliente (Ej: 0981123456)</label>
+            <input type="tel" id="cli-wa" placeholder="Ej: 0981123456">
             
             <div style="display: flex; gap: 10px;">
                 <div style="flex: 1;">
@@ -91,7 +94,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Recordar nombre del vendedor
         window.onload = function() {
             let guardado = localStorage.getItem("vendedor_nombre");
             if (guardado) {
@@ -127,13 +129,22 @@
         window.registrarVenta = function() {
             let vendedor = document.getElementById('nombre-vendedor').value.trim();
             let nombre = document.getElementById('cli-nombre').value.trim();
+            let ciudad = document.getElementById('cli-ciudad').value.trim();
             let wa = document.getElementById('cli-wa').value.trim();
             let metrosMuralla = parseFloat(document.getElementById('cli-metros').value);
             let portones = parseInt(document.getElementById('cli-portones').value);
 
-            if (!nombre || !wa || !metrosMuralla) return alert("Completa los datos del cliente y los metros.");
+            if (!nombre || !ciudad || !wa || !metrosMuralla) {
+                alert("⚠️ Por favor, completa todos los campos (Nombre, Ciudad, WhatsApp y Metros).");
+                return;
+            }
 
-            // Calcular Presupuestos para el panel del jefe
+            // Validar que el WhatsApp sea real (mínimo 9 dígitos y empiece con 09)
+            if (wa.length < 9 || !wa.startsWith('09')) {
+                alert("⚠️ Ingresa un número de WhatsApp válido (Ej: 0981123456).");
+                return;
+            }
+
             let costoPortonAgregado = portones * (3.5 * 1100000); 
             let precio_completo = (metrosMuralla * 340000) + costoPortonAgregado;
             let metrosTotales = metrosMuralla + (portones * 3.5);
@@ -142,6 +153,7 @@
             set(ref(db, 'clientes_muralla_directos/' + idProspecto), {
                 vendedor: vendedor,
                 nombre: nombre,
+                ciudad: ciudad,
                 telefono: wa,
                 metros_totales: metrosTotales,
                 metros_muralla: metrosMuralla,
@@ -152,6 +164,7 @@
             }).then(() => {
                 alert("✅ Venta registrada y enviada a fábrica con éxito.");
                 document.getElementById('cli-nombre').value = '';
+                document.getElementById('cli-ciudad').value = '';
                 document.getElementById('cli-wa').value = '';
                 document.getElementById('cli-metros').value = '';
                 document.getElementById('cli-portones').value = '0';
@@ -172,6 +185,7 @@
                         hayVentas = true;
                         let m = parseFloat(item.metros_muralla) || 0;
                         let p = parseInt(item.cantidad_portones) || 0;
+                        let ciu = item.ciudad || "No especificada";
                         let comi = (m * 15000) + (p * 100000);
                         let estadoClase = item.estado_venta === 'aprobado' ? 'aprobado' : 'pendiente';
                         let estadoTexto = item.estado_venta === 'aprobado' ? 'Aprobado (Cobrar)' : 'En revisión';
@@ -179,7 +193,7 @@
                         contenedor.innerHTML = `
                             <div class="venta-item">
                                 <div class="venta-info">
-                                    <h4>${item.nombre}</h4>
+                                    <h4>${item.nombre} <span style="font-weight:normal; color:var(--primary);">(${ciu})</span></h4>
                                     <p>${m}m muralla | Gs. ${comi.toLocaleString('es-PY')}</p>
                                 </div>
                                 <span class="badge ${estadoClase}">${estadoTexto}</span>
