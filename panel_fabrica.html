@@ -22,7 +22,6 @@
         .stat-card { background-color: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; }
         .stat-card .titulo { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
         .stat-card .valor { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-top: 6px; }
-        .stat-card .sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
 
         .card-tabla { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         .toolbar { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
@@ -49,17 +48,6 @@
         .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
         .vendedor-tag { color: var(--pink); font-weight: bold; }
         .vacio { padding: 30px; text-align: center; color: var(--text-muted); }
-
-        @media (max-width: 768px) {
-            .header, .toolbar, .toolbar-right { flex-direction: column; width: 100%; align-items: stretch; }
-            .toolbar input { width: 100%; box-sizing: border-box; }
-            table, thead, tbody, th, td, tr { display: block; width: 100%; box-sizing: border-box; }
-            thead tr { display: none; }
-            tr { border: 1px solid var(--border); margin-bottom: 15px; border-radius: 8px; }
-            td { position: relative; padding: 10px 10px 10px 40%; text-align: right; border-bottom: 1px solid var(--border); }
-            td::before { content: attr(data-label); position: absolute; left: 10px; top: 10px; width: 35%; text-align: left; font-weight: 700; color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; }
-            .desglose-mini { text-align: right; }
-        }
     </style>
 </head>
 <body>
@@ -132,15 +120,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        window.datosCotizaciones = [];
         const tablaBody = document.getElementById('tabla-body');
 
         onValue(ref(db, 'clientes_muralla_directos'), (snapshot) => {
             const data = snapshot.val();
             tablaBody.innerHTML = '';
-            window.datosCotizaciones = []; 
 
-            if (!data) return;
+            if (!data) {
+                tablaBody.innerHTML = '<tr><td colspan="6" class="vacio">No hay cotizaciones aún.</td></tr>';
+                return;
+            }
 
             let sMat=0, sPer=0, sLog=0, sCom=0, sGan=0;
             const mesActual = new Date().getMonth();
@@ -153,8 +142,8 @@
                 let pres = parseFloat(item.presupuesto_completo) || 0;
                 let esVend = item.estado_venta === 'aprobado';
                 let vendedor = item.vendedor || "";
+                let ciudad = item.ciudad || "No especificada"; // Ciudad capturada
 
-                // Producción
                 let cols = 0, placs = 0;
                 if (mMur > 0.15) {
                     let modE = Math.floor((mMur - 0.15) / 1.65);
@@ -162,15 +151,12 @@
                     if ((mMur - 0.15) - (modE * 1.65) > 0.05) { cols += 1; placs += Math.ceil(5 / Math.floor(1.50 / ((mMur - 0.15) - (modE * 1.65)))); }
                 } else if (mMur > 0) { cols=2; placs=5; }
 
-                // Finanzas Editables
                 let mat = item.desglose_materiales !== undefined ? item.desglose_materiales : (mMur * 86000);
                 let per = item.desglose_personal !== undefined ? item.desglose_personal : (mMur * 38800);
                 let log = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMur * 10400);
                 
                 let comision = vendedor !== "" ? (mMur * 15000) + (cPortones * 100000) : 0;
                 let ganNeta = pres - mat - per - log - comision;
-
-                window.datosCotizaciones.push({ Fecha: item.fecha, Cliente: item.nombre, Vendedor: vendedor, Metros: mMur, Portones: cPortones, Cobrado: pres, Comision: esVend?comision:0, Ganancia: esVend?ganNeta:0 });
 
                 if (item.fecha && esVend) {
                     let f = new Date(item.fecha);
@@ -183,8 +169,7 @@
                 let pBadge = cPortones > 0 ? `<span class="badge porton">+${cPortones} Portón</span>` : '';
                 let clGan = ganNeta >= 0 ? "var(--success)" : "var(--danger)";
 
-                // --- TEXTO INTELIGENTE PARA WHATSAPP ---
-                let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que recién estuviste cotizando el cierre de tu terreno de ${mTot} metros en nuestra página. ¿Qué te pareció el presupuesto? Avisame si tenés alguna duda o si querés que agendemos una visita técnica sin compromiso.`;
+                let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que recién estuviste cotizando el cierre de tu terreno en ${ciudad} (${mTot} metros). ¿Qué te pareció el presupuesto? Avisame si tenés alguna duda o si querés que agendemos una visita técnica.`;
                 let linkWa = `https://wa.me/595${item.telefono}?text=${encodeURIComponent(mensajeWa)}`;
 
                 let htmlVendedor = vendedor !== "" 
@@ -206,6 +191,7 @@
                     <td data-label="Fecha">${fFormat}</td>
                     <td data-label="Cliente">
                         <b>${item.nombre}</b><br>
+                        <span style="font-size: 0.75rem; color: #38bdf8;">📍 ${ciudad}</span><br>
                         <a href="${linkWa}" target="_blank" class="btn-wa">💬 Contactar a ${item.telefono}</a>
                     </td>
                     <td data-label="Medidas / Producción"><b>${mTot}m</b> total<br>${pBadge}<br><span style="color:#a5b4fc;font-size:0.7rem;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span></td>
@@ -241,7 +227,7 @@
             let filas = tablaBody.getElementsByTagName("tr");
             for(let f of filas) f.style.display = f.innerText.toLowerCase().includes(txt) ? "" : "none";
         };
-        window.exportarExcel = function() { alert("Exportación lista en consola (ver código fuente para expandir)"); }
+        window.exportarExcel = function() { alert("Exportación lista en consola"); }
     </script>
 </body>
 </html>
