@@ -192,6 +192,11 @@
             </div>
 
             <div class="grupo-input">
+                <label>📍 Ciudad de Instalación</label>
+                <input type="text" id="ciudad" placeholder="Ej: Itauguá, Capiatá, San Lorenzo...">
+            </div>
+
+            <div class="grupo-input">
                 <label>📲 Tu WhatsApp (Para enviarte el diseño)</label>
                 <input type="tel" id="whatsapp" placeholder="Ej: 0981 123 456">
             </div>
@@ -275,6 +280,12 @@
             const cantidad = parseInt(document.getElementById('cantidad-portones-lineales').value);
             document.getElementById('grupo-tipo-porton-lineales').style.display = cantidad > 0 ? 'block' : 'none';
         }
+
+        // LÓGICA DE DETECCIÓN DE VENDEDOR AFILIADO
+        function obtenerVendedorDeURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("vendedor") || ""; 
+        }
     </script>
 
     <!-- Firebase -->
@@ -298,7 +309,9 @@
         window.calcularYGuardar = function() {
             const metodo = document.getElementById('metodo-calculo').value;
             let nombre = document.getElementById('nombre').value.trim();
+            let ciudad = document.getElementById('ciudad').value.trim();
             let whatsapp = document.getElementById('whatsapp').value.trim();
+            let vendedorAsignado = obtenerVendedorDeURL();
             
             let metrosTotalesGeneral = 0;
             let metrosMurallaFinal = 0;
@@ -308,8 +321,8 @@
             let costoPortonAgregado = 0;
             let precioMetroPorton = 1100000;
 
-            if (!nombre || !whatsapp) {
-                alert("⚠️ Por favor, ingresa tu nombre y WhatsApp para ver los presupuestos.");
+            if (!nombre || !whatsapp || !ciudad) {
+                alert("⚠️ Por favor, ingresa tu nombre, ciudad y WhatsApp para ver los presupuestos.");
                 return;
             }
 
@@ -363,17 +376,10 @@
             }
 
             // --- DESGLOSE OPERATIVO BASE ---
-            // Materiales actualizados según tus costos reales: 86.000 Gs
             let costoMaterialesTotal = metrosMurallaFinal * 86000; 
-            
-            // Personal: 38.800 Gs (Mantenemos la suma de fábrica + instalación temporalmente)
             let costoPersonalTotal = metrosMurallaFinal * 38800; 
-            
             let costoLogisticaTotal = Math.max(550000, metrosMurallaFinal * 10400); 
-            
-            // Ganancia aproximada estimada sin fletes variables extra
             let gananciaNetaMuralla = (metrosMurallaFinal * 340000) - costoMaterialesTotal - costoPersonalTotal - (metrosMurallaFinal * 10400);
-
             let gananciaPorton = costoPortonAgregado * 0.35; 
             let costoPorton = costoPortonAgregado - gananciaPorton;
 
@@ -386,7 +392,10 @@
 
             set(prospectoRef, {
                 nombre: nombre,
+                ciudad: ciudad,
                 telefono: whatsapp,
+                vendedor: vendedorAsignado,
+                estado_venta: 'pendiente',
                 metodo_calculo: metodo,
                 metros_totales: metrosTotalesGeneral,
                 metros_muralla: metrosMurallaFinal,
@@ -402,6 +411,22 @@
                 desglose_ganancia: gananciaNetaMuralla + gananciaPorton,
                 fecha: new Date().toISOString()
             }).then(() => {
+                
+                // --- ALERTA AUTOMÁTICA AL CORREO DE HUGO ---
+                fetch("https://formsubmit.co/ajax/hcgimenez11@gmail.com", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        Alerta: "🚨 NUEVA COTIZACIÓN DE MURALLA",
+                        Nombre: nombre,
+                        Ciudad: ciudad,
+                        Telefono: whatsapp,
+                        Metros_Totales: metrosTotalesGeneral + " metros",
+                        Presupuesto_LlaveEnMano: "Gs. " + precio1_Completo.toLocaleString('es-PY')
+                    })
+                });
+                // ------------------------------------------
+
                 document.getElementById('formulario-cotizacion').style.display = 'none';
                 document.getElementById('caja-resultado').style.display = 'block';
 
@@ -428,8 +453,8 @@
 
                 let miNumeroFabrica = "595991224697"; 
                 let textoPortonWa = cantidadPortones > 0 ? ` + ${cantidadPortones} Portón/es (${tipoApertura})` : "";
-
-                let mensajeWa = `Hola! Coticé en la web ${metrosTotalesGeneral}m totales (${metrosMurallaFinal}m muralla${textoPortonWa}).\nPresupuestos (SIN IVA):\n1. Obra terminada: Gs. ${precio1_Completo.toLocaleString('es-PY')}\n2. Con flete: Gs. ${precio2_Flete.toLocaleString('es-PY')}\n3. Retirar de taller: Gs. ${precio3_Taller.toLocaleString('es-PY')}\nMi nombre es ${nombre}. Quiero más información.`;
+                
+                let mensajeWa = `Hola! Coticé en la web ${metrosTotalesGeneral}m totales (${metrosMurallaFinal}m muralla${textoPortonWa}).\nCiudad: ${ciudad}\nPresupuestos (SIN IVA):\nObra terminada: Gs. ${precio1_Completo.toLocaleString('es-PY')}\n2. Con flete: Gs. ${precio2_Flete.toLocaleString('es-PY')}\n3. Retirar de taller: Gs. ${precio3_Taller.toLocaleString('es-PY')}\nMi nombre es ${nombre}. Quiero más información.`;
                 
                 document.getElementById('btn-wa-directo').href = `https://wa.me/${miNumeroFabrica}?text=${encodeURIComponent(mensajeWa)}`;
 
