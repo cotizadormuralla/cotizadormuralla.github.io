@@ -59,8 +59,7 @@
         .btn-calcular:hover { background-color: #1d4ed8; }
 
         #caja-resultado {
-            /* Se agregó padding-bottom extra para que el texto no quede escondido detrás del botón flotante */
-            display: none; margin-top: 25px; padding: 20px; padding-bottom: 90px; background-color: rgba(15, 23, 42, 0.95);
+            display: none; margin-top: 25px; padding: 20px; padding-bottom: 60px; background-color: rgba(15, 23, 42, 0.95);
             border: 1px solid var(--primary); border-radius: 8px; animation: aparecer 0.4s ease-in-out;
         }
 
@@ -91,14 +90,23 @@
         }
         .alerta-iva { color: #fbbf24; font-weight: bold; }
 
-        /* --- MAGIA DEL BOTÓN FLOTANTE DE WHATSAPP --- */
-        .btn-whatsapp {
-            display: flex; justify-content: center; align-items: center; gap: 8px;
+        .btn-video {
+            display: inline-block; background-color: #0284c7; color: white; text-decoration: none;
+            padding: 10px 20px; border-radius: 6px; font-weight: bold; width: 100%; text-align: center; box-sizing: border-box; font-size: 0.9rem; margin-bottom: 10px;
+        }
+        .btn-video:hover { background-color: #0369a1; }
+        .aviso-privacidad { font-size: 0.7rem; color: #64748b; text-align: center; margin-top: 15px; }
+        .opcion-oculta { display: none; }
+
+        /* --- BOTÓN FLOTANTE INDEPENDIENTE --- */
+        .btn-whatsapp-flotante {
+            display: none; /* Oculto hasta que se aprieta el botón de calcular */
+            justify-content: center; align-items: center; gap: 8px;
             background-color: #25D366; color: white; text-decoration: none;
             padding: 16px 20px; border-radius: 50px; font-weight: bold; font-size: 1.1rem;
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; box-sizing: border-box; z-index: 9999;
-            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); border: 2px solid rgba(255,255,255,0.2);
+            width: 90%; max-width: 400px; box-sizing: border-box; z-index: 999999; /* Z-index gigante */
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5); border: 2px solid rgba(255,255,255,0.2);
             animation: pulsar 2s infinite;
         }
         
@@ -107,14 +115,6 @@
             70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
             100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
         }
-
-        .btn-video {
-            display: inline-block; background-color: #0284c7; color: white; text-decoration: none;
-            padding: 10px 20px; border-radius: 6px; font-weight: bold; width: 100%; text-align: center; box-sizing: border-box; font-size: 0.9rem; margin-bottom: 10px;
-        }
-        .btn-video:hover { background-color: #0369a1; }
-        .aviso-privacidad { font-size: 0.7rem; color: #64748b; text-align: center; margin-top: 15px; }
-        .opcion-oculta { display: none; }
     </style>
 </head>
 <body>
@@ -255,13 +255,13 @@
             <a href="video_muralla.mp4" target="_blank" class="btn-video">
                 🎬 Ver video de ejemplo de la muralla
             </a>
-
-            <!-- El botón ahora es flotante -->
-            <a href="#" id="btn-wa-directo" target="_blank" class="btn-whatsapp">
-                💬 Hablar con un Asesor para Cerrar Trato
-            </a>
         </div>
     </div>
+
+    <!-- AQUÍ SACAMOS EL BOTÓN AFUERA DE TODO PARA QUE FLOTE REALMENTE EN LA PANTALLA -->
+    <a href="#" id="btn-wa-flotante" target="_blank" class="btn-whatsapp-flotante">
+        💬 Hablar con un Asesor para Cerrar Trato
+    </a>
 
     <script>
         function cambiarMetodoCalculo() {
@@ -481,7 +481,9 @@
                 
                 let mensajeWa = `Hola! Coticé en la web ${metrosTotalesGeneral}m totales (${metrosMurallaFinal}m muralla${textoPortonWa}).\nCiudad: ${ciudad}\nPresupuestos (SIN IVA):\nObra terminada: Gs. ${precio1_Completo.toLocaleString('es-PY')}\n2. Con flete: Gs. ${precio2_Flete.toLocaleString('es-PY')}\n3. Retirar de taller: Gs. ${precio3_Taller.toLocaleString('es-PY')}\nMi nombre es ${nombre}. Quiero más información.`;
                 
-                document.getElementById('btn-wa-directo').href = `https://wa.me/${miNumeroFabrica}?text=${encodeURIComponent(mensajeWa)}`;
+                // AQUÍ LE ASIGNAMOS EL ENLACE AL BOTÓN FLOTANTE Y LO HACEMOS APARECER
+                document.getElementById('btn-wa-flotante').href = `https://wa.me/${miNumeroFabrica}?text=${encodeURIComponent(mensajeWa)}`;
+                document.getElementById('btn-wa-flotante').style.display = 'flex';
 
             }).catch((error) => {
                 console.error("Error al guardar prospecto:", error);
