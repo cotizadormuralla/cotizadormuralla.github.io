@@ -100,12 +100,12 @@
 
         /* --- BOTÓN FLOTANTE INDEPENDIENTE --- */
         .btn-whatsapp-flotante {
-            display: none; /* Oculto hasta que se aprieta el botón de calcular */
+            display: none; 
             justify-content: center; align-items: center; gap: 8px;
             background-color: #25D366; color: white; text-decoration: none;
             padding: 16px 20px; border-radius: 50px; font-weight: bold; font-size: 1.1rem;
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; box-sizing: border-box; z-index: 999999; /* Z-index gigante */
+            width: 90%; max-width: 400px; box-sizing: border-box; z-index: 999999;
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5); border: 2px solid rgba(255,255,255,0.2);
             animation: pulsar 2s infinite;
         }
@@ -134,7 +134,6 @@
                 </select>
             </div>
 
-            <!-- Opción 1: Por Terreno -->
             <div id="seccion-terreno">
                 <div class="fila-medidas">
                     <div class="grupo-input">
@@ -173,7 +172,6 @@
                 </div>
             </div>
 
-            <!-- Opción 2: Solo Metros Lineales -->
             <div id="seccion-lineales" class="opcion-oculta">
                 <div class="grupo-input">
                     <label>📏 Total de Metros Lineales</label>
@@ -219,12 +217,10 @@
             <p class="aviso-privacidad">🔒 Tus datos están seguros. No enviamos spam.</p>
         </div>
 
-        <!-- RESULTADO -->
         <div id="caja-resultado">
             <div class="resumen-metros">
                 Metros totales a cerrar: <b id="metros-totales-general">0</b> m<br>
                 Muralla de concreto: <b id="metros-muralla-final">0</b> m
-                
                 <div id="aviso-porton" class="caja-porton"></div>
             </div>
             
@@ -252,13 +248,10 @@
                 • Se realizará una visita técnica previa para confirmar el terreno.
             </div>
             
-            <a href="video_muralla.mp4" target="_blank" class="btn-video">
-                🎬 Ver video de ejemplo de la muralla
-            </a>
+            <a href="video_muralla.mp4" target="_blank" class="btn-video">🎬 Ver video de ejemplo de la muralla</a>
         </div>
     </div>
 
-    <!-- AQUÍ SACAMOS EL BOTÓN AFUERA DE TODO PARA QUE FLOTE REALMENTE EN LA PANTALLA -->
     <a href="#" id="btn-wa-flotante" target="_blank" class="btn-whatsapp-flotante">
         💬 Hablar con un Asesor para Cerrar Trato
     </a>
@@ -274,7 +267,6 @@
                 document.getElementById('seccion-lineales').classList.remove('opcion-oculta');
             }
         }
-
         function cambiarTipoCierreTerreno() {
             const tipo = document.getElementById('tipo-cierre').value;
             if (tipo === 'completo') {
@@ -285,24 +277,20 @@
                 document.getElementById('grupo-tipo-porton-terreno').style.display = 'none';
             }
         }
-
         function cambiarCantidadPortonesTerreno() {
             const cantidad = parseInt(document.getElementById('cantidad-portones-terreno').value);
             document.getElementById('grupo-tipo-porton-terreno').style.display = cantidad > 0 ? 'block' : 'none';
         }
-
         function cambiarCantidadPortonesLineales() {
             const cantidad = parseInt(document.getElementById('cantidad-portones-lineales').value);
             document.getElementById('grupo-tipo-porton-lineales').style.display = cantidad > 0 ? 'block' : 'none';
         }
-
         function obtenerVendedorDeURL() {
             const params = new URLSearchParams(window.location.search);
             return params.get("vendedor") || ""; 
         }
     </script>
 
-    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
@@ -352,8 +340,7 @@
                 let tipoCierre = document.getElementById('tipo-cierre').value;
 
                 if (!frente || !fondo) {
-                    alert("⚠️ Ingresa las medidas del frente y fondo.");
-                    return;
+                    alert("⚠️ Ingresa las medidas del frente y fondo."); return;
                 }
 
                 metrosTotalesGeneral = (frente * 2) + (fondo * 2);
@@ -372,8 +359,7 @@
             } else {
                 let metrosSueltos = parseFloat(document.getElementById('metros-sueltos').value);
                 if (!metrosSueltos) {
-                    alert("⚠️ Ingresa el total de metros lineales.");
-                    return;
+                    alert("⚠️ Ingresa el total de metros lineales."); return;
                 }
                 metrosTotalesGeneral = metrosSueltos;
                 cantidadPortones = parseInt(document.getElementById('cantidad-portones-lineales').value);
@@ -385,23 +371,19 @@
 
             if (cantidadPortones > 0) {
                 metrosPortonTotal = cantidadPortones * 3.5;
-                if (tipoApertura === "Basculante") {
-                    precioMetroPorton = 1250000;
-                }
+                if (tipoApertura === "Basculante") { precioMetroPorton = 1250000; }
                 costoPortonAgregado = metrosPortonTotal * precioMetroPorton;
             }
 
             metrosMurallaFinal = metrosTotalesGeneral - metrosPortonTotal;
 
             if (metrosMurallaFinal < 0) {
-                alert("⚠️ Los metros de portón superan el total ingresado.");
-                return;
+                alert("⚠️ Los metros de portón superan el total ingresado."); return;
             }
 
             let costoMaterialesFabrica = metrosMurallaFinal * 86000; 
             let costoMaterialesInstalacion = metrosMurallaFinal * 23000;
             let costoMaterialesTotal = costoMaterialesFabrica + costoMaterialesInstalacion;
-            
             let costoPersonalTotal = metrosMurallaFinal * 38800; 
             let costoLogisticaTotal = Math.max(550000, metrosMurallaFinal * 10400); 
             let gananciaNetaMuralla = (metrosMurallaFinal * 340000) - costoMaterialesTotal - costoPersonalTotal - (metrosMurallaFinal * 10400);
@@ -438,19 +420,22 @@
                 fecha: new Date().toISOString()
             }).then(() => {
                 
-                fetch("https://formsubmit.co/ajax/f7e44a1b2f747e764812273d58b604bb", {
+                // --- TU CORREO CONFIGURADO PARA EL COTIZADOR ---
+                fetch("https://formsubmit.co/ajax/hcgimenez11@gmail.com", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
-                        Alerta: "🚨 NUEVA COTIZACIÓN DE MURALLA",
-                        Nombre: nombre,
+                        _subject: "🚨 NUEVA COTIZACIÓN WEB: " + nombre,
+                        _template: "table",
+                        Origen: vendedorAsignado ? "Link de Vendedor (" + vendedorAsignado + ")" : "Venta Directa Web",
+                        Nombre_Cliente: nombre,
                         Ciudad: ciudad,
-                        Telefono: whatsapp,
-                        Detalles: textoDetalleMedidas,
+                        Telefono_WhatsApp: whatsapp,
+                        Detalle_Terreno: textoDetalleMedidas,
                         Metros_Totales: metrosTotalesGeneral + " metros",
-                        Presupuesto_LlaveEnMano: "Gs. " + precio1_Completo.toLocaleString('es-PY')
+                        Presupuesto_Llave_Mano: "Gs. " + precio1_Completo.toLocaleString('es-PY')
                     })
-                });
+                }).catch(err => console.log("Error al enviar email", err));
 
                 document.getElementById('formulario-cotizacion').style.display = 'none';
                 document.getElementById('caja-resultado').style.display = 'block';
@@ -481,7 +466,6 @@
                 
                 let mensajeWa = `Hola! Coticé en la web ${metrosTotalesGeneral}m totales (${metrosMurallaFinal}m muralla${textoPortonWa}).\nCiudad: ${ciudad}\nPresupuestos (SIN IVA):\nObra terminada: Gs. ${precio1_Completo.toLocaleString('es-PY')}\n2. Con flete: Gs. ${precio2_Flete.toLocaleString('es-PY')}\n3. Retirar de taller: Gs. ${precio3_Taller.toLocaleString('es-PY')}\nMi nombre es ${nombre}. Quiero más información.`;
                 
-                // AQUÍ LE ASIGNAMOS EL ENLACE AL BOTÓN FLOTANTE Y LO HACEMOS APARECER
                 document.getElementById('btn-wa-flotante').href = `https://wa.me/${miNumeroFabrica}?text=${encodeURIComponent(mensajeWa)}`;
                 document.getElementById('btn-wa-flotante').style.display = 'flex';
 
