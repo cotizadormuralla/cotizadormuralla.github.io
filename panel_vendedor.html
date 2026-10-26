@@ -8,12 +8,12 @@
         :root {
             --bg-body: #0b0f17; --bg-card: #151d2a; --border: #232d3f;
             --text-main: #f1f5f9; --text-muted: #94a3b8;
-            --accent: #38bdf8; --pink: #ec4899;
+            --accent: #38bdf8; --pink: #ec4899; --green: #10b981; --yellow: #fbbf24;
         }
 
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh;}
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 90vh;}
         
-        .contenedor { background-color: var(--bg-card); width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .contenedor { background-color: var(--bg-card); width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 20px;}
         
         h2 { font-size: 1.2rem; color: #60a5fa; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;}
         
@@ -29,18 +29,26 @@
         .caja-comision span { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; }
         .caja-comision b { font-size: 1.4rem; color: var(--pink); }
 
+        .caja-verde { border-color: var(--green); background-color: rgba(16, 185, 129, 0.05); }
+        .caja-verde b { color: var(--green); }
+
         .btn-guardar { width: 100%; padding: 12px; border-radius: 6px; background-color: #10b981; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; }
         .btn-guardar:hover { background-color: #059669; }
+
+        .item-venta { background: rgba(30, 41, 59, 0.5); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid var(--border); }
+        .item-venta.pendiente { border-left-color: var(--yellow); }
+        .item-venta.aprobada { border-left-color: var(--green); }
     </style>
 </head>
 <body>
 
+    <!-- CAJA 1: REGISTRO DE VENTA -->
     <div class="contenedor">
         <h2>📝 Registrar Nueva Venta</h2>
         
         <div class="grupo">
             <label>Tu Nombre (Asesor)</label>
-            <input type="text" id="nombre_vendedor" placeholder="Tu nombre">
+            <input type="text" id="nombre_vendedor" placeholder="Tu nombre" onkeyup="cargarHistorial()">
         </div>
 
         <div class="grupo">
@@ -58,7 +66,6 @@
             <input type="tel" id="whatsapp_cliente" placeholder="Ej: 0981123456">
         </div>
 
-        <!-- NUEVO CAMPO: TIPO DE VENTA -->
         <div class="grupo">
             <label>🛠️ Tipo de Venta Cerrada</label>
             <select id="tipo_venta" onchange="calcularComision()">
@@ -88,13 +95,25 @@
             <b id="monto_comision">Gs. 0</b>
         </div>
 
-        <button class="btn-guardar" onclick="guardarVenta()">Registrar en el Sistema</button>
+        <button class="btn-guardar" onclick="guardarVenta()">Enviar Venta a Fábrica</button>
+    </div>
+
+    <!-- CAJA 2: HISTORIAL Y BALANCE DEL VENDEDOR -->
+    <div class="contenedor">
+        <h2>📊 Mi Balance y Ventas</h2>
+        <div id="lista-ventas">
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Ingresá tu nombre arriba para cargar tu historial.</p>
+        </div>
+        <div class="caja-comision caja-verde">
+            <span>Total Comisiones (Solo Aprobadas):</span>
+            <b id="total-comisiones-ganadas">Gs. 0</b>
+        </div>
     </div>
 
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s",
@@ -110,22 +129,25 @@
 
         let comisionTotal = 0;
 
+        // Recuperar nombre guardado al abrir la página
+        window.onload = function() {
+            let nombreGuardado = localStorage.getItem("vendedor_murallas");
+            if(nombreGuardado) {
+                document.getElementById('nombre_vendedor').value = nombreGuardado;
+                window.cargarHistorial();
+            }
+        }
+
         window.calcularComision = function() {
             let m = parseFloat(document.getElementById('metros').value) || 0;
             let p = parseInt(document.getElementById('portones').value) || 0;
             let tipoVenta = document.getElementById('tipo_venta').value;
             
-            // AQUÍ PODÉS CAMBIAR CUÁNTO LE PAGÁS POR METRO SEGÚN EL TIPO DE VENTA:
             let comisionPorMetro = 0;
-            if (tipoVenta === 'completo') {
-                comisionPorMetro = 15000; // Gs. 15.000 por metro para Obra Terminada
-            } else if (tipoVenta === 'flete') {
-                comisionPorMetro = 10000; // Gs. 10.000 por metro si es con Flete
-            } else if (tipoVenta === 'taller') {
-                comisionPorMetro = 5000;  // Gs. 5.000 por metro si retiran de taller
-            }
+            if (tipoVenta === 'completo') comisionPorMetro = 15000; 
+            else if (tipoVenta === 'flete') comisionPorMetro = 10000; 
+            else if (tipoVenta === 'taller') comisionPorMetro = 5000;  
 
-            // Comisión de portones (podes cambiar el 100000)
             let comisionPorton = p * 100000;
 
             comisionTotal = (m * comisionPorMetro) + comisionPorton;
@@ -149,7 +171,9 @@
                 return;
             }
 
-            // Calcular el presupuesto que cobra la fábrica según el tipo de venta
+            // Guardamos el nombre del vendedor en la memoria del celular/PC
+            localStorage.setItem("vendedor_murallas", vendedor);
+
             let costoPorMetroCliente = 0;
             if (tipoVentaValor === 'completo') costoPorMetroCliente = 340000;
             else if (tipoVentaValor === 'flete') costoPorMetroCliente = 250000;
@@ -165,18 +189,17 @@
                 ciudad: ciudad,
                 telefono: whatsapp,
                 vendedor: vendedor,
-                estado_venta: 'aprobado',
+                estado_venta: 'en_revision', // AHORA ENTRA COMO PENDIENTE DE REVISIÓN
                 metros_totales: metros + (portones * 3.5),
                 metros_muralla: metros,
                 cantidad_portones: portones,
                 tipo_venta: tipoVentaValor,
-                detalle_medidas: "Venta Asesor: " + textoTipoVenta, // Para que lo veas en tu panel ejecutivo
+                detalle_medidas: "Venta Asesor: " + textoTipoVenta,
                 presupuesto_completo: presupuestoCompleto,
-                comision_vendedor: comisionTotal, // Guardamos la comisión exacta
+                comision_vendedor: comisionTotal, 
                 fecha: new Date().toISOString()
             }).then(() => {
                 
-                // Envío de correo a tu Gmail
                 fetch("https://formsubmit.co/ajax/hcgimenez11@gmail.com", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -189,16 +212,60 @@
                         WhatsApp: whatsapp,
                         Tipo_de_Venta: textoTipoVenta,
                         Metros_Cargados: metros + "m",
-                        Portones: portones,
-                        Comision_a_Pagar: "Gs. " + comisionTotal.toLocaleString('es-PY'),
-                        Ingreso_Fabrica: "Gs. " + presupuestoCompleto.toLocaleString('es-PY')
+                        Comision_a_Pagar: "Gs. " + comisionTotal.toLocaleString('es-PY')
                     })
                 }).catch(err => console.log(err));
 
-                alert("Venta registrada con éxito. La fábrica ya recibió la orden.");
+                alert("✅ Venta enviada a Fábrica. Ahora aparecerá en revisión en tu balance.");
                 location.reload(); 
             }).catch((error) => {
                 alert("Error al guardar.");
+            });
+        }
+
+        // NUEVA FUNCIÓN: Leer la base de datos y mostrar las ventas del vendedor
+        window.cargarHistorial = function() {
+            let vendedorBuscado = document.getElementById('nombre_vendedor').value.trim().toLowerCase();
+            if(!vendedorBuscado) return;
+
+            const prospectosRef = ref(db, 'clientes_muralla_directos');
+            onValue(prospectosRef, (snapshot) => {
+                let html = "";
+                let totalGanado = 0;
+                let encontroVentas = false;
+
+                snapshot.forEach((childSnapshot) => {
+                    let data = childSnapshot.val();
+                    if(data.vendedor && data.vendedor.toLowerCase() === vendedorBuscado) {
+                        encontroVentas = true;
+                        
+                        let estaAprobada = data.estado_venta === 'aprobado' || data.estado_venta === 'Aprobada';
+                        let estadoTxt = estaAprobada ? '✅ Aprobada' : '⏳ En Revisión';
+                        let claseCss = estaAprobada ? 'aprobada' : 'pendiente';
+                        let colorEstado = estaAprobada ? '#10b981' : '#fbbf24';
+                        
+                        let comision = data.comision_vendedor || 0;
+                        if(estaAprobada) { totalGanado += comision; }
+
+                        html += `
+                            <div class="item-venta ${claseCss}">
+                                <strong style="color: white; font-size: 1rem;">Cliente: ${data.nombre}</strong><br>
+                                <span style="font-size: 0.8rem; color: #94a3b8;">${data.metros_totales}m totales - ${data.ciudad}</span><br>
+                                <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.85rem; font-weight: bold; color: ${colorEstado};">${estadoTxt}</span>
+                                    <span style="font-size: 0.9rem; font-weight: bold; color: #38bdf8;">Gs. ${comision.toLocaleString('es-PY')}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                if(!encontroVentas) {
+                    html = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Aún no tenés ventas registradas.</p>';
+                }
+
+                document.getElementById('lista-ventas').innerHTML = html;
+                document.getElementById('total-comisiones-ganadas').innerText = 'Gs. ' + totalGanado.toLocaleString('es-PY');
             });
         }
     </script>
