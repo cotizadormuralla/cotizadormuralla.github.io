@@ -12,7 +12,7 @@
             --warning: #f59e0b; --purple: #a855f7; --pink: #ec4899;
         }
 
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 25px; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
         .header h1 { font-size: 1.4rem; font-weight: 600; margin: 0; }
@@ -38,7 +38,7 @@
         .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); display: inline-block; margin-top: 5px; margin-bottom: 5px; }
         .badge.peso { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); display: inline-block; margin-top: 4px; }
         
-        .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; border: 1px solid rgba(52, 211, 153, 0.3); text-align: center; }
         .btn-wa:hover { background: rgba(52, 211, 153, 0.2); text-decoration: none; }
         .btn-estado { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
         .btn-estado.pendiente { background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: rgba(245, 158, 11, 0.4); }
@@ -50,6 +50,25 @@
         .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
         .vendedor-tag { color: var(--pink); font-weight: bold; }
         .vacio { padding: 30px; text-align: center; color: var(--text-muted); }
+
+        /* --- MAGIA PARA CELULARES (DISEÑO TARJETAS) --- */
+        @media (max-width: 800px) {
+            body { padding: 10px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-right { flex-direction: column; width: 100%; }
+            .toolbar-right input, .btn-exportar { width: 100%; box-sizing: border-box; text-align: center; }
+            
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { display: none; /* Oculta los encabezados en celular */ }
+            tr { border: 1px solid var(--border); margin-bottom: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); }
+            td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px; display: flex; flex-direction: column; gap: 5px; }
+            td:last-child { border-bottom: none; }
+            td::before { 
+                content: attr(data-label); 
+                font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: bold; margin-bottom: 2px;
+            }
+            .desglose-mini { margin-top: 5px; }
+        }
     </style>
 </head>
 <body>
@@ -57,8 +76,8 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>Panel Ejecutivo | Murallas Prefabricadas</h1>
-                <p>Gestión de producción, finanzas y contactos.</p>
+                <h1>Panel Ejecutivo</h1>
+                <p>Fábrica de Murallas Prefabricadas.</p>
             </div>
         </div>
 
@@ -80,16 +99,16 @@
                 <div class="valor" id="stat-comisiones" style="color: var(--pink);">Gs. 0</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid var(--success);">
-                <div class="titulo">💰 Tu Ganancia (Trabajando)</div>
+                <div class="titulo">💰 Ganancia Neta</div>
                 <div class="valor" id="stat-ganancia" style="color: var(--success);">Gs. 0</div>
             </div>
         </div>
 
         <div class="card-tabla">
             <div class="toolbar">
-                <span style="font-weight: 600;">Historial de Prospectos y Ventas</span>
+                <span style="font-weight: 600; padding-bottom: 10px; display: block;">Historial de Ventas</span>
                 <div class="toolbar-right">
-                    <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar cliente...">
+                    <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar cliente o ciudad...">
                     <button class="btn-exportar" onclick="exportarExcel()">📥 Descargar Balance</button>
                 </div>
             </div>
@@ -99,14 +118,14 @@
                         <tr>
                             <th>Fecha</th>
                             <th>Cliente / Contacto</th>
-                            <th>Medidas / Producción y Peso</th>
+                            <th>Medidas / Producción</th>
                             <th>Presupuesto</th>
                             <th>Desglose Estratégico</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-body">
-                        <tr><td colspan="6" class="vacio">Cargando...</td></tr>
+                        <tr><td colspan="6" class="vacio">Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -141,6 +160,7 @@
                 let mTot = parseFloat(item.metros_totales) || 0;
                 let mMur = parseFloat(item.metros_muralla) || mTot;
                 let cPortones = parseInt(item.cantidad_portones) || 0;
+                let tipoApertura = item.tipo_apertura ? item.tipo_apertura : ""; // Captura el tipo de portón
                 let pres = parseFloat(item.presupuesto_completo) || 0;
                 let esVend = item.estado_venta === 'aprobado';
                 let vendedor = item.vendedor || "";
@@ -178,25 +198,24 @@
                 if (item.fecha && esVend) {
                     let f = new Date(item.fecha);
                     if (f.getMonth() === mesActual && f.getFullYear() === anioActual) {
-                        sMat+=mat; 
-                        sPer+=per_A; 
-                        sLog+=log; 
-                        sCom+=comision; 
-                        sGan+=ganNeta_A; 
+                        sMat+=mat; sPer+=per_A; sLog+=log; sCom+=comision; sGan+=ganNeta_A; 
                     }
                 }
 
                 let fFormat = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
-                let pBadge = cPortones > 0 ? `<span class="badge porton">+${cPortones} Portón</span><br>` : '';
+                
+                // AQUÍ SE AGREGA EL TIPO DE PORTÓN A LA ETIQUETA
+                let txtPorton = tipoApertura !== "" ? ` (${tipoApertura})` : "";
+                let pBadge = cPortones > 0 ? `<span class="badge porton">🚪 +${cPortones} Portón${txtPorton}</span><br>` : '';
                 
                 let clGan_A = ganNeta_A >= 0 ? "var(--success)" : "var(--danger)";
                 let clGan_B = ganNeta_B >= 0 ? "var(--success)" : "var(--danger)";
 
-                let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que recién estuviste cotizando el cierre de tu terreno en ${ciudad} (${mTot} metros). ¿Qué te pareció el presupuesto? Avisame si tenés alguna duda o si querés que agendemos una visita técnica.`;
+                let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que cotizaste el cierre en ${ciudad} (${mTot}m). ¿Qué te pareció el presupuesto?`;
                 let linkWa = `https://wa.me/595${item.telefono}?text=${encodeURIComponent(mensajeWa)}`;
 
                 let htmlVendedor = vendedor !== "" 
-                    ? `<span class="vendedor-tag">🤝 ${vendedor} (Comisión: Gs. ${comision.toLocaleString('es-PY')})</span>` 
+                    ? `<span class="vendedor-tag">🤝 ${vendedor} (Com.: Gs. ${comision.toLocaleString('es-PY')})</span>` 
                     : `<span style="color:var(--text-muted)">Venta Directa</span>`;
 
                 let htmlDesg = esVend ? `
@@ -209,13 +228,11 @@
                             <div style="font-size:0.7rem; color:var(--accent); margin-bottom:6px; font-weight:bold;">
                                 ⏱️ Obra: ${diasObra} días aprox | 🏗️ Carga: 720.000 Gs (6 peones)
                             </div>
-                            
                             <div style="margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:6px;">
                                 👷‍♂️ <b>Trabajás Vos + 1 Ayudante</b><br>
                                 <span style="font-size:0.65rem; color:var(--text-muted);">Costo Per: ${per_A.toLocaleString()}</span><br>
                                 💰 <b style="color:${clGan_A}; font-size:0.9rem;">Neta: Gs. ${ganNeta_A.toLocaleString('es-PY')}</b>
                             </div>
-                            
                             <div>
                                 🏖️ <b>Vos Libre + 2 Ayudantes</b><br>
                                 <span style="font-size:0.65rem; color:var(--text-muted);">Costo Per: ${per_B.toLocaleString()}</span><br>
@@ -223,28 +240,29 @@
                             </div>
                         </div>
                     </div>
-                ` : `<span style="color:var(--text-muted); font-size:0.7rem;">(Aprobar para ver desglose de ganancias)</span><br><button class="btn-accion" onclick="asignarVendedor('${id}','${vendedor}')">👤 Vendedor: ${vendedor||'Ninguno'}</button>`;
+                ` : `<span style="color:var(--text-muted); font-size:0.7rem;">(Aprobar para ver desglose)</span><br><button class="btn-accion" onclick="asignarVendedor('${id}','${vendedor}')">👤 Vendedor: ${vendedor||'Ninguno'}</button>`;
 
                 let tr = document.createElement('tr');
+                // IMPORTANTE: los data-label generan los títulos automáticos en el celular
                 tr.innerHTML = `
-                    <td data-label="Fecha">${fFormat}</td>
-                    <td data-label="Cliente">
-                        <b>${item.nombre}</b><br>
-                        <span style="font-size: 0.75rem; color: #38bdf8;">📍 ${ciudad}</span><br>
-                        <a href="${linkWa}" target="_blank" class="btn-wa">💬 Contactar a ${item.telefono}</a>
+                    <td data-label="Fecha Registro">${fFormat}</td>
+                    <td data-label="Cliente / Datos">
+                        <b style="font-size:1.1em;">${item.nombre}</b><br>
+                        <span style="font-size: 0.8rem; color: #38bdf8;">📍 ${ciudad}</span><br>
+                        <a href="${linkWa}" target="_blank" class="btn-wa">💬 Contactar al ${item.telefono}</a>
                     </td>
-                    <td data-label="Medidas / Producción">
+                    <td data-label="Medidas y Producción">
                         <b>${mTot}m</b> total
                         ${detalleMedida}
                         ${pBadge}
                         <span style="color:#a5b4fc;font-size:0.7rem; display:block; margin-top:2px;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span>
                         <span class="badge peso">${textoPeso}</span>
                     </td>
-                    <td data-label="Presupuesto"><strong style="color:var(--success)">Gs. ${pres.toLocaleString('es-PY')}</strong></td>
-                    <td data-label="Desglose Estratégico" style="min-width: 220px;">${htmlDesg}</td>
-                    <td data-label="Estado">
-                        <button class="btn-estado ${esVend?'aprobado':'pendiente'}" onclick="alternar('${id}','${item.estado_venta}')">${esVend?'✅ Aprobado':'⏳ Pendiente'}</button><br>
-                        <button class="btn-accion" style="margin-top:5px; color:var(--danger)" onclick="borrar('${id}')">🗑️ Borrar</button>
+                    <td data-label="Presupuesto Total"><strong style="color:var(--success); font-size:1.1em;">Gs. ${pres.toLocaleString('es-PY')}</strong></td>
+                    <td data-label="Costos y Ganancias">${htmlDesg}</td>
+                    <td data-label="Acciones">
+                        <button class="btn-estado ${esVend?'aprobado':'pendiente'}" style="width:100%" onclick="alternar('${id}','${item.estado_venta}')">${esVend?'✅ Venta Aprobada':'⏳ Cotización Pendiente'}</button>
+                        <button class="btn-accion" style="width:100%; margin-left:0; margin-top:5px; color:var(--danger); border-color:rgba(239, 68, 68, 0.3)" onclick="borrar('${id}')">🗑️ Borrar Registro</button>
                     </td>
                 `;
                 tablaBody.appendChild(tr);
@@ -262,19 +280,17 @@
             if (n && !isNaN(n)) { let obj={}; obj[campo]=parseFloat(n); update(ref(db, 'clientes_muralla_directos/'+id), obj); }
         };
         window.asignarVendedor = function(id, actual) {
-            let n = prompt("Nombre del vendedor (dejar vacío si es venta directa tuya):", actual);
+            let n = prompt("Nombre del vendedor (vacío para venta directa):", actual);
             if (n !== null) { update(ref(db, 'clientes_muralla_directos/'+id), {vendedor: n.trim()}); }
         };
-        // CORREGIDO: clientes_muralla_directos (sin la 's' extra)
         window.alternar = function(id, est) { update(ref(db, 'clientes_muralla_directos/'+id), {estado_venta: est==='aprobado'?'pendiente':'aprobado'}); };
-        
-        window.borrar = function(id) { if(confirm("¿Borrar?")) remove(ref(db, 'clientes_muralla_directos/'+id)); };
+        window.borrar = function(id) { if(confirm("¿Borrar permanentemente?")) remove(ref(db, 'clientes_muralla_directos/'+id)); };
         window.filtrarTabla = function() {
             let txt = document.getElementById("buscador").value.toLowerCase();
             let filas = tablaBody.getElementsByTagName("tr");
             for(let f of filas) f.style.display = f.innerText.toLowerCase().includes(txt) ? "" : "none";
         };
-        window.exportarExcel = function() { alert("Exportación lista en consola"); }
+        window.exportarExcel = function() { alert("Herramienta de exportación en desarrollo."); }
     </script>
 </body>
 </html>
