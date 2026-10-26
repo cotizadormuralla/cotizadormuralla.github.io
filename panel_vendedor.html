@@ -50,12 +50,22 @@
 
         <div class="grupo">
             <label>📍 Ciudad de Instalación</label>
-            <input type="text" id="ciudad_cliente" placeholder="Ej: Itauguá, Capiatá, San Lorenzo...">
+            <input type="text" id="ciudad_cliente" placeholder="Ej: Itauguá, Capiatá...">
         </div>
 
         <div class="grupo">
-            <label>WhatsApp del Cliente (Ej: 0981123456)</label>
+            <label>WhatsApp del Cliente</label>
             <input type="tel" id="whatsapp_cliente" placeholder="Ej: 0981123456">
+        </div>
+
+        <!-- NUEVO CAMPO: TIPO DE VENTA -->
+        <div class="grupo">
+            <label>🛠️ Tipo de Venta Cerrada</label>
+            <select id="tipo_venta" onchange="calcularComision()">
+                <option value="completo">1. Obra Terminada (Llave en mano)</option>
+                <option value="flete">2. Solo Material + Flete a Obra</option>
+                <option value="taller">3. Solo Material (Retira de Fábrica)</option>
+            </select>
         </div>
 
         <div class="fila">
@@ -103,7 +113,22 @@
         window.calcularComision = function() {
             let m = parseFloat(document.getElementById('metros').value) || 0;
             let p = parseInt(document.getElementById('portones').value) || 0;
-            comisionTotal = (m * 15000) + (p * 100000);
+            let tipoVenta = document.getElementById('tipo_venta').value;
+            
+            // AQUÍ PODÉS CAMBIAR CUÁNTO LE PAGÁS POR METRO SEGÚN EL TIPO DE VENTA:
+            let comisionPorMetro = 0;
+            if (tipoVenta === 'completo') {
+                comisionPorMetro = 15000; // Gs. 15.000 por metro para Obra Terminada
+            } else if (tipoVenta === 'flete') {
+                comisionPorMetro = 10000; // Gs. 10.000 por metro si es con Flete
+            } else if (tipoVenta === 'taller') {
+                comisionPorMetro = 5000;  // Gs. 5.000 por metro si retiran de taller
+            }
+
+            // Comisión de portones (podes cambiar el 100000)
+            let comisionPorton = p * 100000;
+
+            comisionTotal = (m * comisionPorMetro) + comisionPorton;
             document.getElementById('monto_comision').innerText = "Gs. " + comisionTotal.toLocaleString('es-PY');
         }
 
@@ -114,15 +139,24 @@
             let whatsapp = document.getElementById('whatsapp_cliente').value.trim();
             let metros = parseFloat(document.getElementById('metros').value) || 0;
             let portones = parseInt(document.getElementById('portones').value) || 0;
+            
+            let selectorTipoVenta = document.getElementById('tipo_venta');
+            let tipoVentaValor = selectorTipoVenta.value;
+            let textoTipoVenta = selectorTipoVenta.options[selectorTipoVenta.selectedIndex].text;
 
             if(!vendedor || !cliente || !ciudad || !whatsapp || metros <= 0) {
                 alert("Por favor completa todos los campos correctamente.");
                 return;
             }
 
-            // Datos base para calcular presupuesto en el panel de fábrica
+            // Calcular el presupuesto que cobra la fábrica según el tipo de venta
+            let costoPorMetroCliente = 0;
+            if (tipoVentaValor === 'completo') costoPorMetroCliente = 340000;
+            else if (tipoVentaValor === 'flete') costoPorMetroCliente = 250000;
+            else if (tipoVentaValor === 'taller') costoPorMetroCliente = 180000;
+
             let costoPortonAgregado = portones * 3.5 * 1100000;
-            let presupuestoCompleto = (metros * 340000) + costoPortonAgregado;
+            let presupuestoCompleto = (metros * costoPorMetroCliente) + costoPortonAgregado;
 
             const idProspecto = "lead_" + Date.now();
             
@@ -135,11 +169,14 @@
                 metros_totales: metros + (portones * 3.5),
                 metros_muralla: metros,
                 cantidad_portones: portones,
+                tipo_venta: tipoVentaValor,
+                detalle_medidas: "Venta Asesor: " + textoTipoVenta, // Para que lo veas en tu panel ejecutivo
                 presupuesto_completo: presupuestoCompleto,
+                comision_vendedor: comisionTotal, // Guardamos la comisión exacta
                 fecha: new Date().toISOString()
             }).then(() => {
                 
-                // --- TU CORREO CONFIGURADO PARA AVISARTE SI UN VENDEDOR CARGA ALGO ---
+                // Envío de correo a tu Gmail
                 fetch("https://formsubmit.co/ajax/hcgimenez11@gmail.com", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -150,14 +187,16 @@
                         Cliente: cliente,
                         Ciudad: ciudad,
                         WhatsApp: whatsapp,
+                        Tipo_de_Venta: textoTipoVenta,
                         Metros_Cargados: metros + "m",
                         Portones: portones,
-                        Comision_a_Pagar: "Gs. " + comisionTotal.toLocaleString('es-PY')
+                        Comision_a_Pagar: "Gs. " + comisionTotal.toLocaleString('es-PY'),
+                        Ingreso_Fabrica: "Gs. " + presupuestoCompleto.toLocaleString('es-PY')
                     })
                 }).catch(err => console.log(err));
 
                 alert("Venta registrada con éxito. La fábrica ya recibió la orden.");
-                location.reload(); // Recarga para limpiar los campos
+                location.reload(); 
             }).catch((error) => {
                 alert("Error al guardar.");
             });
