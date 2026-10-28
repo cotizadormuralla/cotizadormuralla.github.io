@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuringCotizador | Calculadora Oficial</title>
+    <title>TuringCotizador | Plataforma Global</title>
     <style>
         :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --success: #10b981; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 70%); }
-        .cotizador-container { width: 100%; max-width: 550px; padding: 30px 20px; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 60%); }
+        
+        /* Estilos del Menú Principal (Por defecto) */
+        #vista-menu { width: 100%; max-width: 400px; padding: 40px 35px; background-color: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); box-sizing: border-box; text-align: center; }
+        .logo-text { font-size: 1.7rem; font-weight: 700; color: var(--text-main); margin: 0 0 5px 0; }
+        .logo-text span { color: var(--primary); font-weight: 400;}
+        .sub-text { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 30px 0; }
+        .btn-opcion { display: flex; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 12px; background-color: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; text-align: left;}
+        .btn-opcion:hover { border-color: var(--primary); background-color: rgba(14, 165, 233, 0.05); }
+        .btn-text span { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 400; margin-top: 2px;}
+
+        /* Estilos del Cotizador (Se activa si hay ?empresa=... o si elige cliente) */
+        #vista-cotizador { display: none; width: 100%; max-width: 550px; padding: 30px 20px; box-sizing: border-box; }
         .header-brand { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .logo-empresa { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .logo-text { font-size: 1.8rem; font-weight: 700; margin: 0; } .logo-text span { color: var(--primary); font-weight: 400;}
         .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 25px; }
-        .grupo-input { margin-bottom: 16px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500;}
+        .grupo-input { margin-bottom: 16px; text-align: left; } 
+        .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500;}
         .grupo-input input, .grupo-input select { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid var(--border); background-color: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .btn-calcular { width: 100%; background-color: var(--primary); color: #020617; border: none; padding: 14px; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
@@ -22,14 +33,33 @@
     </style>
 </head>
 <body>
-    <div class="cotizador-container">
+
+    <!-- 1. VISTA MENÚ PRINCIPAL (Se muestra al entrar a la raíz) -->
+    <div id="vista-menu">
+        <div class="header-central">
+            <h1 class="logo-text">Turing<span>Cotizador</span></h1>
+            <p class="sub-text">SaaS Global de Prefabricados</p>
+        </div>
+        <button class="btn-opcion" onclick="abrirCotizadorPublico()">
+            <div class="btn-text">🛒 Acceso Cliente<span>Cotizar proyecto en la web pública</span></div>
+        </button>
+        <button class="btn-opcion" onclick="window.location.href='login.html'">
+            <div class="btn-text">💼 Portal Asesor / 🏭 Administración<span>Gestión de ventas y configuración de fábrica</span></div>
+        </button>
+    </div>
+
+    <!-- 2. VISTA COTIZADOR (Se activa automáticamente si tiene ?empresa=... o al hacer clic en cliente) -->
+    <div id="vista-cotizador" class="cotizador-container">
         <div class="header-brand">
             <img id="img-logo" class="logo-empresa" src="" alt="Logo">
-            <h1 class="logo-text" id="nombre-empresa-titulo">Turing<span>Cotizador</span></h1>
+            <h1 class="logo-text" id="nombre-empresa-titulo" style="font-size:1.8rem;">Turing<span>Cotizador</span></h1>
             <p style="color:var(--text-muted); font-size:0.85rem;">Presupuesto Inteligente Global</p>
         </div>
         <div class="card">
-            <div class="grupo-input"><label>Tu Nombre Completo</label><input type="text" id="c-nombre" placeholder="Ej: Juan Pérez"></div>
+            <div class="grid-2">
+                <div class="grupo-input"><label>Tu Nombre Completo</label><input type="text" id="c-nombre" placeholder="Ej: Juan Pérez" required></div>
+                <div class="grupo-input"><label>WhatsApp / Teléfono *</label><input type="tel" id="c-whatsapp-cliente" placeholder="Ej: 0981123456" required></div>
+            </div>
             
             <div class="grid-2">
                 <div class="grupo-input">
@@ -44,7 +74,6 @@
 
             <div class="grupo-input"><label>Ciudad donde se construirá</label><input type="text" id="c-ciudad" placeholder="Ej: Itauguá"></div>
             
-            <!-- AYUDA DE MEDIDAS DE TERRENO -->
             <div class="grupo-input">
                 <label>📐 Seleccionar Terreno o Medida Rápida</label>
                 <select id="c-terreno" onchange="calcularMetrosTerreno()">
@@ -104,23 +133,50 @@
         let nombreEmpresaDestino = "TuringCotizador Global";
         let whatsappDestino = ""; let coti = null;
         
-        let cfg = { moneda:"Gs.", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:180000, pPorton:2660000 };
+        let cfg = { moneda:"Gs.", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:180000, pPorton:3850000 };
 
         const valoresMercadoGlobal = {
-            "Paraguay":  { moneda: "Gs.",  pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 2660000 },
-            "Argentina": { moneda: "ARS",  pLlave: 45000,  pEnvio: 35000,  pRetiro: 32000,  pPorton: 350000 },
-            "Bolivia":   { moneda: "Bs.",  pLlave: 320,    pEnvio: 240,    pRetiro: 210,    pPorton: 2500 },
-            "Brasil":    { moneda: "R$",   pLlave: 230,    pEnvio: 170,    pRetiro: 150,    pPorton: 1800 },
-            "Chile":     { moneda: "CLP$", pLlave: 40000,  pEnvio: 30000,  pRetiro: 25000,  pPorton: 300000 },
-            "Colombia":  { moneda: "COP$", pLlave: 180000, pEnvio: 130000, pRetiro: 110000, pPorton: 1400000 },
-            "Ecuador":   { moneda: "USD",  pLlave: 45,     pEnvio: 35,     pRetiro: 30,     pPorton: 350 },
-            "España":    { moneda: "€",    pLlave: 45,     pEnvio: 35,     pRetiro: 30,     pPorton: 350 },
-            "Estados Unidos": { moneda: "USD", pLlave: 60, pEnvio: 45,     pRetiro: 40,     pPorton: 500 },
-            "México":    { moneda: "MXN$", pLlave: 900,    pEnvio: 650,    pRetiro: 550,    pPorton: 6500 },
-            "Perú":      { moneda: "S/",   pLlave: 170,    pEnvio: 130,    pRetiro: 110,    pPorton: 1300 },
-            "Uruguay":   { moneda: "$U",   pLlave: 1800,   pEnvio: 1300,   pRetiro: 1100,   pPorton: 13000 },
-            "Venezuela": { moneda: "USD",  pLlave: 40,     pEnvio: 30,     pRetiro: 25,     pPorton: 300 }
+            "Paraguay":  { moneda: "Gs.",  pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000 },
+            "Argentina": { moneda: "ARS",  pLlave: 45000,  pEnvio: 35000,  pRetiro: 32000,  pPorton: 450000 },
+            "Bolivia":   { moneda: "Bs.",  pLlave: 320,    pEnvio: 240,    pRetiro: 210,    pPorton: 3500 },
+            "Brasil":    { moneda: "R$",   pLlave: 230,    pEnvio: 170,    pRetiro: 150,    pPorton: 2500 },
+            "Chile":     { moneda: "CLP$", pLlave: 40000,  pEnvio: 30000,  pRetiro: 25000,  pPorton: 400000 },
+            "Colombia":  { moneda: "COP$", pLlave: 180000, pEnvio: 130000, pRetiro: 110000, pPorton: 1800000 },
+            "Ecuador":   { moneda: "USD",  pLlave: 45,     pEnvio: 35,     pRetiro: 30,     pPorton: 500 },
+            "España":    { moneda: "€",    pLlave: 45,     pEnvio: 35,     pRetiro: 30,     pPorton: 500 },
+            "Estados Unidos": { moneda: "USD", pLlave: 60, pEnvio: 45,     pRetiro: 40,     pPorton: 650 },
+            "México":    { moneda: "MXN$", pLlave: 900,    pEnvio: 650,    pRetiro: 550,    pPorton: 8500 },
+            "Perú":      { moneda: "S/",   pLlave: 170,    pEnvio: 130,    pRetiro: 110,    pPorton: 1800 },
+            "Uruguay":   { moneda: "$U",   pLlave: 1800,   pEnvio: 1300,   pRetiro: 1100,   pPorton: 18000 },
+            "Venezuela": { moneda: "USD",  pLlave: 40,     pEnvio: 30,     pRetiro: 25,     pPorton: 400 }
         };
+
+        // Si entra con ?empresa=..., muestra el cotizador directamente ocultando el menú
+        if(uidEmpresa) {
+            document.getElementById('vista-menu').style.display = 'none';
+            document.getElementById('vista-cotizador').style.display = 'block';
+            get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(s => {
+                if(s.exists()) {
+                    let c = s.val(); cfg = {...cfg, ...c}; 
+                    if(c.nombreEmpresa) { 
+                        nombreEmpresaDestino = c.nombreEmpresa; 
+                        document.getElementById('nombre-empresa-titulo').innerHTML = `<span style="color:white;">Cotizador de</span> <span style="color:var(--primary)">${c.nombreEmpresa}</span>`; 
+                    }
+                    if(c.whatsapp) whatsappDestino = c.whatsapp;
+                    if(c.logoUrl) {
+                        let img = document.getElementById('img-logo');
+                        img.src = c.logoUrl;
+                        img.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        window.abrirCotizadorPublico = function() {
+            document.getElementById('vista-menu').style.display = 'none';
+            document.getElementById('vista-cotizador').style.display = 'block';
+            actualizarPreciosPais();
+        }
 
         window.actualizarPreciosPais = function() {
             if (uidEmpresa) return;
@@ -142,31 +198,13 @@
             else mInput.value = '';
         }
 
-        if(uidEmpresa) {
-            get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(s => {
-                if(s.exists()) {
-                    let c = s.val(); cfg = {...cfg, ...c}; 
-                    if(c.nombreEmpresa) { 
-                        nombreEmpresaDestino = c.nombreEmpresa; 
-                        document.getElementById('nombre-empresa-titulo').innerHTML = `<span style="color:white;">Cotizador de</span> <span style="color:var(--primary)">${c.nombreEmpresa}</span>`; 
-                    }
-                    if(c.whatsapp) whatsappDestino = c.whatsapp;
-                    if(c.logoUrl) {
-                        let img = document.getElementById('img-logo');
-                        img.src = c.logoUrl;
-                        img.style.display = 'block';
-                    }
-                }
-            });
-        } else {
-            actualizarPreciosPais();
-        }
-
         window.procesar = function() {
+            let telCliente = document.getElementById('c-whatsapp-cliente').value.trim();
             let m = parseFloat(document.getElementById('c-metros').value); 
             let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
             let pTipo = document.getElementById('c-portones-tipo').value;
             
+            if(!telCliente) return alert("El número de WhatsApp es obligatorio para cotizar.");
             if(!m) return alert("Ingresá o seleccioná los metros lineales.");
             let t = document.getElementById('c-tipo').value;
             
@@ -179,6 +217,7 @@
             
             coti = { 
                 cliente: document.getElementById('c-nombre').value, 
+                telefono: telCliente,
                 pais: document.getElementById('c-pais').value, 
                 depto: document.getElementById('c-depto').value, 
                 ciudad: document.getElementById('c-ciudad').value, 
@@ -201,7 +240,7 @@
             set(push(ref(db, ruta)), coti).then(() => {
                 document.getElementById('btn-registrar').style.display = 'none';
                 if(whatsappDestino) {
-                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n\n👤 Cliente: ${coti.cliente}\n📐 Metros: ${coti.metros}m\n🚪 Portón: ${coti.portonesCantidad} (${coti.portonesTipo})\n🏗️ Modalidad: ${coti.tipoVenta}\n📍 Destino: ${coti.ciudad}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}\n\nQuiero reservar turno.`);
+                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n📐 Metros: ${coti.metros}m\n🚪 Portón: ${coti.portonesCantidad} (${coti.portonesTipo})\n🏗️ Modalidad: ${coti.tipoVenta}\n📍 Destino: ${coti.ciudad}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}\n\nQuiero reservar turno.`);
                     document.getElementById('btn-whatsapp').href = `https://wa.me/${whatsappDestino}?text=${msg}`;
                     document.getElementById('btn-whatsapp').style.display = 'block';
                 } else { alert("Enviado a Bolsa Global. Una fábrica de su zona lo contactará pronto."); location.reload(); }
