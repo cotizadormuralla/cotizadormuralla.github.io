@@ -8,7 +8,6 @@
         :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --success: #10b981; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 60%); }
         
-        /* Estilos del Menú Principal (Por defecto) */
         #vista-menu { width: 100%; max-width: 400px; padding: 40px 35px; background-color: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); box-sizing: border-box; text-align: center; }
         .logo-text { font-size: 1.7rem; font-weight: 700; color: var(--text-main); margin: 0 0 5px 0; }
         .logo-text span { color: var(--primary); font-weight: 400;}
@@ -17,7 +16,6 @@
         .btn-opcion:hover { border-color: var(--primary); background-color: rgba(14, 165, 233, 0.05); }
         .btn-text span { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 400; margin-top: 2px;}
 
-        /* Estilos del Cotizador (Se activa si hay ?empresa=... o si elige cliente) */
         #vista-cotizador { display: none; width: 100%; max-width: 550px; padding: 30px 20px; box-sizing: border-box; }
         .header-brand { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .logo-empresa { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -34,7 +32,6 @@
 </head>
 <body>
 
-    <!-- 1. VISTA MENÚ PRINCIPAL (Se muestra al entrar a la raíz) -->
     <div id="vista-menu">
         <div class="header-central">
             <h1 class="logo-text">Turing<span>Cotizador</span></h1>
@@ -48,7 +45,6 @@
         </button>
     </div>
 
-    <!-- 2. VISTA COTIZADOR (Se activa automáticamente si tiene ?empresa=... o al hacer clic en cliente) -->
     <div id="vista-cotizador" class="cotizador-container">
         <div class="header-brand">
             <img id="img-logo" class="logo-empresa" src="" alt="Logo">
@@ -151,7 +147,6 @@
             "Venezuela": { moneda: "USD",  pLlave: 40,     pEnvio: 30,     pRetiro: 25,     pPorton: 400 }
         };
 
-        // Si entra con ?empresa=..., muestra el cotizador directamente ocultando el menú
         if(uidEmpresa) {
             document.getElementById('vista-menu').style.display = 'none';
             document.getElementById('vista-cotizador').style.display = 'block';
@@ -243,7 +238,13 @@
                     let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n📐 Metros: ${coti.metros}m\n🚪 Portón: ${coti.portonesCantidad} (${coti.portonesTipo})\n🏗️ Modalidad: ${coti.tipoVenta}\n📍 Destino: ${coti.ciudad}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}\n\nQuiero reservar turno.`);
                     document.getElementById('btn-whatsapp').href = `https://wa.me/${whatsappDestino}?text=${msg}`;
                     document.getElementById('btn-whatsapp').style.display = 'block';
-                } else { alert("Enviado a Bolsa Global. Una fábrica de su zona lo contactará pronto."); location.reload(); }
+                } else { 
+                    let aviso = document.createElement('div');
+                    aviso.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#10b981; color:#020617; padding:12px 24px; border-radius:8px; font-weight:bold; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);";
+                    aviso.innerText = "✅ ¡Presupuesto guardado con éxito! Una fábrica de tu zona te contactará pronto.";
+                    document.body.appendChild(aviso);
+                    setTimeout(() => location.reload(), 3500);
+                }
             });
         }
     </script>

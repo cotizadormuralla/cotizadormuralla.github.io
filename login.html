@@ -35,7 +35,6 @@
             <p class="sub-text" id="subtitulo-modo">Administración de Fábrica</p>
         </div>
 
-        <!-- FORMULARIO DE ACCESO / REGISTRO -->
         <form onsubmit="procesarAutenticacion(event)">
             <div class="grupo-input">
                 <label>Correo electrónico</label>
@@ -66,10 +65,8 @@
         
         let modoRegistro = false;
 
-        // Verificar si ya está logueado
         onAuthStateChanged(auth, (user) => {
             if (user && !modoRegistro) {
-                // Si viene del parámetro tipo vendedor o fábrica
                 let urlParams = new URLSearchParams(window.location.search);
                 let tipo = urlParams.get('tipo');
                 if(tipo === 'vendedor') window.location.href = "panel_vendedor.html";
@@ -112,13 +109,11 @@
 
             setPersistence(auth, browserLocalPersistence).then(() => {
                 if(modoRegistro) {
-                    // REGISTRO AUTOMÁTICO DE NUEVA FÁBRICA
                     return createUserWithEmailAndPassword(auth, email, password).then(() => {
                         window.location.href = "panel_fabrica.html";
                     });
                 } else {
-                    // INICIO DE SESIÓN NORMAL
-                    return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+                    return signInWithEmailAndPassword(auth, email, password).then(() => {
                         let urlParams = new URLSearchParams(window.location.search);
                         let tipo = urlParams.get('tipo');
                         if(tipo === 'vendedor') window.location.href = "panel_vendedor.html";
