@@ -5,26 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TuringCotizador | Portal Universal</title>
     <style>
-        :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --primary-hover: #0284c7; --success: #10b981; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 60%); }
-        .caja-principal { background-color: var(--bg-card); width: 100%; max-width: 400px; padding: 40px 35px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); box-sizing: border-box; }
+        :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --success: #10b981; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 60%); padding: 20px; box-sizing: border-box;}
+        .caja-principal { background-color: var(--bg-card); width: 100%; max-width: 400px; padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); box-sizing: border-box; }
         .header-central { text-align: center; margin-bottom: 30px; }
         .logo-text { font-size: 1.7rem; font-weight: 700; color: var(--text-main); margin: 0 0 5px 0; }
         .logo-text span { color: var(--primary); font-weight: 400;}
         .sub-text { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
-        
         .grupo-input { margin-bottom: 18px; text-align: left; position: relative; }
         .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
         .grupo-input input { width: 100%; padding: 12px 45px 12px 14px; border-radius: 6px; border: 1px solid var(--border); background-color: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
         .grupo-input input:focus { outline: none; border-color: var(--primary); }
-        .btn-ver-pass { position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 4px; line-height: 1; }
-        
+        .btn-ver-pass { position: absolute; right: 12px; top: 32px; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0; }
+        .btn-ver-pass:hover { color: var(--primary); }
         .btn-accion { width: 100%; background-color: var(--primary); color: #020617; border: none; padding: 12px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         .btn-accion:hover { background-color: #0284c7; color: white; }
-        
         #mensaje-error { color: #ef4444; font-size: 0.8rem; margin-top: 15px; display: block; text-align: center; }
         .enlaces-inferiores { margin-top: 20px; text-align: center; font-size: 0.85rem;}
-        .enlaces-inferiores button { background: none; border:none; color: var(--text-muted); cursor:pointer; text-decoration: underline;}
+        .enlaces-inferiores button { background: none; border:none; color: var(--text-muted); cursor:pointer; text-decoration: underline; padding: 5px;}
         .enlaces-inferiores button:hover { color: var(--primary); }
     </style>
 </head>
@@ -43,7 +41,9 @@
             <div class="grupo-input">
                 <label>Contraseña</label>
                 <input type="password" id="password" autocomplete="current-password" required placeholder="••••••••">
-                <button type="button" class="btn-ver-pass" onclick="togglePassword()" id="ojo-btn">👁️</button>
+                <button type="button" class="btn-ver-pass" onclick="togglePassword()" id="ojo-btn" title="Mostrar/Ocultar contraseña">
+                    <svg id="icono-ojo" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
             </div>
             <button type="submit" class="btn-accion" id="btn-principal">Iniciar Sesión</button>
         </form>
@@ -51,15 +51,14 @@
         <div id="mensaje-error"></div>
 
         <div class="enlaces-inferiores">
-            <p id="texto-cambio" style="color:var(--text-muted);">¿No tienes una fábrica registrada? <button onclick="cambiarModo('registro')">Regístrate gratis</button></p>
-            <div style="margin-top: 15px;"><button onclick="window.location.href='index.html'">← Volver al inicio</button></div>
+            <p id="texto-cambio" style="color:var(--text-muted); margin-bottom:15px;">¿No tienes una fábrica registrada? <button onclick="cambiarModo('registro')">Regístrate gratis</button></p>
+            <button onclick="window.location.href='index.html'" style="text-decoration:none;">← Volver al inicio</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-
         const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", authDomain: "gestorinmobiliario-d68b3.firebaseapp.com", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" });
         const auth = getAuth(app);
         
@@ -90,13 +89,13 @@
 
         window.togglePassword = function() {
             const passInput = document.getElementById('password');
-            const ojoBtn = document.getElementById('ojo-btn');
+            const iconoOjo = document.getElementById('icono-ojo');
             if (passInput.type === 'password') {
                 passInput.type = 'text';
-                ojoBtn.innerText = '🙈';
+                iconoOjo.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
             } else {
                 passInput.type = 'password';
-                ojoBtn.innerText = '👁️';
+                iconoOjo.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
             }
         }
 
@@ -106,28 +105,20 @@
             const password = document.getElementById('password').value;
             const errBox = document.getElementById('mensaje-error');
             errBox.innerText = "";
-
             setPersistence(auth, browserLocalPersistence).then(() => {
                 if(modoRegistro) {
-                    return createUserWithEmailAndPassword(auth, email, password).then(() => {
-                        window.location.href = "panel_fabrica.html";
-                    });
+                    return createUserWithEmailAndPassword(auth, email, password).then(() => { window.location.href = "panel_fabrica.html"; });
                 } else {
                     return signInWithEmailAndPassword(auth, email, password).then(() => {
-                        let urlParams = new URLSearchParams(window.location.search);
-                        let tipo = urlParams.get('tipo');
+                        let tipo = new URLSearchParams(window.location.search).get('tipo');
                         if(tipo === 'vendedor') window.location.href = "panel_vendedor.html";
                         else window.location.href = "panel_fabrica.html";
                     });
                 }
             }).catch((error) => {
-                if(error.code === 'auth/email-already-in-use') {
-                    errBox.innerText = "Este correo ya está registrado. Inicia sesión.";
-                } else if(error.code === 'auth/weak-password') {
-                    errBox.innerText = "La contraseña debe tener al menos 6 caracteres.";
-                } else {
-                    errBox.innerText = "Error en las credenciales o en el acceso.";
-                }
+                if(error.code === 'auth/email-already-in-use') errBox.innerText = "Este correo ya está registrado. Inicia sesión.";
+                else if(error.code === 'auth/weak-password') errBox.innerText = "La contraseña debe tener al menos 6 caracteres.";
+                else errBox.innerText = "Error en las credenciales o en el acceso.";
             });
         }
     </script>

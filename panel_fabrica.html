@@ -7,7 +7,7 @@
     <style>
         :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --primary-hover: #0284c7; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; background-color: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
+        .sidebar { width: 260px; background-color: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10; flex-shrink: 0;}
         .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
         .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .menu-btn:hover { background-color: rgba(56, 189, 248, 0.1); color: var(--primary); } .menu-btn.activo { background-color: var(--primary); color: #0f172a; font-weight: 600; }
@@ -21,13 +21,28 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .btn-primario { background-color: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%;}
         .btn-primario:hover { background-color: var(--primary-hover); color: white; }
-        .btn-eliminar { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;}
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem;} th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600;} td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
+        
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px;} 
+        th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600;} 
+        td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
+        
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} .badge.pendiente { background-color: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3);} .badge.activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3);}
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.8); z-index: 100; display: none; justify-content: center; align-items: center;} .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; } .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px;}
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box;} .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px;}
         .toast-notificacion { position: fixed; bottom: 30px; right: 30px; background-color: var(--success); color: #020617; padding: 12px 24px; border-radius: 8px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000;} .toast-notificacion.mostrar { transform: translateY(0); opacity: 1; }
         .enlace-empresa { background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; margin-top:10px; font-family: monospace; color: var(--primary); word-break: break-all;}
         .subtitulo-cfg { font-size: 1rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 15px; margin-top: 0;}
+
+        /* DISEÑO PARA CELULARES */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 5px; border-right: none; border-bottom: 1px solid var(--border); }
+            .logo-text { display: none; }
+            .menu-btn { padding: 8px 12px; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap; }
+            .main-content { padding: 15px; overflow-y: visible; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .header-top h2 { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
@@ -39,24 +54,24 @@
     </div>
 
     <div class="main-content">
-        <!-- PESTAÑA VENTAS -->
         <div id="seccion-ventas" class="seccion activa">
             <div class="header-top">
-                <h2>Historial de Ventas Privadas</h2>
-                <div style="display:flex; gap:15px; align-items:center;">
-                    <span style="font-size:0.8rem; color:var(--text-muted);" id="email-usuario-actual"></span>
+                <h2>Historial de Ventas</h2>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="font-size:0.75rem; color:var(--text-muted); display:none;" id="email-usuario-actual"></span>
                     <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
                 </div>
             </div>
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <table>
-                    <thead><tr style="background-color: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente</th><th>Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
-                    <tbody id="tabla-ventas-body"></tbody>
-                </table>
+            <div class="card" style="padding: 0;">
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr style="background-color: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente</th><th>Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                        <tbody id="tabla-ventas-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- PESTAÑA EQUIPO -->
         <div id="seccion-equipo" class="seccion">
             <div class="header-top"><h2>Gestión de Vendedores</h2></div>
             <div class="card">
@@ -68,13 +83,14 @@
                 <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta de Asesor</button>
             </div>
             <div class="card">
-                <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
+                <div class="table-responsive">
+                    <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
+                </div>
             </div>
         </div>
 
-        <!-- PESTAÑA CONFIGURACIÓN UNIVERSAL -->
         <div id="seccion-configuracion" class="seccion">
-            <div class="header-top"><h2>Configuración de Fábrica (Universal)</h2></div>
+            <div class="header-top"><h2>Configuración de Fábrica</h2></div>
             
             <div class="card">
                 <h3 class="subtitulo-cfg">1. Identidad, Logo y Moneda</h3>
@@ -153,21 +169,14 @@
         const auth = getAuth(app); const db = getDatabase(app);
         const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
 
-        let propietarioUID = ""; let listaVentasGlobal = []; 
-        let logoBase64Temporal = "";
+        let propietarioUID = ""; let listaVentasGlobal = []; let logoBase64Temporal = "";
         
-        let cfg = { 
-            moneda: "Gs.", logoUrl: "", 
-            largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, 
-            pLlave: 340000, pEnvio: 250000, pRetiro: 230000, pPorton: 2660000, 
-            cFab: 140000, cInst: 50000, cAlz: 30, com: 5 
-        };
-
+        let cfg = { moneda: "Gs.", logoUrl: "", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 140000, cInst: 50000, cAlz: 30, com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                propietarioUID = user.uid; document.getElementById('email-usuario-actual').innerText = user.email;
+                propietarioUID = user.uid; document.getElementById('email-usuario-actual').innerText = user.email; document.getElementById('email-usuario-actual').style.display = "block";
                 document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
                 cargarConfiguracion(); cargarVendedores(); cargarVentas();
             } else { window.location.href = "login.html"; }
@@ -178,32 +187,14 @@
 
         window.cargarConfiguracion = function() {
             get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
-                let c = s.exists() ? s.val() : {};
-                cfg = { ...cfg, ...c };
-                
-                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; 
-                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
-                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; 
-                document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
-                
+                let c = s.exists() ? s.val() : {}; cfg = { ...cfg, ...c };
+                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
+                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
                 if(cfg.logoUrl) logoBase64Temporal = cfg.logoUrl;
-                
-                document.getElementById('config-precio-llave').value = cfg.pLlave; 
-                document.getElementById('config-precio-envio').value = cfg.pEnvio; 
-                document.getElementById('config-precio-retiro').value = cfg.pRetiro; 
-                document.getElementById('config-precio-porton').value = cfg.pPorton;
-                
-                document.getElementById('config-costo-fab').value = cfg.cFab; 
-                document.getElementById('config-costo-inst').value = cfg.cInst; 
-                document.getElementById('config-costo-alz').value = cfg.cAlz; 
-                document.getElementById('config-comision').value = cfg.com;
-                
-                document.getElementById('config-largo-placa').value = cfg.largoPlaca; 
-                document.getElementById('config-alto-placa').value = cfg.altoPlaca; 
-                document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
-                document.getElementById('config-ancho-col').value = cfg.anchoCol; 
-                document.getElementById('config-encastre').value = cfg.encastre; 
-                document.getElementById('config-peso-col').value = cfg.pesoCol;
+                document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
+                document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; document.getElementById('config-costo-alz').value = cfg.cAlz; document.getElementById('config-comision').value = cfg.com;
+                document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
+                document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
             });
         }
 
@@ -214,10 +205,7 @@
                     const file = e.target.files[0];
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = function(uploadEvent) {
-                            logoBase64Temporal = uploadEvent.target.result;
-                            mostrarToast("📁 Logo cargado en memoria. Guardá los cambios.");
-                        };
+                        reader.onload = function(uploadEvent) { logoBase64Temporal = uploadEvent.target.result; mostrarToast("📁 Logo cargado. Guardá los cambios."); };
                         reader.readAsDataURL(file);
                     }
                 });
@@ -226,46 +214,28 @@
 
         window.guardarConfiguracion = function() {
             cfg = {
-                nombreEmpresa: document.getElementById('config-nombre').value, 
-                whatsapp: document.getElementById('config-whatsapp').value, 
-                moneda: document.getElementById('config-moneda').value || "Gs.",
-                logoUrl: logoBase64Temporal,
-                pLlave: Number(document.getElementById('config-precio-llave').value), 
-                pEnvio: Number(document.getElementById('config-precio-envio').value), 
-                pRetiro: Number(document.getElementById('config-precio-retiro').value), 
-                pPorton: Number(document.getElementById('config-precio-porton').value),
-                cFab: Number(document.getElementById('config-costo-fab').value), 
-                cInst: Number(document.getElementById('config-costo-inst').value), 
-                cAlz: Number(document.getElementById('config-costo-alz').value), 
-                com: Number(document.getElementById('config-comision').value),
-                largoPlaca: Number(document.getElementById('config-largo-placa').value), 
-                altoPlaca: Number(document.getElementById('config-alto-placa').value), 
-                pesoPlaca: Number(document.getElementById('config-peso-placa').value),
-                anchoCol: Number(document.getElementById('config-ancho-col').value), 
-                encastre: Number(document.getElementById('config-encastre').value), 
-                pesoCol: Number(document.getElementById('config-peso-col').value)
+                nombreEmpresa: document.getElementById('config-nombre').value, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", logoUrl: logoBase64Temporal,
+                pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
+                cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
+                largoPlaca: Number(document.getElementById('config-largo-placa').value), altoPlaca: Number(document.getElementById('config-alto-placa').value), pesoPlaca: Number(document.getElementById('config-peso-placa').value),
+                anchoCol: Number(document.getElementById('config-ancho-col').value), encastre: Number(document.getElementById('config-encastre').value), pesoCol: Number(document.getElementById('config-peso-col').value)
             };
-            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { 
-                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; 
-                mostrarToast("✅ Configuración y Valores Universales Guardados."); 
-            });
+            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ Valores Guardados."); });
         }
 
         function calcularReales(metros, portonesStr, tipo) {
-            let m = parseFloat(metros)||0; let p = parseInt(portonesStr)||0;
-            let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
+            let m = parseFloat(metros)||0; let p = parseInt(portonesStr)||0; let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
             let modulos = Math.ceil(m / largoModulo); let placas = modulos * Math.ceil(200 / cfg.altoPlaca); let columnas = modulos + 1 + p;
             let kg = (columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca); let ton = (kg / 1000).toFixed(2);
             let pMetro = cfg.pEnvio; if(tipo.includes("Llave")) pMetro = cfg.pLlave; else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
-            let total = (m * pMetro) + (p * cfg.pPorton);
-            return { placas, columnas, kg, ton, total, m, p, tipo, largoModulo };
+            let total = (m * pMetro) + (p * cfg.pPorton); return { placas, columnas, kg, ton, total, m, p, tipo, largoModulo };
         }
 
         window.cargarVentas = function() {
             onValue(ref(db, 'empresas/' + propietarioUID + '/cotizaciones'), (snap) => {
                 let html = ""; listaVentasGlobal = []; let i = 0;
                 snap.forEach((c) => {
-                    let v = c.val(); let calc = calcularReales(v.metros, v.portones, v.tipoVenta); listaVentasGlobal.push(calc); 
+                    let v = c.val(); let calc = calcularReales(v.metros, v.portonesCantidad || v.portones, v.tipoVenta); listaVentasGlobal.push(calc); 
                     html += `<tr>
                         <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small></td>
                         <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small></td>
@@ -279,23 +249,16 @@
         }
 
         window.abrirDesglose = function(idx) {
-            let c = listaVentasGlobal[idx];
-            let cFab = c.m * cfg.cFab; let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0;
-            let cAlz = c.kg * cfg.cAlz; let comision = c.total * (cfg.com / 100);
-            document.getElementById('m-tipo').innerText = c.tipo;
-            document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(c.total)}`;
-            document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
-            document.getElementById('m-costo-alzada').innerText = `- ${cfg.moneda} ${fm(cAlz)} (${c.ton} Ton)`;
-            document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
-            document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)}`;
-            document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(c.total - (cFab+cInst+cAlz+comision))}`;
+            let c = listaVentasGlobal[idx]; let cFab = c.m * cfg.cFab; let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; let cAlz = c.kg * cfg.cAlz; let comision = c.total * (cfg.com / 100);
+            document.getElementById('m-tipo').innerText = c.tipo; document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(c.total)}`; document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
+            document.getElementById('m-costo-alzada').innerText = `- ${cfg.moneda} ${fm(cAlz)} (${c.ton} Ton)`; document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
+            document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)}`; document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(c.total - (cFab+cInst+cAlz+comision))}`;
             document.getElementById('modal-desglose').style.display = 'flex';
         }
         window.cerrarModal = function() { document.getElementById('modal-desglose').style.display = 'none'; }
         
         window.guardarVendedor = function() {
-            let n = document.getElementById('nuevo-vendedor-nombre').value, e = document.getElementById('nuevo-vendedor-email').value, p = document.getElementById('nuevo-vendedor-pass').value;
-            if(!n||!e) return;
+            let n = document.getElementById('nuevo-vendedor-nombre').value, e = document.getElementById('nuevo-vendedor-email').value, p = document.getElementById('nuevo-vendedor-pass').value; if(!n||!e) return;
             createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); });
         }
         window.cargarVendedores = function() {
