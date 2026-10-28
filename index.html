@@ -42,7 +42,36 @@
                 <div class="grupo-input"><label>Depto / Estado</label><input type="text" id="c-depto" placeholder="Ej: Central"></div>
             </div>
 
-            <div class="grupo-input"><label>Ciudad donde se construirá</label><input type="text" id="c-ciudad" placeholder="Ej: San Lorenzo"></div>
+            <div class="grupo-input"><label>Ciudad donde se construirá</label><input type="text" id="c-ciudad" placeholder="Ej: Itauguá"></div>
+            
+            <!-- AYUDA DE MEDIDAS DE TERRENO -->
+            <div class="grupo-input">
+                <label>📐 Seleccionar Terreno o Medida Rápida</label>
+                <select id="c-terreno" onchange="calcularMetrosTerreno()">
+                    <option value="manual">Ingresar Metros Manuales</option>
+                    <option value="12x30_4lados">Terreno 12x30 (Cercar 4 Lados = 84 mts)</option>
+                    <option value="12x30_3lados">Terreno 12x30 (Cercar 3 Lados = 72 mts)</option>
+                    <option value="10x30_4lados">Terreno 10x30 (Cercar 4 Lados = 80 mts)</option>
+                    <option value="10x30_3lados">Terreno 10x30 (Cercar 3 Lados = 70 mts)</option>
+                </select>
+            </div>
+
+            <div class="grid-2">
+                <div class="grupo-input"><label>Metros Lineales</label><input type="number" id="c-metros" placeholder="Ej: 20"></div>
+                <div class="grupo-input">
+                    <label>Tipo de Portón</label>
+                    <select id="c-portones-tipo">
+                        <option value="Sin Portón">Sin Portón</option>
+                        <option value="Corredizo">Portón Corredizo</option>
+                        <option value="Basculante">Portón Basculante</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grupo-input">
+                <label>Cantidad de Portones</label>
+                <input type="number" id="c-portones-cant" value="0" min="0" max="5">
+            </div>
             
             <div class="grupo-input">
                 <label>Modalidad de Contrato</label>
@@ -51,11 +80,6 @@
                     <option value="Solo Materiales (Envío a Obra)">2. Solo Materiales (Envío a Obra)</option>
                     <option value="Solo Materiales (Retiro de Fábrica)">3. Solo Materiales (Retiro de Fábrica)</option>
                 </select>
-            </div>
-            
-            <div class="grid-2">
-                <div class="grupo-input"><label>Metros Lineales</label><input type="number" id="c-metros" placeholder="Ej: 20"></div>
-                <div class="grupo-input"><label>Portones</label><select id="c-portones"><option value="0">Sin Portón</option><option value="1">1 Portón</option><option value="2">2 Portones</option></select></div>
             </div>
             
             <button class="btn-calcular" onclick="procesar()">Calcular Presupuesto</button>
@@ -80,10 +104,10 @@
         let nombreEmpresaDestino = "TuringCotizador Global";
         let whatsappDestino = ""; let coti = null;
         
-        let cfg = { moneda:"Gs.", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:230000, pPorton:2660000 };
+        let cfg = { moneda:"Gs.", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:180000, pPorton:2660000 };
 
         const valoresMercadoGlobal = {
-            "Paraguay":  { moneda: "Gs.",  pLlave: 340000, pEnvio: 250000, pRetiro: 230000, pPorton: 2660000 },
+            "Paraguay":  { moneda: "Gs.",  pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 2660000 },
             "Argentina": { moneda: "ARS",  pLlave: 45000,  pEnvio: 35000,  pRetiro: 32000,  pPorton: 350000 },
             "Bolivia":   { moneda: "Bs.",  pLlave: 320,    pEnvio: 240,    pRetiro: 210,    pPorton: 2500 },
             "Brasil":    { moneda: "R$",   pLlave: 230,    pEnvio: 170,    pRetiro: 150,    pPorton: 1800 },
@@ -108,6 +132,16 @@
             }
         }
 
+        window.calcularMetrosTerreno = function() {
+            let t = document.getElementById('c-terreno').value;
+            let mInput = document.getElementById('c-metros');
+            if(t === '12x30_4lados') mInput.value = 84;
+            else if(t === '12x30_3lados') mInput.value = 72;
+            else if(t === '10x30_4lados') mInput.value = 80;
+            else if(t === '10x30_3lados') mInput.value = 70;
+            else mInput.value = '';
+        }
+
         if(uidEmpresa) {
             get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(s => {
                 if(s.exists()) {
@@ -129,21 +163,36 @@
         }
 
         window.procesar = function() {
-            let m = parseFloat(document.getElementById('c-metros').value); let p = parseInt(document.getElementById('c-portones').value);
-            if(!m) return alert("Ingresá los metros lineales.");
+            let m = parseFloat(document.getElementById('c-metros').value); 
+            let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
+            let pTipo = document.getElementById('c-portones-tipo').value;
+            
+            if(!m) return alert("Ingresá o seleccioná los metros lineales.");
             let t = document.getElementById('c-tipo').value;
             
             let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
-            let modulos = Math.ceil(m / largoModulo); let placas = modulos * Math.ceil(200 / cfg.altoPlaca); let columnas = modulos + 1 + p;
+            let modulos = Math.ceil(m / largoModulo); let placas = modulos * Math.ceil(200 / cfg.altoPlaca); let columnas = modulos + 1 + pCant;
             let ton = (((columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca)) / 1000).toFixed(2);
             
             let pMetro = cfg.pEnvio; if(t.includes("Llave")) pMetro = cfg.pLlave; else if(t.includes("Retiro")) pMetro = cfg.pRetiro;
-            let total = (m * pMetro) + (p * cfg.pPorton);
+            let total = (m * pMetro) + (pCant * cfg.pPorton);
             
-            coti = { cliente: document.getElementById('c-nombre').value, pais: document.getElementById('c-pais').value, depto: document.getElementById('c-depto').value, ciudad: document.getElementById('c-ciudad').value, metros: m, portones: p, tipoVenta: t, ingresoTotal: total, fecha: new Date().toISOString(), estado: "Pendiente (Web)" };
+            coti = { 
+                cliente: document.getElementById('c-nombre').value, 
+                pais: document.getElementById('c-pais').value, 
+                depto: document.getElementById('c-depto').value, 
+                ciudad: document.getElementById('c-ciudad').value, 
+                metros: m, 
+                portonesCantidad: pCant,
+                portonesTipo: pTipo,
+                tipoVenta: t, 
+                ingresoTotal: total, 
+                fecha: new Date().toISOString(), 
+                estado: "Pendiente (Web)" 
+            };
             
             document.getElementById('r-monto').innerText = `${cfg.moneda} ${fm(total)}`;
-            document.getElementById('r-desglose').innerHTML = `Materiales: <strong>${columnas} Columnas</strong> y <strong>${placas} Placas</strong>.<br>Carga pesada estimada: <strong>${ton} Toneladas</strong>.`;
+            document.getElementById('r-desglose').innerHTML = `Materiales: <strong>${columnas} Columnas</strong> y <strong>${placas} Placas</strong>.<br>Portón: <strong>${pCant} (${pTipo})</strong>.<br>Carga pesada estimada: <strong>${ton} Toneladas</strong>.`;
             document.getElementById('resultado-box').style.display = 'block';
         }
 
@@ -152,7 +201,7 @@
             set(push(ref(db, ruta)), coti).then(() => {
                 document.getElementById('btn-registrar').style.display = 'none';
                 if(whatsappDestino) {
-                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n\n👤 Cliente: ${coti.cliente}\n📐 Metros: ${coti.metros}m\n🏗️ Modalidad: ${coti.tipoVenta}\n📍 Destino: ${coti.ciudad}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}\n\nQuiero reservar turno.`);
+                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n\n👤 Cliente: ${coti.cliente}\n📐 Metros: ${coti.metros}m\n🚪 Portón: ${coti.portonesCantidad} (${coti.portonesTipo})\n🏗️ Modalidad: ${coti.tipoVenta}\n📍 Destino: ${coti.ciudad}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}\n\nQuiero reservar turno.`);
                     document.getElementById('btn-whatsapp').href = `https://wa.me/${whatsappDestino}?text=${msg}`;
                     document.getElementById('btn-whatsapp').style.display = 'block';
                 } else { alert("Enviado a Bolsa Global. Una fábrica de su zona lo contactará pronto."); location.reload(); }
