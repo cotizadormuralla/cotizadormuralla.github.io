@@ -76,13 +76,12 @@
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración de Fábrica (Universal)</h2></div>
             
-            <!-- IDENTIDAD Y LOGO DESDE GALERÍA -->
             <div class="card">
                 <h3 class="subtitulo-cfg">1. Identidad, Logo y Moneda</h3>
                 <div class="grid-3">
                     <div class="grupo-input"><label>Nombre Comercial</label><input type="text" id="config-nombre" placeholder="Ej: G.H.Mix"></div>
                     <div class="grupo-input"><label>WhatsApp de Ventas</label><input type="tel" id="config-whatsapp" placeholder="Ej: 595981..."></div>
-                    <div class="grupo-input"><label>Símbolo de Moneda</label><input type="text" id="config-moneda" placeholder="Ej: Gs., $, €, S/"></div>
+                    <div class="grupo-input"><label>Símbolo de Moneda</label><input type="text" id="config-moneda" placeholder="Ej: Gs., $, €"></div>
                 </div>
                 <div class="grupo-input" style="margin-top: 15px;">
                     <label>Logotipo (Elegir imagen de tu galería)</label>
@@ -95,7 +94,6 @@
             </div>
 
             <div class="grid-2">
-                <!-- PRECIOS DE VENTA -->
                 <div class="card">
                     <h3 class="subtitulo-cfg" style="color: var(--success);">2. Precios Públicos</h3>
                     <div class="grupo-input"><label>Precio Metro (Llave en mano)</label><input type="number" id="config-precio-llave"></div>
@@ -104,19 +102,17 @@
                     <div class="grupo-input"><label>Precio por Portón</label><input type="number" id="config-precio-porton"></div>
                 </div>
 
-                <!-- COSTOS OPERATIVOS -->
                 <div class="card">
                     <h3 class="subtitulo-cfg" style="color: var(--danger);">3. Costos Operativos (Fábrica)</h3>
                     <div class="grupo-input"><label>Costo de Fabricación (Por Metro)</label><input type="number" id="config-costo-fab"></div>
                     <div class="grupo-input"><label>Costo de Instalación (Por Metro)</label><input type="number" id="config-costo-inst"></div>
                     <div class="grupo-input"><label>Costo Personal/Logística (Por Kilo)</label><input type="number" id="config-costo-alz"></div>
-                    <div class="grupo-input"><label>Comisión Vendedor (%)</label><input type="number" id="config-comision" value="5"></div>
+                    <div class="grupo-input"><label>Comisión Vendedor (%)</label><input type="number" id="config-comision"></div>
                 </div>
             </div>
 
-            <!-- FICHA TÉCNICA MOLDES -->
             <div class="card">
-                <h3 class="subtitulo-cfg" style="color: var(--warning);">4. Ficha Técnica (Moldes)</h3>
+                <h3 class="subtitulo-cfg" style="color: var(--warning);">4. Ficha Técnica (Moldes y Pesos)</h3>
                 <div class="grid-3">
                     <div class="grupo-input"><label>Largo Placa (cm)</label><input type="number" id="config-largo-placa"></div>
                     <div class="grupo-input"><label>Alto Placa (cm)</label><input type="number" id="config-alto-placa"></div>
@@ -159,7 +155,14 @@
 
         let propietarioUID = ""; let listaVentasGlobal = []; 
         let logoBase64Temporal = "";
-        let cfg = { moneda:"Gs.", logoUrl:"", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:230000, pPorton:2660000, cFab:140000, cInst:50000, cAlz:30, com:5 };
+        
+        let cfg = { 
+            moneda: "Gs.", logoUrl: "", 
+            largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, 
+            pLlave: 340000, pEnvio: 250000, pRetiro: 230000, pPorton: 2660000, 
+            cFab: 140000, cInst: 50000, cAlz: 30, com: 5 
+        };
+
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
         onAuthStateChanged(auth, (user) => {
@@ -175,17 +178,32 @@
 
         window.cargarConfiguracion = function() {
             get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
-                if(s.exists()) {
-                    let c = s.val(); cfg = {...cfg, ...c};
-                    document.getElementById('config-nombre').value = c.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = c.nombreEmpresa || "Turing";
-                    document.getElementById('config-whatsapp').value = c.whatsapp || ""; document.getElementById('config-moneda').value = c.moneda || "Gs.";
-                    if(c.logoUrl) logoBase64Temporal = c.logoUrl;
-                    
-                    document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
-                    document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; document.getElementById('config-costo-alz').value = cfg.cAlz; document.getElementById('config-comision').value = cfg.com;
-                    document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
-                    document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
-                }
+                let c = s.exists() ? s.val() : {};
+                cfg = { ...cfg, ...c };
+                
+                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; 
+                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
+                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; 
+                document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
+                
+                if(cfg.logoUrl) logoBase64Temporal = cfg.logoUrl;
+                
+                document.getElementById('config-precio-llave').value = cfg.pLlave; 
+                document.getElementById('config-precio-envio').value = cfg.pEnvio; 
+                document.getElementById('config-precio-retiro').value = cfg.pRetiro; 
+                document.getElementById('config-precio-porton').value = cfg.pPorton;
+                
+                document.getElementById('config-costo-fab').value = cfg.cFab; 
+                document.getElementById('config-costo-inst').value = cfg.cInst; 
+                document.getElementById('config-costo-alz').value = cfg.cAlz; 
+                document.getElementById('config-comision').value = cfg.com;
+                
+                document.getElementById('config-largo-placa').value = cfg.largoPlaca; 
+                document.getElementById('config-alto-placa').value = cfg.altoPlaca; 
+                document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
+                document.getElementById('config-ancho-col').value = cfg.anchoCol; 
+                document.getElementById('config-encastre').value = cfg.encastre; 
+                document.getElementById('config-peso-col').value = cfg.pesoCol;
             });
         }
 
@@ -208,14 +226,29 @@
 
         window.guardarConfiguracion = function() {
             cfg = {
-                nombreEmpresa: document.getElementById('config-nombre').value, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.",
+                nombreEmpresa: document.getElementById('config-nombre').value, 
+                whatsapp: document.getElementById('config-whatsapp').value, 
+                moneda: document.getElementById('config-moneda').value || "Gs.",
                 logoUrl: logoBase64Temporal,
-                pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
-                cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
-                largoPlaca: Number(document.getElementById('config-largo-placa').value), altoPlaca: Number(document.getElementById('config-alto-placa').value), pesoPlaca: Number(document.getElementById('config-peso-placa').value),
-                anchoCol: Number(document.getElementById('config-ancho-col').value), encastre: Number(document.getElementById('config-encastre').value), pesoCol: Number(document.getElementById('config-peso-col').value)
+                pLlave: Number(document.getElementById('config-precio-llave').value), 
+                pEnvio: Number(document.getElementById('config-precio-envio').value), 
+                pRetiro: Number(document.getElementById('config-precio-retiro').value), 
+                pPorton: Number(document.getElementById('config-precio-porton').value),
+                cFab: Number(document.getElementById('config-costo-fab').value), 
+                cInst: Number(document.getElementById('config-costo-inst').value), 
+                cAlz: Number(document.getElementById('config-costo-alz').value), 
+                com: Number(document.getElementById('config-comision').value),
+                largoPlaca: Number(document.getElementById('config-largo-placa').value), 
+                altoPlaca: Number(document.getElementById('config-alto-placa').value), 
+                pesoPlaca: Number(document.getElementById('config-peso-placa').value),
+                anchoCol: Number(document.getElementById('config-ancho-col').value), 
+                encastre: Number(document.getElementById('config-encastre').value), 
+                pesoCol: Number(document.getElementById('config-peso-col').value)
             };
-            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ Configuración y Logo Guardados."); });
+            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { 
+                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; 
+                mostrarToast("✅ Configuración y Valores Universales Guardados."); 
+            });
         }
 
         function calcularReales(metros, portonesStr, tipo) {

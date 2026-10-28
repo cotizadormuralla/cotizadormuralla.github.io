@@ -17,10 +17,11 @@
         .btn-opcion:hover { border-color: var(--primary); background-color: rgba(14, 165, 233, 0.05); }
         .btn-text span { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 400; margin-top: 2px;}
         #pantalla-login { display: none; }
-        .grupo-input { margin-bottom: 18px; text-align: left; }
+        .grupo-input { margin-bottom: 18px; text-align: left; position: relative; }
         .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
-        .grupo-input input { width: 100%; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--border); background-color: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
+        .grupo-input input { width: 100%; padding: 12px 40px 12px 14px; border-radius: 6px; border: 1px solid var(--border); background-color: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
         .grupo-input input:focus { outline: none; border-color: var(--primary); }
+        .btn-ver-pass { position: absolute; right: 12px; top: 34px; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--text-muted); }
         .btn-ingresar { width: 100%; background-color: var(--text-main); color: var(--bg-body); border: none; padding: 12px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         .btn-ingresar:hover { background-color: white; }
         #mensaje-error { color: #ef4444; font-size: 0.8rem; margin-top: 15px; display: block; text-align: center; }
@@ -51,7 +52,6 @@
         <div id="pantalla-login">
             <h3 style="text-align: center; margin-bottom: 20px;" id="titulo-destino">Inicio de Sesión</h3>
             
-            <!-- FORMULARIO ESTÁNDAR PARA QUE GOOGLE GUARDE LA CONTRASEÑA -->
             <form onsubmit="procesarAcceso(event)">
                 <div class="grupo-input">
                     <label>Correo electrónico</label>
@@ -60,6 +60,7 @@
                 <div class="grupo-input">
                     <label>Contraseña</label>
                     <input type="password" id="password" autocomplete="current-password" required>
+                    <button type="button" class="btn-ver-pass" onclick="togglePassword()" id="ojo-btn">👁️</button>
                 </div>
                 <button type="submit" class="btn-ingresar">Ingresar al Sistema</button>
             </form>
@@ -73,13 +74,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", authDomain: "gestorinmobiliario-d68b3.firebaseapp.com", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3", storageBucket: "gestorinmobiliario-d68b3.firebasestorage.app", messagingSenderId: "927434078075", appId: "1:927434078075:web:95bd3c4e6720bcd282afde" };
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", authDomain: "gestorinmobiliario-d68b3.firebaseapp.com", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" });
         const auth = getAuth(app);
         
         let destinoSeleccionado = "";
 
-        // MEMORIA AUTOMÁTICA: Si ya está logueado, lo manda directo sin pedir clave
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 let ultimoPanel = localStorage.getItem("turing_ultimo_panel");
@@ -97,12 +96,23 @@
         }
         window.volverAtras = function() { document.getElementById('pantalla-login').style.display = 'none'; document.getElementById('pantalla-eleccion').style.display = 'block'; }
 
+        window.togglePassword = function() {
+            const passInput = document.getElementById('password');
+            const ojoBtn = document.getElementById('ojo-btn');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                ojoBtn.innerText = '🙈';
+            } else {
+                passInput.type = 'password';
+                ojoBtn.innerText = '👁️';
+            }
+        }
+
         window.procesarAcceso = function(event) {
-            event.preventDefault(); // Evita que la página recargue al mandar el form
+            event.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // ACTIVAMOS LA MEMORIA PERMANENTE DE FIREBASE
             setPersistence(auth, browserLocalPersistence).then(() => {
                 return signInWithEmailAndPassword(auth, email, password);
             }).then(() => {
