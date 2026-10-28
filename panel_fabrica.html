@@ -3,301 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Ejecutivo | Fábrica de Murallas</title>
+    <title>TuringCotizador | Panel de Administración</title>
     <style>
-        :root {
-            --bg-body: #0b0f17; --bg-card: #151d2a; --border: #232d3f;
-            --text-main: #f1f5f9; --text-muted: #94a3b8;
-            --accent: #38bdf8; --danger: #ef4444; --success: #10b981;
-            --warning: #f59e0b; --purple: #a855f7; --pink: #ec4899;
-        }
-
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
-        .header h1 { font-size: 1.4rem; font-weight: 600; margin: 0; }
-        .header p { margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted); }
-
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background-color: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; }
-        .stat-card .titulo { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        .stat-card .valor { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-top: 6px; }
-
-        .card-tabla { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        .toolbar { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-        .toolbar-right { display: flex; gap: 10px; align-items: center; }
-        .toolbar input { background: #0b0f17; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; color: white; width: 250px; }
-        .btn-exportar { background-color: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
-        th { background-color: #0d1420; color: var(--text-muted); padding: 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
-        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-        tr:hover { background-color: rgba(255,255,255,0.02); }
-
-        .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; background: #1e293b; color: #cbd5e1; }
-        .badge.porton { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); display: inline-block; margin-top: 5px; margin-bottom: 5px; }
-        .badge.peso { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); display: inline-block; margin-top: 4px; }
-        
-        .btn-wa { color: #34d399; text-decoration: none; font-weight: 600; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; border: 1px solid rgba(52, 211, 153, 0.3); text-align: center; }
-        .btn-wa:hover { background: rgba(52, 211, 153, 0.2); text-decoration: none; }
-        .btn-estado { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
-        .btn-estado.pendiente { background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: rgba(245, 158, 11, 0.4); }
-        .btn-estado.aprobado { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
-        
-        .btn-accion { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-size: 0.65rem; cursor: pointer; margin-left: 4px; }
-        .btn-accion:hover { background: var(--accent); color: white; border-color: var(--accent); }
-        
-        .desglose-mini { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
-        .vendedor-tag { color: var(--pink); font-weight: bold; }
-        .vacio { padding: 30px; text-align: center; color: var(--text-muted); }
-
-        /* --- MAGIA PARA CELULARES (DISEÑO TARJETAS SEPARADAS) --- */
-        @media (max-width: 800px) {
-            body { padding: 10px; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-            .toolbar-right { flex-direction: column; width: 100%; }
-            .toolbar-right input, .btn-exportar { width: 100%; box-sizing: border-box; text-align: center; }
-            
-            table, thead, tbody, th, td, tr { display: block; }
-            thead tr { display: none; /* Oculta los encabezados en celular */ }
-            
-            /* --- AQUÍ ESTÁ LA MEJORA DE SEPARACIÓN VISUAL --- */
-            tr { 
-                border: 1px solid #334155; /* Borde más definido */
-                margin-bottom: 35px; /* MUCHO MÁS ESPACIO ENTRE CLIENTES */
-                border-radius: 12px; 
-                background: #0f172a; /* Fondo más oscuro para la tarjeta */
-                box-shadow: 0 10px 20px rgba(0,0,0,0.6); /* Sombra para que resalte del fondo */
-            }
-            
-            td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px; display: flex; flex-direction: column; gap: 5px; }
-            td:last-child { border-bottom: none; }
-            td::before { 
-                content: attr(data-label); 
-                font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: bold; margin-bottom: 2px;
-            }
-            .desglose-mini { margin-top: 5px; }
-        }
+        :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --primary-hover: #0284c7; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background-color: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
+        .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .menu-btn:hover { background-color: rgba(56, 189, 248, 0.1); color: var(--primary); } .menu-btn.activo { background-color: var(--primary); color: #0f172a; font-weight: 600; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
+        .btn-logout { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;}
+        .seccion { display: none; } .seccion.activa { display: block; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 20px;}
+        .grupo-input { margin-bottom: 15px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); }
+        .grupo-input input, .grupo-input select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background-color: #0f172a; color: white; box-sizing: border-box; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .btn-primario { background-color: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%;}
+        .btn-primario:hover { background-color: var(--primary-hover); color: white; }
+        .btn-eliminar { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;}
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem;} th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600;} td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} .badge.pendiente { background-color: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3);} .badge.activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3);}
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.8); z-index: 100; display: none; justify-content: center; align-items: center;} .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; } .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px;}
+        .toast-notificacion { position: fixed; bottom: 30px; right: 30px; background-color: var(--success); color: #020617; padding: 12px 24px; border-radius: 8px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000;} .toast-notificacion.mostrar { transform: translateY(0); opacity: 1; }
+        .enlace-empresa { background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; margin-top:10px; font-family: monospace; color: var(--primary); word-break: break-all;}
+        .subtitulo-cfg { font-size: 1rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 15px; margin-top: 0;}
     </style>
 </head>
 <body>
+    <div class="sidebar">
+        <h1 class="logo-text" id="header-empresa">Turing<span>SaaS</span></h1>
+        <button class="menu-btn activo" onclick="cambiarTab('ventas')">📊 Ventas Globales</button>
+        <button class="menu-btn" onclick="cambiarTab('equipo')">👥 Equipo</button>
+        <button class="menu-btn" onclick="cambiarTab('configuracion')">⚙️ Configuración</button>
+    </div>
 
-    <div class="container">
-        <div class="header">
-            <div>
-                <h1>Panel Ejecutivo</h1>
-                <p>Fábrica de Murallas Prefabricadas.</p>
-            </div>
-        </div>
-
-        <div class="grid-stats">
-            <div class="stat-card" style="border-left: 3px solid var(--warning);">
-                <div class="titulo">🧱 Materiales</div>
-                <div class="valor" id="stat-materiales">Gs. 0</div>
-            </div>
-            <div class="stat-card" style="border-left: 3px solid var(--accent);">
-                <div class="titulo">👷‍♂️ Personal (Base)</div>
-                <div class="valor" id="stat-personal">Gs. 0</div>
-            </div>
-            <div class="stat-card" style="border-left: 3px solid var(--purple);">
-                <div class="titulo">🚚 Logística</div>
-                <div class="valor" id="stat-logistica">Gs. 0</div>
-            </div>
-            <div class="stat-card" style="border-left: 3px solid var(--pink);">
-                <div class="titulo">🤝 Comisiones</div>
-                <div class="valor" id="stat-comisiones" style="color: var(--pink);">Gs. 0</div>
-            </div>
-            <div class="stat-card" style="border-left: 3px solid var(--success);">
-                <div class="titulo">💰 Ganancia Neta</div>
-                <div class="valor" id="stat-ganancia" style="color: var(--success);">Gs. 0</div>
-            </div>
-        </div>
-
-        <div class="card-tabla">
-            <div class="toolbar">
-                <span style="font-weight: 600; padding-bottom: 10px; display: block;">Historial de Ventas</span>
-                <div class="toolbar-right">
-                    <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="🔍 Buscar cliente o ciudad...">
-                    <button class="btn-exportar" onclick="exportarExcel()">📥 Descargar Balance</button>
+    <div class="main-content">
+        <!-- PESTAÑA VENTAS -->
+        <div id="seccion-ventas" class="seccion activa">
+            <div class="header-top">
+                <h2>Historial de Ventas Privadas</h2>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <span style="font-size:0.8rem; color:var(--text-muted);" id="email-usuario-actual"></span>
+                    <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
                 </div>
             </div>
-            <div style="overflow-x: auto;">
-                <table id="tabla-prospectos">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Cliente / Contacto</th>
-                            <th>Medidas / Producción</th>
-                            <th>Presupuesto</th>
-                            <th>Desglose Estratégico</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-body">
-                        <tr><td colspan="6" class="vacio">Cargando datos...</td></tr>
-                    </tbody>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table>
+                    <thead><tr style="background-color: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente</th><th>Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                    <tbody id="tabla-ventas-body"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- PESTAÑA EQUIPO -->
+        <div id="seccion-equipo" class="seccion">
+            <div class="header-top"><h2>Gestión de Vendedores</h2></div>
+            <div class="card">
+                <div class="grid-3">
+                    <div class="grupo-input"><label>Nombre</label><input type="text" id="nuevo-vendedor-nombre"></div>
+                    <div class="grupo-input"><label>Correo (Acceso)</label><input type="email" id="nuevo-vendedor-email"></div>
+                    <div class="grupo-input"><label>Clave Temporal</label><input type="text" id="nuevo-vendedor-pass" value="Ventas123" readonly style="color: var(--warning);"></div>
+                </div>
+                <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta de Asesor</button>
+            </div>
+            <div class="card">
+                <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
+            </div>
+        </div>
+
+        <!-- PESTAÑA CONFIGURACIÓN UNIVERSAL -->
+        <div id="seccion-configuracion" class="seccion">
+            <div class="header-top"><h2>Configuración de Fábrica (Universal)</h2></div>
+            
+            <!-- IDENTIDAD Y LOGO DESDE GALERÍA -->
+            <div class="card">
+                <h3 class="subtitulo-cfg">1. Identidad, Logo y Moneda</h3>
+                <div class="grid-3">
+                    <div class="grupo-input"><label>Nombre Comercial</label><input type="text" id="config-nombre" placeholder="Ej: G.H.Mix"></div>
+                    <div class="grupo-input"><label>WhatsApp de Ventas</label><input type="tel" id="config-whatsapp" placeholder="Ej: 595981..."></div>
+                    <div class="grupo-input"><label>Símbolo de Moneda</label><input type="text" id="config-moneda" placeholder="Ej: Gs., $, €, S/"></div>
+                </div>
+                <div class="grupo-input" style="margin-top: 15px;">
+                    <label>Logotipo (Elegir imagen de tu galería)</label>
+                    <input type="file" id="config-logo-file" accept="image/*" style="background:transparent; border:none; padding:0; color:white;">
+                </div>
+                <div style="margin-top: 10px;">
+                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Tu Enlace de Ventas Exclusivo:</label>
+                    <div class="enlace-empresa" id="link-exclusivo">Cargando...</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- PRECIOS DE VENTA -->
+                <div class="card">
+                    <h3 class="subtitulo-cfg" style="color: var(--success);">2. Precios Públicos</h3>
+                    <div class="grupo-input"><label>Precio Metro (Llave en mano)</label><input type="number" id="config-precio-llave"></div>
+                    <div class="grupo-input"><label>Precio Metro (Envío a Obra)</label><input type="number" id="config-precio-envio"></div>
+                    <div class="grupo-input"><label>Precio Metro (Retiro de Fábrica)</label><input type="number" id="config-precio-retiro"></div>
+                    <div class="grupo-input"><label>Precio por Portón</label><input type="number" id="config-precio-porton"></div>
+                </div>
+
+                <!-- COSTOS OPERATIVOS -->
+                <div class="card">
+                    <h3 class="subtitulo-cfg" style="color: var(--danger);">3. Costos Operativos (Fábrica)</h3>
+                    <div class="grupo-input"><label>Costo de Fabricación (Por Metro)</label><input type="number" id="config-costo-fab"></div>
+                    <div class="grupo-input"><label>Costo de Instalación (Por Metro)</label><input type="number" id="config-costo-inst"></div>
+                    <div class="grupo-input"><label>Costo Personal/Logística (Por Kilo)</label><input type="number" id="config-costo-alz"></div>
+                    <div class="grupo-input"><label>Comisión Vendedor (%)</label><input type="number" id="config-comision" value="5"></div>
+                </div>
+            </div>
+
+            <!-- FICHA TÉCNICA MOLDES -->
+            <div class="card">
+                <h3 class="subtitulo-cfg" style="color: var(--warning);">4. Ficha Técnica (Moldes)</h3>
+                <div class="grid-3">
+                    <div class="grupo-input"><label>Largo Placa (cm)</label><input type="number" id="config-largo-placa"></div>
+                    <div class="grupo-input"><label>Alto Placa (cm)</label><input type="number" id="config-alto-placa"></div>
+                    <div class="grupo-input"><label>Peso 1 Placa (Kg)</label><input type="number" id="config-peso-placa"></div>
+                    <div class="grupo-input"><label>Ancho Columna (cm)</label><input type="number" id="config-ancho-col"></div>
+                    <div class="grupo-input"><label>Encastre/Ranura (cm)</label><input type="number" id="config-encastre"></div>
+                    <div class="grupo-input"><label>Peso 1 Columna (Kg)</label><input type="number" id="config-peso-col"></div>
+                </div>
+                <button class="btn-primario" onclick="guardarConfiguracion()">💾 Guardar Toda la Configuración</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase -->
+    <!-- MODAL DESGLOSE -->
+    <div id="modal-desglose" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Desglose Matemático</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
+            <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
+            <div class="fila-desglose"><span style="color:var(--text-muted)">Ingreso Bruto:</span><strong id="m-ingreso" style="color:white;">0</strong></div>
+            <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                <div class="fila-desglose"><span>Costo Fabricación:</span><span id="m-costo-fab" style="color:var(--danger)">- 0</span></div>
+                <div class="fila-desglose"><span>Logística/Personal (Por Kg):</span><span id="m-costo-alzada" style="color:var(--danger)">- 0</span></div>
+                <div class="fila-desglose" id="fila-inst"><span>Instalación en Obra:</span><span id="m-costo-inst" style="color:var(--danger)">- 0</span></div>
+                <div class="fila-desglose"><span>Comisión Vendedor:</span><span id="m-comision" style="color:var(--danger)">- 0</span></div>
+            </div>
+            <div class="fila-desglose" style="font-size:1.1rem; color:var(--success); font-weight:bold; border:none; margin-top:10px;"><span>GANANCIA NETA:</span><span id="m-ganancia">0</span></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast-notificacion"><span id="toast-mensaje"></span></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", authDomain: "gestorinmobiliario-d68b3.firebaseapp.com", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3", storageBucket: "gestorinmobiliario-d68b3.firebasestorage.app", messagingSenderId: "927434078075", appId: "1:927434078075:web:95bd3c4e6720bcd282afde" };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
-        const tablaBody = document.getElementById('tabla-body');
+        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" });
+        const auth = getAuth(app); const db = getDatabase(app);
+        const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
 
-        onValue(ref(db, 'clientes_muralla_directos'), (snapshot) => {
-            const data = snapshot.val();
-            tablaBody.innerHTML = '';
+        let propietarioUID = ""; let listaVentasGlobal = []; 
+        let logoBase64Temporal = "";
+        let cfg = { moneda:"Gs.", logoUrl:"", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:230000, pPorton:2660000, cFab:140000, cInst:50000, cAlz:30, com:5 };
+        const fm = (num) => Number(num).toLocaleString('es-ES');
 
-            if (!data) {
-                tablaBody.innerHTML = '<tr><td colspan="6" class="vacio">No hay cotizaciones aún.</td></tr>';
-                return;
-            }
-
-            let sMat=0, sPer=0, sLog=0, sCom=0, sGan=0;
-            const mesActual = new Date().getMonth();
-            const anioActual = new Date().getFullYear();
-
-            Object.entries(data).reverse().forEach(([id, item]) => {
-                let mTot = parseFloat(item.metros_totales) || 0;
-                let mMur = parseFloat(item.metros_muralla) || mTot;
-                let cPortones = parseInt(item.cantidad_portones) || 0;
-                let tipoApertura = item.tipo_apertura ? item.tipo_apertura : ""; // Captura el tipo de portón
-                let pres = parseFloat(item.presupuesto_completo) || 0;
-                let esVend = item.estado_venta === 'aprobado';
-                let vendedor = item.vendedor || "";
-                let ciudad = item.ciudad || "No especificada";
-
-                let detalleMedida = item.detalle_medidas ? `<span style="font-size: 0.75rem; color: #cbd5e1; display: block; margin-top: 3px;">📏 ${item.detalle_medidas}</span>` : '';
-
-                let cols = 0, placs = 0;
-                if (mMur > 0.15) {
-                    let modE = Math.floor((mMur - 0.15) / 1.65);
-                    cols = modE + 1; placs = modE * 5;
-                    if ((mMur - 0.15) - (modE * 1.65) > 0.05) { cols += 1; placs += Math.ceil(5 / Math.floor(1.50 / ((mMur - 0.15) - (modE * 1.65)))); }
-                } else if (mMur > 0) { cols=2; placs=5; }
-
-                let pesoPlacasKg = placs * 55;
-                let pesoColumnasKg = cols * 95;
-                let pesoTotalKg = pesoPlacasKg + pesoColumnasKg;
-                let textoPeso = pesoTotalKg >= 1000 
-                    ? `⚖️ ${(pesoTotalKg / 1000).toFixed(2)} Toneladas (${pesoTotalKg.toLocaleString('es-PY')} kg)` 
-                    : `⚖️ ${pesoTotalKg.toLocaleString('es-PY')} kg`;
-
-                let mat = item.desglose_materiales !== undefined ? item.desglose_materiales : (mMur * 86000);
-                let log = item.desglose_logistica !== undefined ? item.desglose_logistica : Math.max(550000, mMur * 10400);
-                let comision = vendedor !== "" ? (mMur * 15000) + (cPortones * 100000) : 0;
-                
-                let diasObra = Math.max(1, Math.ceil(mMur / 15)); 
-                let costoFleteCarga = 720000; 
-                
-                let per_A = costoFleteCarga + (diasObra * 150000); 
-                let per_B = costoFleteCarga + (diasObra * 300000); 
-
-                let ganNeta_A = pres - mat - log - comision - per_A;
-                let ganNeta_B = pres - mat - log - comision - per_B;
-
-                if (item.fecha && esVend) {
-                    let f = new Date(item.fecha);
-                    if (f.getMonth() === mesActual && f.getFullYear() === anioActual) {
-                        sMat+=mat; sPer+=per_A; sLog+=log; sCom+=comision; sGan+=ganNeta_A; 
-                    }
-                }
-
-                let fFormat = item.fecha ? new Date(item.fecha).toLocaleString('es-PY', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
-                
-                let txtPorton = tipoApertura !== "" ? ` (${tipoApertura})` : "";
-                let pBadge = cPortones > 0 ? `<span class="badge porton">🚪 +${cPortones} Portón${txtPorton}</span><br>` : '';
-                
-                let clGan_A = ganNeta_A >= 0 ? "var(--success)" : "var(--danger)";
-                let clGan_B = ganNeta_B >= 0 ? "var(--success)" : "var(--danger)";
-
-                let mensajeWa = `¡Hola ${item.nombre}! Soy de PREfabricados. Vi que cotizaste el cierre en ${ciudad} (${mTot}m). ¿Qué te pareció el presupuesto?`;
-                let linkWa = `https://wa.me/595${item.telefono}?text=${encodeURIComponent(mensajeWa)}`;
-
-                let htmlVendedor = vendedor !== "" 
-                    ? `<span class="vendedor-tag">🤝 ${vendedor} (Com.: Gs. ${comision.toLocaleString('es-PY')})</span>` 
-                    : `<span style="color:var(--text-muted)">Venta Directa</span>`;
-
-                let htmlDesg = esVend ? `
-                    <div class="desglose-mini">
-                        🧱 Mat: ${mat.toLocaleString('es-PY')} <button class="btn-accion" onclick="editar('${id}','desglose_materiales',${mat})">✏️</button><br>
-                        🚚 Log: ${log.toLocaleString('es-PY')} <button class="btn-accion" onclick="editar('${id}','desglose_logistica',${log})">✏️</button><br>
-                        ${htmlVendedor} <button class="btn-accion" style="margin-bottom:8px;" onclick="asignarVendedor('${id}','${vendedor}')">👤 Asignar</button>
-                        
-                        <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: 6px; border-left: 3px solid var(--accent); margin-top: 5px;">
-                            <div style="font-size:0.7rem; color:var(--accent); margin-bottom:6px; font-weight:bold;">
-                                ⏱️ Obra: ${diasObra} días aprox | 🏗️ Carga: 720.000 Gs (6 peones)
-                            </div>
-                            <div style="margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:6px;">
-                                👷‍♂️ <b>Trabajás Vos + 1 Ayudante</b><br>
-                                <span style="font-size:0.65rem; color:var(--text-muted);">Costo Per: ${per_A.toLocaleString()}</span><br>
-                                💰 <b style="color:${clGan_A}; font-size:0.9rem;">Neta: Gs. ${ganNeta_A.toLocaleString('es-PY')}</b>
-                            </div>
-                            <div>
-                                🏖️ <b>Vos Libre + 2 Ayudantes</b><br>
-                                <span style="font-size:0.65rem; color:var(--text-muted);">Costo Per: ${per_B.toLocaleString()}</span><br>
-                                💰 <b style="color:${clGan_B}; font-size:0.9rem;">Neta: Gs. ${ganNeta_B.toLocaleString('es-PY')}</b>
-                            </div>
-                        </div>
-                    </div>
-                ` : `<span style="color:var(--text-muted); font-size:0.7rem;">(Aprobar para ver desglose)</span><br><button class="btn-accion" onclick="asignarVendedor('${id}','${vendedor}')">👤 Vendedor: ${vendedor||'Ninguno'}</button>`;
-
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="Fecha Registro">${fFormat}</td>
-                    <td data-label="Cliente / Datos">
-                        <b style="font-size:1.1em;">${item.nombre}</b><br>
-                        <span style="font-size: 0.8rem; color: #38bdf8;">📍 ${ciudad}</span><br>
-                        <a href="${linkWa}" target="_blank" class="btn-wa">💬 Contactar al ${item.telefono}</a>
-                    </td>
-                    <td data-label="Medidas y Producción">
-                        <b>${mTot}m</b> total
-                        ${detalleMedida}
-                        ${pBadge}
-                        <span style="color:#a5b4fc;font-size:0.7rem; display:block; margin-top:2px;">🏗️ ${cols} Col / 🧱 ${placs} Plac</span>
-                        <span class="badge peso">${textoPeso}</span>
-                    </td>
-                    <td data-label="Presupuesto Total"><strong style="color:var(--success); font-size:1.1em;">Gs. ${pres.toLocaleString('es-PY')}</strong></td>
-                    <td data-label="Costos y Ganancias">${htmlDesg}</td>
-                    <td data-label="Acciones">
-                        <button class="btn-estado ${esVend?'aprobado':'pendiente'}" style="width:100%" onclick="alternar('${id}','${item.estado_venta}')">${esVend?'✅ Venta Aprobada':'⏳ Cotización Pendiente'}</button>
-                        <button class="btn-accion" style="width:100%; margin-left:0; margin-top:5px; color:var(--danger); border-color:rgba(239, 68, 68, 0.3)" onclick="borrar('${id}')">🗑️ Borrar Registro</button>
-                    </td>
-                `;
-                tablaBody.appendChild(tr);
-            });
-
-            document.getElementById('stat-materiales').innerText = "Gs. " + sMat.toLocaleString('es-PY');
-            document.getElementById('stat-personal').innerText = "Gs. " + sPer.toLocaleString('es-PY');
-            document.getElementById('stat-logistica').innerText = "Gs. " + sLog.toLocaleString('es-PY');
-            document.getElementById('stat-comisiones').innerText = "Gs. " + sCom.toLocaleString('es-PY');
-            document.getElementById('stat-ganancia').innerText = "Gs. " + sGan.toLocaleString('es-PY');
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                propietarioUID = user.uid; document.getElementById('email-usuario-actual').innerText = user.email;
+                document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
+                cargarConfiguracion(); cargarVendedores(); cargarVentas();
+            } else { window.location.href = "login.html"; }
         });
 
-        window.editar = function(id, campo, actual) {
-            let n = prompt("Nuevo monto (Gs):", actual);
-            if (n && !isNaN(n)) { let obj={}; obj[campo]=parseFloat(n); update(ref(db, 'clientes_muralla_directos/'+id), obj); }
-        };
-        window.asignarVendedor = function(id, actual) {
-            let n = prompt("Nombre del vendedor (vacío para venta directa):", actual);
-            if (n !== null) { update(ref(db, 'clientes_muralla_directos/'+id), {vendedor: n.trim()}); }
-        };
-        window.alternar = function(id, est) { update(ref(db, 'clientes_muralla_directos/'+id), {estado_venta: est==='aprobado'?'pendiente':'aprobado'}); };
-        window.borrar = function(id) { if(confirm("¿Borrar permanentemente?")) remove(ref(db, 'clientes_muralla_directos/'+id)); };
-        window.filtrarTabla = function() {
-            let txt = document.getElementById("buscador").value.toLowerCase();
-            let filas = tablaBody.getElementsByTagName("tr");
-            for(let f of filas) f.style.display = f.innerText.toLowerCase().includes(txt) ? "" : "none";
-        };
-        window.exportarExcel = function() { alert("Herramienta de exportación en desarrollo."); }
+        window.cambiarTab = function(t) { document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa')); document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('activo')); document.getElementById('seccion-' + t).classList.add('activa'); }
+        function mostrarToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-mensaje').innerText = msg; t.classList.add('mostrar'); setTimeout(() => t.classList.remove('mostrar'), 3000); }
+
+        window.cargarConfiguracion = function() {
+            get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
+                if(s.exists()) {
+                    let c = s.val(); cfg = {...cfg, ...c};
+                    document.getElementById('config-nombre').value = c.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = c.nombreEmpresa || "Turing";
+                    document.getElementById('config-whatsapp').value = c.whatsapp || ""; document.getElementById('config-moneda').value = c.moneda || "Gs.";
+                    if(c.logoUrl) logoBase64Temporal = c.logoUrl;
+                    
+                    document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
+                    document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; document.getElementById('config-costo-alz').value = cfg.cAlz; document.getElementById('config-comision').value = cfg.com;
+                    document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
+                    document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputLogo = document.getElementById('config-logo-file');
+            if(inputLogo) {
+                inputLogo.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(uploadEvent) {
+                            logoBase64Temporal = uploadEvent.target.result;
+                            mostrarToast("📁 Logo cargado en memoria. Guardá los cambios.");
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+
+        window.guardarConfiguracion = function() {
+            cfg = {
+                nombreEmpresa: document.getElementById('config-nombre').value, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.",
+                logoUrl: logoBase64Temporal,
+                pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
+                cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
+                largoPlaca: Number(document.getElementById('config-largo-placa').value), altoPlaca: Number(document.getElementById('config-alto-placa').value), pesoPlaca: Number(document.getElementById('config-peso-placa').value),
+                anchoCol: Number(document.getElementById('config-ancho-col').value), encastre: Number(document.getElementById('config-encastre').value), pesoCol: Number(document.getElementById('config-peso-col').value)
+            };
+            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ Configuración y Logo Guardados."); });
+        }
+
+        function calcularReales(metros, portonesStr, tipo) {
+            let m = parseFloat(metros)||0; let p = parseInt(portonesStr)||0;
+            let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
+            let modulos = Math.ceil(m / largoModulo); let placas = modulos * Math.ceil(200 / cfg.altoPlaca); let columnas = modulos + 1 + p;
+            let kg = (columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca); let ton = (kg / 1000).toFixed(2);
+            let pMetro = cfg.pEnvio; if(tipo.includes("Llave")) pMetro = cfg.pLlave; else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
+            let total = (m * pMetro) + (p * cfg.pPorton);
+            return { placas, columnas, kg, ton, total, m, p, tipo, largoModulo };
+        }
+
+        window.cargarVentas = function() {
+            onValue(ref(db, 'empresas/' + propietarioUID + '/cotizaciones'), (snap) => {
+                let html = ""; listaVentasGlobal = []; let i = 0;
+                snap.forEach((c) => {
+                    let v = c.val(); let calc = calcularReales(v.metros, v.portones, v.tipoVenta); listaVentasGlobal.push(calc); 
+                    html += `<tr>
+                        <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small></td>
+                        <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small></td>
+                        <td><span style="color:var(--primary)">${calc.m}m (${calc.columnas} Col / ${calc.placas} Plac)</span><br><small style="color:var(--warning)">⚖️ ${calc.ton} Ton</small></td>
+                        <td>${cfg.moneda} ${fm(calc.total)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Ver Desglose</small></td>
+                        <td><span class="badge pendiente">${v.estado}</span><br><small style="cursor:pointer; color:var(--danger)" onclick="if(confirm('Borrar?')) remove(ref(db, 'empresas/${propietarioUID}/cotizaciones/${c.key}'))">🗑️ Borrar</small></td>
+                    </tr>`; i++;
+                });
+                document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">Sin ventas</td></tr>`;
+            });
+        }
+
+        window.abrirDesglose = function(idx) {
+            let c = listaVentasGlobal[idx];
+            let cFab = c.m * cfg.cFab; let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0;
+            let cAlz = c.kg * cfg.cAlz; let comision = c.total * (cfg.com / 100);
+            document.getElementById('m-tipo').innerText = c.tipo;
+            document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(c.total)}`;
+            document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
+            document.getElementById('m-costo-alzada').innerText = `- ${cfg.moneda} ${fm(cAlz)} (${c.ton} Ton)`;
+            document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
+            document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)}`;
+            document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(c.total - (cFab+cInst+cAlz+comision))}`;
+            document.getElementById('modal-desglose').style.display = 'flex';
+        }
+        window.cerrarModal = function() { document.getElementById('modal-desglose').style.display = 'none'; }
+        
+        window.guardarVendedor = function() {
+            let n = document.getElementById('nuevo-vendedor-nombre').value, e = document.getElementById('nuevo-vendedor-email').value, p = document.getElementById('nuevo-vendedor-pass').value;
+            if(!n||!e) return;
+            createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); });
+        }
+        window.cargarVendedores = function() {
+            onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (snap) => {
+                let h = ""; snap.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-eliminar" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">🗑️</button></td></tr>`; });
+                document.getElementById('tabla-vendedores-body').innerHTML = h;
+            });
+        }
+        window.cerrarSesion = function() { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href = "login.html"); }
     </script>
 </body>
 </html>

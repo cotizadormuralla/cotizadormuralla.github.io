@@ -3,271 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal del Vendedor | Murallas</title>
+    <title>Portal Asesor | TuringCotizador</title>
     <style>
-        :root {
-            --bg-body: #0b0f17; --bg-card: #151d2a; --border: #232d3f;
-            --text-main: #f1f5f9; --text-muted: #94a3b8;
-            --accent: #38bdf8; --pink: #ec4899; --green: #10b981; --yellow: #fbbf24;
-        }
-
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 90vh;}
-        
-        .contenedor { background-color: var(--bg-card); width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 20px;}
-        
-        h2 { font-size: 1.2rem; color: #60a5fa; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;}
-        
-        .grupo { margin-bottom: 15px; }
-        .grupo label { display: block; margin-bottom: 6px; font-size: 0.8rem; font-weight: bold; color: var(--text-muted); }
-        .grupo input, .grupo select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background-color: rgba(30, 41, 59, 0.5); color: white; box-sizing: border-box; }
-        .grupo input:focus, .grupo select:focus { outline: none; border-color: var(--accent); }
-        
-        .fila { display: flex; gap: 10px; }
-        .fila .grupo { flex: 1; }
-
-        .caja-comision { border: 1px dashed var(--pink); background-color: rgba(236, 72, 153, 0.05); padding: 15px; text-align: center; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; }
-        .caja-comision span { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; }
-        .caja-comision b { font-size: 1.4rem; color: var(--pink); }
-
-        .caja-verde { border-color: var(--green); background-color: rgba(16, 185, 129, 0.05); }
-        .caja-verde b { color: var(--green); }
-
-        .btn-guardar { width: 100%; padding: 12px; border-radius: 6px; background-color: #10b981; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; }
-        .btn-guardar:hover { background-color: #059669; }
-
-        .item-venta { background: rgba(30, 41, 59, 0.5); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid var(--border); }
-        .item-venta.pendiente { border-left-color: var(--yellow); }
-        .item-venta.aprobada { border-left-color: var(--green); }
+        :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --primary: #0ea5e9; }
+        body { font-family: sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 20px;}
+        .card { background: var(--bg-card); border: 1px solid var(--border); padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; }
+        .btn { background: var(--primary); color: #000; padding: 12px; border:none; width:100%; border-radius:6px; font-weight:bold; cursor:pointer;}
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; background: #020617; border: 1px solid var(--border); color: white; border-radius: 6px; box-sizing: border-box;}
     </style>
 </head>
 <body>
-
-    <!-- CAJA 1: REGISTRO DE VENTA -->
-    <div class="contenedor">
-        <h2>📝 Registrar Nueva Venta</h2>
+    <div class="card">
+        <h2 style="margin-top:0; color:var(--primary);">Registro Rápido Asesor</h2>
+        <span id="user-email" style="display:block; margin-bottom:20px; font-size:0.8rem; color:grey;">Cargando...</span>
         
-        <div class="grupo">
-            <label>Tu Nombre (Asesor)</label>
-            <input type="text" id="nombre_vendedor" placeholder="Tu nombre" onkeyup="cargarHistorial()">
+        <input type="text" id="cliente" placeholder="Nombre del Cliente" required>
+        <input type="text" id="ciudad" placeholder="Ciudad (Ej: San Lorenzo)" required>
+        <select id="tipo">
+            <option value="Llave en mano">1. Obra Terminada (Llave en mano)</option>
+            <option value="Solo Materiales (Envío a Obra)">2. Solo Materiales (Envío a Obra)</option>
+            <option value="Solo Materiales (Retiro de Fábrica)">3. Solo Materiales (Retiro de Fábrica)</option>
+        </select>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="metros" placeholder="Metros" required>
+            <input type="number" id="portones" placeholder="Portones (0, 1, 2)" value="0">
         </div>
-
-        <div class="grupo">
-            <label>Nombre del Cliente</label>
-            <input type="text" id="nombre_cliente" placeholder="Nombre y Apellido">
-        </div>
-
-        <div class="grupo">
-            <label>📍 Ciudad de Instalación</label>
-            <input type="text" id="ciudad_cliente" placeholder="Ej: Itauguá, Capiatá...">
-        </div>
-
-        <div class="grupo">
-            <label>WhatsApp del Cliente</label>
-            <input type="tel" id="whatsapp_cliente" placeholder="Ej: 0981123456">
-        </div>
-
-        <div class="grupo">
-            <label>🛠️ Tipo de Venta Cerrada</label>
-            <select id="tipo_venta" onchange="calcularComision()">
-                <option value="completo">1. Obra Terminada (Llave en mano)</option>
-                <option value="flete">2. Solo Material + Flete a Obra</option>
-                <option value="taller">3. Solo Material (Retira de Fábrica)</option>
-            </select>
-        </div>
-
-        <div class="fila">
-            <div class="grupo">
-                <label>Metros (Muralla)</label>
-                <input type="number" id="metros" placeholder="Ej: 15" onkeyup="calcularComision()">
-            </div>
-            <div class="grupo">
-                <label>Portones</label>
-                <select id="portones" onchange="calcularComision()">
-                    <option value="0">0 Portones</option>
-                    <option value="1">1 Portón</option>
-                    <option value="2">2 Portones</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="caja-comision">
-            <span>Tu comisión por esta obra será:</span>
-            <b id="monto_comision">Gs. 0</b>
-        </div>
-
-        <button class="btn-guardar" onclick="guardarVenta()">Enviar Venta a Fábrica</button>
+        
+        <button class="btn" onclick="guardar()">Enviar a Fábrica</button>
+        <button onclick="cerrarSesion()" style="background:transparent; border:none; color:grey; width:100%; margin-top:20px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
-    <!-- CAJA 2: HISTORIAL Y BALANCE DEL VENDEDOR -->
-    <div class="contenedor">
-        <h2>📊 Mi Balance y Ventas</h2>
-        <div id="lista-ventas">
-            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Ingresá tu nombre arriba para cargar tu historial.</p>
-        </div>
-        <div class="caja-comision caja-verde">
-            <span>Total Comisiones (Solo Aprobadas):</span>
-            <b id="total-comisiones-ganadas">Gs. 0</b>
-        </div>
-    </div>
-
-    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getDatabase, ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s",
-            authDomain: "gestorinmobiliario-d68b3.firebaseapp.com",
-            databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com",
-            projectId: "gestorinmobiliario-d68b3",
-            storageBucket: "gestorinmobiliario-d68b3.firebasestorage.app",
-            messagingSenderId: "927434078075",
-            appId: "1:927434078075:web:95bd3c4e6720bcd282afde"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const db = getDatabase(initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" }));
+        const auth = getAuth();
+        let jefeUID = ""; let asName = "";
 
-        let comisionTotal = 0;
-
-        // Recuperar nombre guardado al abrir la página
-        window.onload = function() {
-            let nombreGuardado = localStorage.getItem("vendedor_murallas");
-            if(nombreGuardado) {
-                document.getElementById('nombre_vendedor').value = nombreGuardado;
-                window.cargarHistorial();
-            }
-        }
-
-        window.calcularComision = function() {
-            let m = parseFloat(document.getElementById('metros').value) || 0;
-            let p = parseInt(document.getElementById('portones').value) || 0;
-            let tipoVenta = document.getElementById('tipo_venta').value;
-            
-            let comisionPorMetro = 0;
-            if (tipoVenta === 'completo') comisionPorMetro = 15000; 
-            else if (tipoVenta === 'flete') comisionPorMetro = 10000; 
-            else if (tipoVenta === 'taller') comisionPorMetro = 5000;  
-
-            let comisionPorton = p * 100000;
-
-            comisionTotal = (m * comisionPorMetro) + comisionPorton;
-            document.getElementById('monto_comision').innerText = "Gs. " + comisionTotal.toLocaleString('es-PY');
-        }
-
-        window.guardarVenta = function() {
-            let vendedor = document.getElementById('nombre_vendedor').value.trim();
-            let cliente = document.getElementById('nombre_cliente').value.trim();
-            let ciudad = document.getElementById('ciudad_cliente').value.trim();
-            let whatsapp = document.getElementById('whatsapp_cliente').value.trim();
-            let metros = parseFloat(document.getElementById('metros').value) || 0;
-            let portones = parseInt(document.getElementById('portones').value) || 0;
-            
-            let selectorTipoVenta = document.getElementById('tipo_venta');
-            let tipoVentaValor = selectorTipoVenta.value;
-            let textoTipoVenta = selectorTipoVenta.options[selectorTipoVenta.selectedIndex].text;
-
-            if(!vendedor || !cliente || !ciudad || !whatsapp || metros <= 0) {
-                alert("Por favor completa todos los campos correctamente.");
-                return;
-            }
-
-            // Guardamos el nombre del vendedor en la memoria del celular/PC
-            localStorage.setItem("vendedor_murallas", vendedor);
-
-            let costoPorMetroCliente = 0;
-            if (tipoVentaValor === 'completo') costoPorMetroCliente = 340000;
-            else if (tipoVentaValor === 'flete') costoPorMetroCliente = 250000;
-            else if (tipoVentaValor === 'taller') costoPorMetroCliente = 180000;
-
-            let costoPortonAgregado = portones * 3.5 * 1100000;
-            let presupuestoCompleto = (metros * costoPorMetroCliente) + costoPortonAgregado;
-
-            const idProspecto = "lead_" + Date.now();
-            
-            set(ref(db, 'clientes_muralla_directos/' + idProspecto), {
-                nombre: cliente,
-                ciudad: ciudad,
-                telefono: whatsapp,
-                vendedor: vendedor,
-                estado_venta: 'en_revision', // AHORA ENTRA COMO PENDIENTE DE REVISIÓN
-                metros_totales: metros + (portones * 3.5),
-                metros_muralla: metros,
-                cantidad_portones: portones,
-                tipo_venta: tipoVentaValor,
-                detalle_medidas: "Venta Asesor: " + textoTipoVenta,
-                presupuesto_completo: presupuestoCompleto,
-                comision_vendedor: comisionTotal, 
-                fecha: new Date().toISOString()
-            }).then(() => {
-                
-                fetch("https://formsubmit.co/ajax/hcgimenez11@gmail.com", {
-                    method: "POST",
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                        _subject: "💼 NUEVA VENTA DE ASESOR: " + vendedor,
-                        _template: "table",
-                        Vendedor_Responsable: vendedor,
-                        Cliente: cliente,
-                        Ciudad: ciudad,
-                        WhatsApp: whatsapp,
-                        Tipo_de_Venta: textoTipoVenta,
-                        Metros_Cargados: metros + "m",
-                        Comision_a_Pagar: "Gs. " + comisionTotal.toLocaleString('es-PY')
-                    })
-                }).catch(err => console.log(err));
-
-                alert("✅ Venta enviada a Fábrica. Ahora aparecerá en revisión en tu balance.");
-                location.reload(); 
-            }).catch((error) => {
-                alert("Error al guardar.");
-            });
-        }
-
-        // NUEVA FUNCIÓN: Leer la base de datos y mostrar las ventas del vendedor
-        window.cargarHistorial = function() {
-            let vendedorBuscado = document.getElementById('nombre_vendedor').value.trim().toLowerCase();
-            if(!vendedorBuscado) return;
-
-            const prospectosRef = ref(db, 'clientes_muralla_directos');
-            onValue(prospectosRef, (snapshot) => {
-                let html = "";
-                let totalGanado = 0;
-                let encontroVentas = false;
-
-                snapshot.forEach((childSnapshot) => {
-                    let data = childSnapshot.val();
-                    if(data.vendedor && data.vendedor.toLowerCase() === vendedorBuscado) {
-                        encontroVentas = true;
-                        
-                        let estaAprobada = data.estado_venta === 'aprobado' || data.estado_venta === 'Aprobada';
-                        let estadoTxt = estaAprobada ? '✅ Aprobada' : '⏳ En Revisión';
-                        let claseCss = estaAprobada ? 'aprobada' : 'pendiente';
-                        let colorEstado = estaAprobada ? '#10b981' : '#fbbf24';
-                        
-                        let comision = data.comision_vendedor || 0;
-                        if(estaAprobada) { totalGanado += comision; }
-
-                        html += `
-                            <div class="item-venta ${claseCss}">
-                                <strong style="color: white; font-size: 1rem;">Cliente: ${data.nombre}</strong><br>
-                                <span style="font-size: 0.8rem; color: #94a3b8;">${data.metros_totales}m totales - ${data.ciudad}</span><br>
-                                <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.85rem; font-weight: bold; color: ${colorEstado};">${estadoTxt}</span>
-                                    <span style="font-size: 0.9rem; font-weight: bold; color: #38bdf8;">Gs. ${comision.toLocaleString('es-PY')}</span>
-                                </div>
-                            </div>
-                        `;
-                    }
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                document.getElementById('user-email').innerText = "Vendedor: " + u.email;
+                get(ref(db, 'empresas')).then(s => {
+                    s.forEach(emp => { let vends = emp.child('vendedores').val(); if(vends) Object.values(vends).forEach(v => { if(v.email === u.email) { jefeUID = emp.key; asName = v.nombre; } }); });
                 });
+            } else { window.location.href = "login.html"; }
+        });
 
-                if(!encontroVentas) {
-                    html = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Aún no tenés ventas registradas.</p>';
-                }
-
-                document.getElementById('lista-ventas').innerHTML = html;
-                document.getElementById('total-comisiones-ganadas').innerText = 'Gs. ' + totalGanado.toLocaleString('es-PY');
-            });
+        window.guardar = function() {
+            if(!jefeUID) return alert("Cuenta no vinculada.");
+            set(push(ref(db, `empresas/${jefeUID}/cotizaciones`)), {
+                vendedor: asName, cliente: document.getElementById('cliente').value, ciudad: document.getElementById('ciudad').value,
+                tipoVenta: document.getElementById('tipo').value, metros: document.getElementById('metros').value, portones: document.getElementById('portones').value,
+                estado: "Cotizado Asesor", fecha: new Date().toISOString()
+            }).then(() => { alert("Venta registrada."); document.getElementById('metros').value = ""; document.getElementById('cliente').value = ""; });
         }
+        window.cerrarSesion = function() { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href="login.html"); }
     </script>
 </body>
 </html>
