@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TuringCotizador | Plataforma Global</title>
     <style>
-        :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --success: #10b981; }
+        :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --success: #10b981; --warning: #fbbf24; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 60%); padding: 15px;}
         
         #vista-menu { width: 100%; max-width: 400px; padding: 40px 30px; background-color: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); box-sizing: border-box; text-align: center; }
@@ -25,15 +25,16 @@
         .grupo-input input, .grupo-input select { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid var(--border); background-color: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 500px) { .grid-2 { grid-template-columns: 1fr; } }
-        .btn-calcular { width: 100%; background-color: var(--primary); color: #020617; border: none; padding: 14px; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .btn-calcular { width: 100%; background-color: var(--primary); color: #020617; border: none; padding: 14px; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.2s;}
+        .btn-calcular:hover { background-color: #0284c7; color: white;}
         #resultado-box { display: none; margin-top: 25px; padding: 20px; background: rgba(14, 165, 233, 0.05); border: 1px solid var(--primary); border-radius: 8px; text-align: center; }
         .monto-destacado { font-size: 1.6rem; font-weight: 700; color: var(--success); margin: 10px 0;}
         .btn-wa { background-color: #25D366; color: #020617; text-decoration: none; padding: 14px; border-radius: 6px; font-weight: bold; display: none; margin-top:15px; }
+        .aviso-terreno { font-size: 0.75rem; color: var(--warning); margin-top: 5px; display: none;}
     </style>
 </head>
 <body>
 
-    <!-- MENÚ PRINCIPAL -->
     <div id="vista-menu">
         <div class="header-central">
             <h1 class="logo-text">Turing<span>Cotizador</span></h1>
@@ -47,7 +48,6 @@
         </button>
     </div>
 
-    <!-- COTIZADOR -->
     <div id="vista-cotizador" class="cotizador-container">
         <div class="header-brand">
             <img id="img-logo" class="logo-empresa" src="" alt="Logo">
@@ -74,31 +74,34 @@
             <div class="grupo-input"><label>Ciudad donde se construirá</label><input type="text" id="c-ciudad" placeholder="Ej: Itauguá"></div>
             
             <div class="grupo-input">
-                <label>📐 Seleccionar Terreno o Medida Rápida</label>
-                <select id="c-terreno" onchange="calcularMetrosTerreno()">
-                    <option value="manual">Ingresar Metros Manuales</option>
-                    <option value="12x30_4lados">Terreno 12x30 (Cercar 4 Lados = 84 mts)</option>
-                    <option value="12x30_3lados">Terreno 12x30 (Cercar 3 Lados = 72 mts)</option>
-                    <option value="10x30_4lados">Terreno 10x30 (Cercar 4 Lados = 80 mts)</option>
-                    <option value="10x30_3lados">Terreno 10x30 (Cercar 3 Lados = 70 mts)</option>
+                <label>Cantidad de Portones</label>
+                <input type="number" id="c-portones-cant" value="0" min="0" max="5" onchange="calcularMetrosTerreno()">
+            </div>
+            
+            <div class="grupo-input">
+                <label>Tipo de Portón (Asumimos 3.5m c/u por defecto)</label>
+                <select id="c-portones-tipo">
+                    <option value="Sin Portón">Sin Portón</option>
+                    <option value="Corredizo">Portón Corredizo</option>
+                    <option value="Basculante">Portón Basculante</option>
                 </select>
             </div>
 
-            <div class="grid-2">
-                <div class="grupo-input"><label>Metros Lineales</label><input type="number" id="c-metros" placeholder="Ej: 20"></div>
-                <div class="grupo-input">
-                    <label>Tipo de Portón</label>
-                    <select id="c-portones-tipo">
-                        <option value="Sin Portón">Sin Portón</option>
-                        <option value="Corredizo">Portón Corredizo</option>
-                        <option value="Basculante">Portón Basculante</option>
-                    </select>
-                </div>
+            <div class="grupo-input">
+                <label>📐 Seleccionar Terreno o Medida Rápida</label>
+                <select id="c-terreno" onchange="calcularMetrosTerreno()">
+                    <option value="manual">Ingresar Metros Manuales</option>
+                    <option value="12x30_4lados" data-metros="84">Terreno 12x30 (4 Lados Ciegos = 84 mts)</option>
+                    <option value="12x30_3lados" data-metros="72">Terreno 12x30 (3 Lados = 72 mts)</option>
+                    <option value="10x30_4lados" data-metros="80">Terreno 10x30 (4 Lados Ciegos = 80 mts)</option>
+                    <option value="10x30_3lados" data-metros="70">Terreno 10x30 (3 Lados = 70 mts)</option>
+                </select>
+                <div id="aviso-terreno" class="aviso-terreno">Se han descontado metros por el portón.</div>
             </div>
 
             <div class="grupo-input">
-                <label>Cantidad de Portones</label>
-                <input type="number" id="c-portones-cant" value="0" min="0" max="5">
+                <label>Metros Lineales Reales a Construir</label>
+                <input type="number" id="c-metros" step="0.01" placeholder="Ej: 20">
             </div>
             
             <div class="grupo-input">
@@ -115,7 +118,7 @@
             <div id="resultado-box">
                 <div style="font-size:0.85rem; color:var(--text-muted);">PRESUPUESTO ESTIMADO</div>
                 <div class="monto-destacado" id="r-monto">0</div>
-                <div id="r-desglose" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; line-height:1.6;"></div>
+                <div id="r-desglose" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; line-height:1.6; text-align:left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;"></div>
                 <button class="btn-calcular" style="background:var(--success);" id="btn-registrar" onclick="registrarBD()">Guardar Presupuesto</button>
                 <a id="btn-whatsapp" class="btn-wa" target="_blank" href="#">💬 Enviar a Fábrica por WhatsApp</a>
             </div>
@@ -136,8 +139,7 @@
 
         const valoresMercadoGlobal = {
             "Paraguay":  { moneda: "Gs.",  pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000 },
-            "Argentina": { moneda: "ARS",  pLlave: 45000,  pEnvio: 35000,  pRetiro: 32000,  pPorton: 450000 },
-            "Bolivia":   { moneda: "Bs.",  pLlave: 320,    pEnvio: 240,    pRetiro: 210,    pPorton: 3500 }
+            "Argentina": { moneda: "ARS",  pLlave: 45000,  pEnvio: 35000,  pRetiro: 32000,  pPorton: 450000 }
         };
 
         if(uidEmpresa) {
@@ -151,11 +153,7 @@
                         document.getElementById('nombre-empresa-titulo').innerHTML = `<span style="color:white;">Cotizador de</span> <span style="color:var(--primary)">${c.nombreEmpresa}</span>`; 
                     }
                     if(c.whatsapp) whatsappDestino = c.whatsapp;
-                    if(c.logoUrl) {
-                        let img = document.getElementById('img-logo');
-                        img.src = c.logoUrl;
-                        img.style.display = 'block';
-                    }
+                    if(c.logoUrl) { document.getElementById('img-logo').src = c.logoUrl; document.getElementById('img-logo').style.display = 'block'; }
                 }
             });
         }
@@ -168,21 +166,36 @@
 
         window.actualizarPreciosPais = function() {
             if (uidEmpresa) return;
-            let paisSeleccionado = document.getElementById('c-pais').value;
-            if (valoresMercadoGlobal[paisSeleccionado]) {
-                let v = valoresMercadoGlobal[paisSeleccionado];
+            let p = document.getElementById('c-pais').value;
+            if (valoresMercadoGlobal[p]) {
+                let v = valoresMercadoGlobal[p];
                 cfg.moneda = v.moneda; cfg.pLlave = v.pLlave; cfg.pEnvio = v.pEnvio; cfg.pRetiro = v.pRetiro; cfg.pPorton = v.pPorton;
             }
         }
 
         window.calcularMetrosTerreno = function() {
-            let t = document.getElementById('c-terreno').value;
+            let select = document.getElementById('c-terreno');
             let mInput = document.getElementById('c-metros');
-            if(t === '12x30_4lados') mInput.value = 84;
-            else if(t === '12x30_3lados') mInput.value = 72;
-            else if(t === '10x30_4lados') mInput.value = 80;
-            else if(t === '10x30_3lados') mInput.value = 70;
-            else mInput.value = '';
+            let aviso = document.getElementById('aviso-terreno');
+            let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
+            
+            if(select.value === 'manual') {
+                aviso.style.display = 'none';
+                return;
+            }
+            
+            let metrosTeoricos = parseFloat(select.options[select.selectedIndex].getAttribute('data-metros'));
+            let anchoPortonAsumido = 3.5; 
+            
+            if (pCant > 0) {
+                let descuento = pCant * anchoPortonAsumido;
+                mInput.value = (metrosTeoricos - descuento).toFixed(2);
+                aviso.innerText = `Se descontaron ${descuento}m por ${pCant} portón(es).`;
+                aviso.style.display = 'block';
+            } else {
+                mInput.value = metrosTeoricos;
+                aviso.style.display = 'none';
+            }
         }
 
         window.procesar = function() {
@@ -191,42 +204,59 @@
             let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
             let pTipo = document.getElementById('c-portones-tipo').value;
             
-            if(!telCliente) return alert("Por favor, ingresá tu número de WhatsApp.");
-            if(!m) return alert("Por favor, ingresá los metros lineales.");
+            if(!telCliente) return alert("Ingresá tu WhatsApp.");
+            if(!m || m <= 0) return alert("Ingresá los metros.");
             let t = document.getElementById('c-tipo').value;
             
-            // LÓGICA ESTRUCTURAL EXACTA (Pared = Col Inicial + Modulos)
+            // CÁLCULO ESTRUCTURAL FINO
             let mCm = m * 100;
-            let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre); // Ej: 160 + 15 - 10 = 165
+            let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
             
             let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo);
             if (modulos < 0) modulos = 0;
             
             let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo);
-            let sobrante = largoTeorico - mCm; // Lo que sobra del último módulo
+            let sobrante = largoTeorico - mCm; 
             
             let placaFinalSize = Math.round(cfg.largoPlaca - sobrante);
-            let textoCorte = "";
-            if(placaFinalSize < cfg.largoPlaca && placaFinalSize > 0) {
-                textoCorte = `<br><small style="color:var(--warning)">* Incluye pedazo de placa final cortada a: <b>${placaFinalSize} cm</b></small>`;
+            let placasPorColumna = Math.ceil(200 / cfg.altoPlaca);
+            
+            let placasEnteras = (modulos - 1) * placasPorColumna;
+            let placasCorte = placasPorColumna; // Las de la última columna
+            if(placaFinalSize >= cfg.largoPlaca || placaFinalSize <= 0) {
+                placasEnteras = modulos * placasPorColumna;
+                placasCorte = 0;
+                placaFinalSize = 0;
             }
 
-            let placas = modulos * Math.ceil(200 / cfg.altoPlaca); 
-            let columnas = modulos + 1 + pCant;
-            let ton = (((columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca)) / 1000).toFixed(2);
+            let totalPlacasFisicas = placasEnteras + placasCorte;
+            let columnas = modulos + 1 + (pCant > 0 ? pCant + 1 : 0); // Portones requieren columnas extra
             
+            let ton = (((columnas * cfg.pesoCol) + (totalPlacasFisicas * cfg.pesoPlaca)) / 1000).toFixed(2);
             let pMetro = cfg.pEnvio; if(t.includes("Llave")) pMetro = cfg.pLlave; else if(t.includes("Retiro")) pMetro = cfg.pRetiro;
             let total = (m * pMetro) + (pCant * cfg.pPorton);
             
             coti = { 
                 cliente: document.getElementById('c-nombre').value, telefono: telCliente,
                 pais: document.getElementById('c-pais').value, depto: document.getElementById('c-depto').value, ciudad: document.getElementById('c-ciudad').value, 
-                metros: m, corteCm: placaFinalSize, portonesCantidad: pCant, portonesTipo: pTipo, tipoVenta: t, ingresoTotal: total, 
+                metros: m, portonesCantidad: pCant, portonesTipo: pTipo, tipoVenta: t, ingresoTotal: total, 
+                placaFinalSize: placaFinalSize, placasEnteras: placasEnteras, placasCorte: placasCorte, columnas: columnas, ton: ton,
                 fecha: new Date().toISOString(), estado: "Pendiente (Web)", vendedor: "Venta Directa" 
             };
             
+            let txtDesglose = `🧱 <strong>Producción Requerida:</strong><br>
+            • ${columnas} Columnas estructurales<br>
+            • ${placasEnteras} Placas enteras (${cfg.largoPlaca}cm)<br>`;
+            
+            if(placasCorte > 0) {
+                txtDesglose += `• ${placasCorte} Placas para remate de <span style="color:var(--warning)">${placaFinalSize}cm</span><br>`;
+            }
+            
+            txtDesglose += `<br>🚪 <strong>Portones:</strong> ${pCant} (${pTipo})<br>
+            ⚖️ <strong>Carga Estimada:</strong> ${ton} Toneladas`;
+
             document.getElementById('r-monto').innerText = `${cfg.moneda} ${fm(total)}`;
-            document.getElementById('r-desglose').innerHTML = `Materiales: <strong>${columnas} Columnas</strong> y <strong>${placas} Placas</strong>.${textoCorte}<br>Portón: <strong>${pCant} (${pTipo})</strong>.<br>Carga pesada estimada: <strong>${ton} Toneladas</strong>.`;
+            document.getElementById('r-desglose').innerHTML = txtDesglose;
             document.getElementById('resultado-box').style.display = 'block';
         }
 
@@ -235,13 +265,12 @@
             set(push(ref(db, ruta)), coti).then(() => {
                 document.getElementById('btn-registrar').style.display = 'none';
                 if(whatsappDestino) {
-                    let corteTxt = coti.corteCm < cfg.largoPlaca ? `\n✂️ Remate final: Placa de ${coti.corteCm}cm` : "";
-                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n📐 Metros: ${coti.metros}m${corteTxt}\n🚪 Portón: ${coti.portonesCantidad} (${coti.portonesTipo})\n🏗️ Modalidad: ${coti.tipoVenta}\n📍 Destino: ${coti.ciudad}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}\n\nQuiero reservar turno.`);
+                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n📐 Metros: ${coti.metros}m\n🏗️ Modalidad: ${coti.tipoVenta}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}`);
                     document.getElementById('btn-whatsapp').href = `https://wa.me/${whatsappDestino}?text=${msg}`;
                     document.getElementById('btn-whatsapp').style.display = 'block';
                 } else { 
                     let aviso = document.createElement('div');
-                    aviso.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:#020617; padding:12px 24px; border-radius:8px; font-weight:bold; font-size: 0.9rem; z-index:1000; text-align:center;";
+                    aviso.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:#020617; padding:12px 24px; border-radius:8px; font-weight:bold; font-size: 0.9rem; z-index:1000;";
                     aviso.innerText = "✅ ¡Presupuesto guardado!";
                     document.body.appendChild(aviso);
                     setTimeout(() => location.reload(), 3000);

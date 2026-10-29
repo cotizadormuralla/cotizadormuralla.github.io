@@ -3,456 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuringCotizador | Panel de Administración</title>
+    <title>TuringSaaS | ERP Prefabricados</title>
     <style>
-        :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --primary-hover: #0284c7; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; background-color: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10; flex-shrink: 0;}
-        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
+        :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
+        .logo-text { font-size: 1.5rem; font-weight: 700; margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
         .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .menu-btn:hover { background-color: rgba(56, 189, 248, 0.1); color: var(--primary); } .menu-btn.activo { background-color: var(--primary); color: #0f172a; font-weight: 600; }
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
         .btn-logout { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;}
         .seccion { display: none; } .seccion.activa { display: block; }
-        .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 20px;}
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 20px;}
         .grupo-input { margin-bottom: 15px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); }
-        .grupo-input input, .grupo-input select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background-color: #0f172a; color: white; box-sizing: border-box; }
+        .grupo-input input, .grupo-input select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; box-sizing: border-box; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .btn-primario { background-color: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%;}
-        .btn-primario:hover { background-color: var(--primary-hover); color: white; }
+        .btn-primario { background: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;}
         
-        .table-responsive { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px;} 
-        th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600;} 
+        th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border);} 
         td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
         
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} 
-        .badge.pendiente { background-color: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3);} 
-        .badge.activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3);}
-        .badge.danger { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3);}
+        .badge.pendiente { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251,191,36,0.3);} 
+        .badge.activo { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.3);}
+        .badge.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3);}
         
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} 
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} 
         .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box;} 
         .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; align-items: center;}
-        .toast-notificacion { position: fixed; bottom: 30px; right: 30px; background-color: var(--success); color: #020617; padding: 12px 24px; border-radius: 8px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000;} 
-        .toast-notificacion.mostrar { transform: translateY(0); opacity: 1; }
-        .enlace-empresa { background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; margin-top:10px; font-family: monospace; color: var(--primary); word-break: break-all;}
-        .subtitulo-cfg { font-size: 1rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 15px; margin-top: 0;}
+        
+        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;} 
+        .toast.mostrar { transform: translateY(0); opacity: 1; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
-            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 5px; border-right: none; border-bottom: 1px solid var(--border); }
-            .logo-text { display: none; }
-            .menu-btn { padding: 8px 12px; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap; }
-            .main-content { padding: 15px; overflow-y: visible; }
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            .header-top h2 { font-size: 1.2rem; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 5px; border-right: none; }
+            .logo-text { display: none; } .menu-btn { padding: 8px 12px; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap; }
+            .main-content { padding: 15px; } .grid-2, .grid-3 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h1 class="logo-text" id="header-empresa">Turing<span>SaaS</span></h1>
-        <button class="menu-btn activo" onclick="cambiarTab('ventas')">📊 Ventas Globales</button>
-        <button class="menu-btn" onclick="cambiarTab('equipo')">👥 Equipo</button>
-        <button class="menu-btn" onclick="cambiarTab('configuracion')">⚙️ Configuración</button>
+        <button class="menu-btn activo" onclick="cambiarTab('ventas')">📊 Gestión de Obras</button>
+        <button class="menu-btn" onclick="cambiarTab('equipo')">👥 Vendedores</button>
+        <button class="menu-btn" onclick="cambiarTab('configuracion')">⚙️ Configuración ERP</button>
     </div>
 
     <div class="main-content">
         <div id="seccion-ventas" class="seccion activa">
-            <div class="header-top">
-                <h2>Historial de Ventas</h2>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <span style="font-size:0.75rem; color:var(--text-muted); display:none;" id="email-usuario-actual"></span>
-                    <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
-                </div>
-            </div>
-            <div class="card" style="padding: 0;">
-                <div class="table-responsive">
-                    <table>
-                        <thead><tr style="background-color: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente</th><th>Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
-                        <tbody id="tabla-ventas-body"></tbody>
-                    </table>
-                </div>
+            <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Salir</button></div>
+            <div class="card" style="padding: 0; overflow-x:auto;">
+                <table>
+                    <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                    <tbody id="tabla-ventas-body"></tbody>
+                </table>
             </div>
         </div>
 
         <div id="seccion-equipo" class="seccion">
-            <div class="header-top"><h2>Gestión de Vendedores</h2></div>
+            <div class="header-top"><h2>Vendedores</h2></div>
             <div class="card">
                 <div class="grid-3">
                     <div class="grupo-input"><label>Nombre</label><input type="text" id="nuevo-vendedor-nombre"></div>
-                    <div class="grupo-input"><label>Correo (Acceso)</label><input type="email" id="nuevo-vendedor-email"></div>
-                    <div class="grupo-input"><label>Clave Temporal</label><input type="text" id="nuevo-vendedor-pass" value="Ventas123" readonly style="color: var(--warning);"></div>
+                    <div class="grupo-input"><label>Correo</label><input type="email" id="nuevo-vendedor-email"></div>
+                    <div class="grupo-input"><label>Clave</label><input type="text" id="nuevo-vendedor-pass" value="Ventas123" readonly style="color: var(--warning);"></div>
                 </div>
-                <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta de Asesor</button>
+                <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta</button>
             </div>
-            <div class="card">
-                <div class="table-responsive">
-                    <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
-                </div>
+            <div class="card" style="overflow-x:auto;">
+                <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
             </div>
         </div>
 
         <div id="seccion-configuracion" class="seccion">
-            <div class="header-top"><h2>Configuración de Fábrica</h2></div>
+            <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
             
             <div class="card">
-                <h3 class="subtitulo-cfg">1. Identidad, Logo y Moneda</h3>
                 <div class="grid-3">
-                    <div class="grupo-input"><label>Nombre Comercial</label><input type="text" id="config-nombre" placeholder="Ej: G.H.Mix"></div>
-                    <div class="grupo-input"><label>WhatsApp de Ventas</label><input type="tel" id="config-whatsapp" placeholder="Ej: 595981..."></div>
-                    <div class="grupo-input"><label>Símbolo de Moneda</label><input type="text" id="config-moneda" placeholder="Ej: Gs., $, €"></div>
-                </div>
-                <div class="grupo-input" style="margin-top: 15px;">
-                    <label>Logotipo (Elegir imagen de tu galería)</label>
-                    <input type="file" id="config-logo-file" accept="image/*" style="background:transparent; border:none; padding:0; color:white;">
+                    <div class="grupo-input"><label>Nombre Comercial</label><input type="text" id="config-nombre"></div>
+                    <div class="grupo-input"><label>WhatsApp</label><input type="tel" id="config-whatsapp"></div>
+                    <div class="grupo-input"><label>Moneda</label><input type="text" id="config-moneda" value="Gs."></div>
                 </div>
                 <div style="margin-top: 10px;">
-                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Tu Enlace de Ventas Exclusivo:</label>
-                    <div class="enlace-empresa" id="link-exclusivo">Cargando...</div>
+                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Enlace de Ventas Exclusivo:</label>
+                    <div style="background: rgba(56,189,248,0.1); padding: 10px; border-radius: 6px; margin-top:5px; font-family: monospace; color: var(--primary);" id="link-exclusivo">Cargando...</div>
                 </div>
             </div>
 
             <div class="grid-2">
                 <div class="card">
-                    <h3 class="subtitulo-cfg" style="color: var(--success);">2. Precios Públicos</h3>
-                    <div class="grupo-input"><label>Precio Metro (Llave en mano)</label><input type="number" id="config-precio-llave"></div>
-                    <div class="grupo-input"><label>Precio Metro (Envío a Obra)</label><input type="number" id="config-precio-envio"></div>
-                    <div class="grupo-input"><label>Precio Metro (Retiro de Fábrica)</label><input type="number" id="config-precio-retiro"></div>
-                    <div class="grupo-input"><label>Precio por Portón</label><input type="number" id="config-precio-porton"></div>
+                    <h3 style="color: var(--success); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Precios de Venta (Por Metro)</h3>
+                    <div class="grupo-input"><label>Obra Terminada (Material + Inst.)</label><input type="number" id="config-precio-llave"></div>
+                    <div class="grupo-input"><label>Envío a Obra (Solo material)</label><input type="number" id="config-precio-envio"></div>
+                    <div class="grupo-input"><label>Retiro de Fábrica</label><input type="number" id="config-precio-retiro"></div>
+                    <div class="grupo-input"><label>Precio Base Portón</label><input type="number" id="config-precio-porton"></div>
                 </div>
 
                 <div class="card">
-                    <h3 class="subtitulo-cfg" style="color: var(--danger);">3. Costos Operativos (Fábrica)</h3>
-                    <div class="grupo-input"><label>Costo de Fabricación (Por Metro)</label><input type="number" id="config-costo-fab"></div>
-                    <div class="grupo-input"><label>Costo de Instalación (Por Metro)</label><input type="number" id="config-costo-inst"></div>
-                    <div class="grupo-input"><label>Pago Personal Alzador (Por Kilo)</label><input type="number" id="config-costo-alz"></div>
+                    <h3 style="color: var(--danger); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Costos Operativos (Fábrica)</h3>
+                    <div class="grupo-input"><label>Costo Fabricación (Por Metro)</label><input type="number" id="config-costo-fab"></div>
+                    <div class="grupo-input"><label>Costo Instalación (Por Metro)</label><input type="number" id="config-costo-inst"></div>
                     <div class="grupo-input"><label>Comisión Vendedor (%)</label><input type="number" id="config-comision"></div>
+                    
+                    <div class="grupo-input">
+                        <label>Tipo de Contrato Logístico (Alzadores)</label>
+                        <select id="config-tipo-logistica">
+                            <option value="destajo">A destajo (Pago por Kg alzado)</option>
+                            <option value="fijo">Personal Fijo Mensual (No descuenta por obra)</option>
+                        </select>
+                    </div>
+                    <div class="grupo-input" id="caja-pago-kg"><label>Pago Alzador (Por Kg)</label><input type="number" id="config-costo-alz"></div>
                 </div>
             </div>
 
             <div class="card">
-                <h3 class="subtitulo-cfg" style="color: var(--warning);">4. Ficha Técnica (Moldes y Pesos)</h3>
+                <h3 style="color: var(--warning); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Ficha Técnica Estructural</h3>
                 <div class="grid-3">
                     <div class="grupo-input"><label>Largo Placa (cm)</label><input type="number" id="config-largo-placa"></div>
                     <div class="grupo-input"><label>Alto Placa (cm)</label><input type="number" id="config-alto-placa"></div>
                     <div class="grupo-input"><label>Peso 1 Placa (Kg)</label><input type="number" id="config-peso-placa"></div>
                     <div class="grupo-input"><label>Ancho Columna (cm)</label><input type="number" id="config-ancho-col"></div>
-                    <div class="grupo-input"><label>Encastre/Ranura (cm)</label><input type="number" id="config-encastre"></div>
+                    <div class="grupo-input"><label>Encastre (cm)</label><input type="number" id="config-encastre"></div>
                     <div class="grupo-input"><label>Peso 1 Columna (Kg)</label><input type="number" id="config-peso-col"></div>
                 </div>
-                <button class="btn-primario" onclick="guardarConfiguracion()">💾 Guardar Toda la Configuración</button>
+                <button class="btn-primario" onclick="guardarConfiguracion()">💾 Guardar ERP</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DESGLOSE -->
+    <!-- MODAL DESGLOSE FINANCIERO -->
     <div id="modal-desglose" class="modal-overlay">
         <div class="modal-box">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Desglose Matemático</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Análisis de Rentabilidad</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
             <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
-            <div class="fila-desglose"><span style="color:var(--text-muted)">Ingreso Bruto:</span><strong id="m-ingreso" style="color:white;">0</strong></div>
+            <div class="fila-desglose"><span style="color:var(--text-muted)">Ingreso Bruto Total:</span><strong id="m-ingreso" style="color:white;">0</strong></div>
             <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
-                <div class="fila-desglose"><span>Costo Fabricación:</span><span id="m-costo-fab" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose"><span>Fabricación de Material:</span><span id="m-costo-fab" style="color:var(--danger)">0</span></div>
                 
-                <!-- FLETE DINÁMICO INDIVIDUAL -->
-                <div class="fila-desglose" id="fila-flete"><span>Flete / Camión (Por Viaje):</span><div id="m-costo-flete-contenedor"></div></div>
+                <div class="fila-desglose" id="fila-flete"><span>Flete (Camión Tercerizado):</span><div id="m-costo-flete-contenedor"></div></div>
                 
-                <div class="fila-desglose"><span>Personal Alzador (Por Kg):</span><span id="m-costo-alzada" style="color:var(--danger)">0</span></div>
-                <div class="fila-desglose" id="fila-inst"><span>Instalación en Obra:</span><span id="m-costo-inst" style="color:var(--danger)">0</span></div>
-                <div class="fila-desglose" id="fila-comision"><span>Comisión Vendedor:</span><span id="m-comision" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-alzadores"><span>Logística (Alzadores):</span><span id="m-costo-alzada" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-inst"><span>Cuadrilla Instalación:</span><span id="m-costo-inst" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-comision"><span>Comisión de Venta:</span><span id="m-comision" style="color:var(--danger)">0</span></div>
             </div>
-            <div class="fila-desglose" style="font-size:1.1rem; color:var(--success); font-weight:bold; border:none; margin-top:10px;"><span>GANANCIA NETA:</span><span id="m-ganancia">0</span></div>
+            <div class="fila-desglose" style="font-size:1.1rem; color:var(--success); font-weight:bold; border:none; margin-top:10px;"><span>GANANCIA NETA OBRA:</span><span id="m-ganancia">0</span></div>
         </div>
     </div>
 
-    <div id="toast" class="toast-notificacion"><span id="toast-mensaje"></span></div>
+    <div id="toast" class="toast"><span id="toast-mensaje"></span></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" });
-        const auth = getAuth(app); 
-        const db = getDatabase(app);
-        const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
+        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" });
+        const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
 
-        let propietarioUID = ""; 
-        let listaVentasGlobal = []; 
-        let logoBase64Temporal = "";
-        
-        // Se elimina el flete de la config general, ahora es por obra
-        let cfg = { moneda: "Gs.", logoUrl: "", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 140000, cInst: 50000, cAlz: 30, com: 5 };
+        let propietarioUID = ""; let listaVentasGlobal = []; 
+        let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 140000, cInst: 50000, cAlz: 30, tipoLogistica: 'destajo', com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 propietarioUID = user.uid; 
-                document.getElementById('email-usuario-actual').innerText = user.email; 
-                document.getElementById('email-usuario-actual').style.display = "block";
                 document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
-                cargarConfiguracion(); 
-                cargarVendedores(); 
-                cargarVentas();
-            } else { 
-                window.location.href = "login.html"; 
-            }
+                cargarConfiguracion(); cargarVendedores(); cargarVentas();
+            } else { window.location.href = "login.html"; }
         });
 
-        window.cambiarTab = function(t) { 
-            document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa')); 
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('activo')); 
-            document.getElementById('seccion-' + t).classList.add('activa'); 
-        }
-
-        function mostrarToast(msg) { 
-            const t = document.getElementById('toast'); 
-            document.getElementById('toast-mensaje').innerText = msg; 
-            t.classList.add('mostrar'); 
-            setTimeout(() => t.classList.remove('mostrar'), 3000); 
-        }
+        window.cambiarTab = (t) => { document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa')); document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('activo')); document.getElementById('seccion-' + t).classList.add('activa'); }
+        const mostrarToast = (msg) => { const t = document.getElementById('toast'); document.getElementById('toast-mensaje').innerText = msg; t.classList.add('mostrar'); setTimeout(() => t.classList.remove('mostrar'), 3000); }
 
         window.cargarConfiguracion = function() {
             get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
-                let c = s.exists() ? s.val() : {}; 
-                cfg = { ...cfg, ...c };
-                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; 
-                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
-                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; 
-                document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
-                if(cfg.logoUrl) logoBase64Temporal = cfg.logoUrl;
-                document.getElementById('config-precio-llave').value = cfg.pLlave; 
-                document.getElementById('config-precio-envio').value = cfg.pEnvio; 
-                document.getElementById('config-precio-retiro').value = cfg.pRetiro; 
-                document.getElementById('config-precio-porton').value = cfg.pPorton;
-                document.getElementById('config-costo-fab').value = cfg.cFab; 
-                document.getElementById('config-costo-inst').value = cfg.cInst; 
-                document.getElementById('config-costo-alz').value = cfg.cAlz; 
+                if(s.exists()) cfg = { ...cfg, ...s.val() };
+                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
+                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
+                document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
+                document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; 
+                
+                document.getElementById('config-tipo-logistica').value = cfg.tipoLogistica || 'destajo';
+                document.getElementById('config-costo-alz').value = cfg.cAlz;
                 document.getElementById('config-comision').value = cfg.com;
-                document.getElementById('config-largo-placa').value = cfg.largoPlaca; 
-                document.getElementById('config-alto-placa').value = cfg.altoPlaca; 
-                document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
-                document.getElementById('config-ancho-col').value = cfg.anchoCol; 
-                document.getElementById('config-encastre').value = cfg.encastre; 
-                document.getElementById('config-peso-col').value = cfg.pesoCol;
+                
+                document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
+                document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
+                
+                document.getElementById('config-tipo-logistica').addEventListener('change', (e) => {
+                    document.getElementById('caja-pago-kg').style.display = e.target.value === 'fijo' ? 'none' : 'block';
+                });
+                if(cfg.tipoLogistica === 'fijo') document.getElementById('caja-pago-kg').style.display = 'none';
             });
         }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const inputLogo = document.getElementById('config-logo-file');
-            if(inputLogo) {
-                inputLogo.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(uploadEvent) { 
-                            logoBase64Temporal = uploadEvent.target.result; 
-                            mostrarToast("📁 Logo cargado. Guardá los cambios."); 
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-        });
 
         window.guardarConfiguracion = function() {
             cfg = {
-                nombreEmpresa: document.getElementById('config-nombre').value, 
-                whatsapp: document.getElementById('config-whatsapp').value, 
-                moneda: document.getElementById('config-moneda').value || "Gs.", 
-                logoUrl: logoBase64Temporal,
-                pLlave: Number(document.getElementById('config-precio-llave').value), 
-                pEnvio: Number(document.getElementById('config-precio-envio').value), 
-                pRetiro: Number(document.getElementById('config-precio-retiro').value), 
-                pPorton: Number(document.getElementById('config-precio-porton').value),
-                cFab: Number(document.getElementById('config-costo-fab').value), 
-                cInst: Number(document.getElementById('config-costo-inst').value), 
-                cAlz: Number(document.getElementById('config-costo-alz').value), 
-                com: Number(document.getElementById('config-comision').value),
-                largoPlaca: Number(document.getElementById('config-largo-placa').value), 
-                altoPlaca: Number(document.getElementById('config-alto-placa').value), 
-                pesoPlaca: Number(document.getElementById('config-peso-placa').value),
-                anchoCol: Number(document.getElementById('config-ancho-col').value), 
-                encastre: Number(document.getElementById('config-encastre').value), 
-                pesoCol: Number(document.getElementById('config-peso-col').value)
+                nombreEmpresa: document.getElementById('config-nombre').value, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", 
+                pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
+                cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), 
+                tipoLogistica: document.getElementById('config-tipo-logistica').value, cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
+                largoPlaca: Number(document.getElementById('config-largo-placa').value), altoPlaca: Number(document.getElementById('config-alto-placa').value), pesoPlaca: Number(document.getElementById('config-peso-placa').value),
+                anchoCol: Number(document.getElementById('config-ancho-col').value), encastre: Number(document.getElementById('config-encastre').value), pesoCol: Number(document.getElementById('config-peso-col').value)
             };
-            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { 
-                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; 
-                mostrarToast("✅ Valores Guardados."); 
-            });
-        }
-
-        // CÁLCULO ESTRUCTURAL
-        function calcularReales(metros, portonesStr, tipo) {
-            let m = parseFloat(metros)||0; 
-            let p = parseInt(portonesStr)||0; 
-            
-            let mCm = m * 100;
-            let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
-            
-            let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo);
-            if (modulos < 0) modulos = 0;
-            
-            let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo);
-            let sobrante = largoTeorico - mCm; 
-            
-            let placaFinalSize = Math.round(cfg.largoPlaca - sobrante);
-            
-            let placas = modulos * Math.ceil(200 / cfg.altoPlaca); 
-            let columnas = modulos + 1 + p;
-            let kg = (columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca); 
-            let ton = (kg / 1000).toFixed(2);
-            let pMetro = cfg.pEnvio; 
-            if(tipo.includes("Llave")) pMetro = cfg.pLlave; 
-            else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
-            let total = (m * pMetro) + (p * cfg.pPorton); 
-            
-            return { placas, columnas, kg, ton, total, m, p, tipo, placaFinalSize };
+            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ ERP Guardado."); });
         }
 
         window.cargarVentas = function() {
             onValue(ref(db, 'empresas/' + propietarioUID + '/cotizaciones'), (snap) => {
-                let ventasArray = [];
-                snap.forEach((c) => {
-                    let v = c.val(); 
-                    v.key = c.key; 
-                    ventasArray.push(v);
-                });
+                let vArr = []; snap.forEach(c => { let v = c.val(); v.key = c.key; vArr.push(v); }); vArr.reverse();
+                let html = ""; listaVentasGlobal = vArr; let i = 0;
                 
-                ventasArray.reverse();
-
-                let html = ""; 
-                listaVentasGlobal = []; 
-                let i = 0;
-                
-                ventasArray.forEach((v) => {
-                    let calc = calcularReales(v.metros, v.portonesCantidad || v.portones, v.tipoVenta); 
-                    listaVentasGlobal.push({v: v, calc: calc}); 
-                    
-                    let textoCorte = (calc.placaFinalSize < cfg.largoPlaca && calc.placaFinalSize > 0) ? `<br><span style="color:var(--warning); font-size:0.7rem;">✂️ Remate final: Placa de ${calc.placaFinalSize}cm</span>` : "";
-                    
-                    let vendedorTexto = v.vendedor && v.vendedor !== "Venta Directa" ? `<br><small style="color:var(--primary)">Vendedor: ${v.vendedor}</small>` : "";
-                    
-                    let badgeClass = "pendiente";
-                    if(v.estado.includes("Aprobada")) badgeClass = "activo";
-                    if(v.estado.includes("Rechazada")) badgeClass = "danger";
+                vArr.forEach((v) => {
+                    let pCorte = v.placaFinalSize > 0 ? `<br><span style="color:var(--warning); font-size:0.7rem;">✂️ +${v.placasCorte} Placas de ${v.placaFinalSize}cm</span>` : "";
+                    let vend = v.vendedor && v.vendedor !== "Venta Directa" ? `<br><small style="color:var(--primary)">Vend: ${v.vendedor}</small>` : "";
+                    let b = "pendiente"; if(v.estado.includes("Aprobada")) b = "activo"; if(v.estado.includes("Rechazada")) b = "danger";
 
                     html += `<tr>
-                        <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vendedorTexto}</td>
+                        <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vend}</td>
                         <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small></td>
-                        <td><span style="color:var(--primary)">${calc.m}m (${calc.columnas} Col / ${calc.placas} Plac)</span>${textoCorte}<br><small style="color:var(--warning)">⚖️ ${calc.ton} Ton</small></td>
-                        <td>${cfg.moneda} ${fm(calc.total)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Ver Desglose</small></td>
                         <td>
-                            <span class="badge ${badgeClass}" style="cursor:pointer;" onclick="cambiarEstadoVenta('${v.key}', '${v.estado}')">${v.estado} 🔄</span>
-                            <br><small style="cursor:pointer; color:var(--danger); margin-top:5px; display:inline-block;" onclick="if(confirm('Borrar?')) remove(ref(db, 'empresas/${propietarioUID}/cotizaciones/${v.key}'))">🗑️ Borrar</small>
+                            <span style="color:var(--primary)">${v.columnas} Col / ${v.placasEnteras} Placas Enteras</span>
+                            ${pCorte}
+                            <br><small style="color:var(--text-muted)">⚖️ ${v.ton} Ton</small>
                         </td>
-                    </tr>`; 
-                    i++;
+                        <td>${cfg.moneda} ${fm(v.ingresoTotal)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Análisis Finanzas</small></td>
+                        <td>
+                            <span class="badge ${b}" style="cursor:pointer;" onclick="cambiarEstadoVenta('${v.key}', '${v.estado}')">${v.estado} 🔄</span>
+                            <br><small style="cursor:pointer; color:var(--danger); margin-top:5px; display:inline-block;" onclick="if(confirm('Borrar obra?')) remove(ref(db, 'empresas/${propietarioUID}/cotizaciones/${v.key}'))">🗑️ Borrar</small>
+                        </td>
+                    </tr>`; i++;
                 });
-                document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">Sin ventas</td></tr>`;
+                document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">Sin obras registradas</td></tr>`;
             });
         }
 
-        window.cambiarEstadoVenta = function(key, estadoActual) {
-            let nuevoEstado = "Aprobada ✅";
-            if(estadoActual.includes("Aprobada")) nuevoEstado = "Rechazada ❌";
-            else if(estadoActual.includes("Rechazada")) nuevoEstado = "Pendiente (Web)";
-            
-            set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), nuevoEstado);
-        }
+        window.cambiarEstadoVenta = (key, est) => { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), est.includes("Aprobada") ? "Rechazada ❌" : est.includes("Rechazada") ? "Pendiente (Web)" : "Aprobada ✅"); }
 
         window.abrirDesglose = function(idx) {
-            let data = listaVentasGlobal[idx]; 
-            let c = data.calc; 
-            let v = data.v;
+            let v = listaVentasGlobal[idx]; 
+            let cFab = v.metros * cfg.cFab; 
+            let cInst = v.tipoVenta.includes("Llave") ? (v.metros * cfg.cInst) : 0; 
             
-            let cFab = c.m * cfg.cFab; 
-            let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; 
-            let cAlz = c.kg * cfg.cAlz; 
+            // Flete Dinámico
+            let flete = v.tipoVenta.includes("Retiro") ? 0 : (v.fleteReal || 0);
             
-            // Flete Dinámico específico de esta venta
-            let flete = v.fleteReal || 0;
+            // Logística (Alzadores): Verifica si la fábrica paga fijo mensual o a destajo
+            let cAlz = 0;
+            if(cfg.tipoLogistica === 'destajo') { cAlz = (parseFloat(v.ton) * 1000) * cfg.cAlz; }
             
-            let comision = 0;
-            let esVendedor = (v.vendedor && v.vendedor !== "Venta Directa");
-            if (esVendedor) {
-                comision = c.total * (cfg.com / 100);
+            let comision = (v.vendedor && v.vendedor !== "Venta Directa") ? v.ingresoTotal * (cfg.com / 100) : 0;
+
+            document.getElementById('m-tipo').innerText = v.tipoVenta; document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(v.ingresoTotal)}`; document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
+            
+            // Flete interactivo
+            let txtFlete = flete > 0 ? `- ${cfg.moneda} ${fm(flete)}` : "Aún no cargado";
+            document.getElementById('m-costo-flete-contenedor').innerHTML = `<span style="color:var(--danger); font-weight:bold; margin-right:10px;">${txtFlete}</span><button onclick="asignarFlete('${v.key}', ${flete})" style="background:var(--primary); color:#020617; border:none; border-radius:4px; font-size:0.75rem; font-weight:bold; padding:4px 8px; cursor:pointer;">✏️ Cargar Flete</button>`;
+            
+            // Mostrar texto correcto para alzadores
+            let filaAlz = document.getElementById('fila-alzadores');
+            if(cfg.tipoLogistica === 'fijo') {
+                document.getElementById('m-costo-alzada').innerHTML = `<span style="color:var(--text-muted)">Costos Fijos (Sueldo Mensual)</span>`;
+            } else {
+                document.getElementById('m-costo-alzada').innerHTML = `- ${cfg.moneda} ${fm(cAlz)} <span style="font-size:0.7rem">(${v.ton}T)</span>`;
             }
 
-            document.getElementById('m-tipo').innerText = c.tipo; 
-            document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(c.total)}`; 
-            document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
+            document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
+            document.getElementById('fila-comision').style.display = comision > 0 ? 'flex' : 'none'; document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)} (${v.vendedor})`;
             
-            // Sección de flete individual
-            let txtFlete = flete > 0 ? `- ${cfg.moneda} ${fm(flete)}` : "Aún no cargado";
-            document.getElementById('m-costo-flete-contenedor').innerHTML = `<span style="color:var(--danger); font-weight:bold; margin-right:10px;">${txtFlete}</span><button onclick="asignarFlete('${v.key}', ${flete})" style="background:var(--primary); color:#020617; border:none; border-radius:4px; font-size:0.75rem; font-weight:bold; padding:4px 8px; cursor:pointer;">✏️ Cargar</button>`;
-            
-            document.getElementById('m-costo-alzada').innerText = `- ${cfg.moneda} ${fm(cAlz)} (${c.ton} Ton)`; 
-            
-            document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; 
-            document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
-            
-            let filaComision = document.getElementById('fila-comision');
-            if(esVendedor) {
-                filaComision.style.display = 'flex';
-                document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)} (${v.vendedor})`;
-            } else {
-                filaComision.style.display = 'none';
-            }
-            
-            document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(c.total - (cFab + cInst + cAlz + flete + comision))}`;
+            document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(v.ingresoTotal - (cFab + cInst + cAlz + flete + comision))}`;
             document.getElementById('modal-desglose').style.display = 'flex';
         }
         
-        // FUNCIÓN PARA QUE EL JEFE CARGUE EL COSTO DEL CAMIÓN A ESA OBRA
-        window.asignarFlete = function(keyVenta, fleteActual) {
-            let nuevoMonto = prompt("💰 Ingresá el costo real que te va a cobrar el fletero para esta obra:", fleteActual || 0);
-            if(nuevoMonto !== null && nuevoMonto.trim() !== "") {
-                let valorLimpio = parseFloat(nuevoMonto.replace(/[^0-9]/g, ''));
-                if(!isNaN(valorLimpio)) {
-                    set(ref(db, `empresas/${propietarioUID}/cotizaciones/${keyVenta}/fleteReal`), valorLimpio).then(() => {
-                        cerrarModal(); // Cierra el modal para que Firebase actualice y al volver a abrir esté perfecto
-                        mostrarToast("🚚 Costo de flete actualizado con éxito");
-                    });
-                }
+        window.asignarFlete = (key, fActual) => {
+            let m = prompt("🚚 Ingresá el costo real que cobró el camión para llevar el material:", fActual || 0);
+            if(m !== null && m.trim() !== "" && !isNaN(parseFloat(m.replace(/[^0-9]/g, '')))) {
+                set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/fleteReal`), parseFloat(m.replace(/[^0-9]/g, ''))).then(() => { cerrarModal(); mostrarToast("🚚 Costo guardado"); });
             }
         }
 
-        window.cerrarModal = function() { 
-            document.getElementById('modal-desglose').style.display = 'none'; 
-        }
-        
-        window.guardarVendedor = function() {
-            let n = document.getElementById('nuevo-vendedor-nombre').value;
-            let e = document.getElementById('nuevo-vendedor-email').value;
-            let p = document.getElementById('nuevo-vendedor-pass').value; 
-            if(!n||!e) return;
-            
-            createUserWithEmailAndPassword(authSecundario, e, p).then(() => { 
-                signOut(authSecundario); 
-                set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); 
-                mostrarToast("✅ Vendedor creado."); 
-            });
-        }
-
-        window.cargarVendedores = function() {
-            onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (snap) => {
-                let h = ""; 
-                snap.forEach(c => { 
-                    let v=c.val(); 
-                    h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-eliminar" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">🗑️</button></td></tr>`; 
-                });
-                document.getElementById('tabla-vendedores-body').innerHTML = h;
-            });
-        }
-
-        window.cerrarSesion = function() { 
-            localStorage.removeItem("turing_ultimo_panel"); 
-            signOut(auth).then(() => window.location.href = "login.html"); 
-        }
+        window.cerrarModal = () => document.getElementById('modal-desglose').style.display = 'none';
+        window.guardarVendedor = () => { let n=document.getElementById('nuevo-vendedor-nombre').value, e=document.getElementById('nuevo-vendedor-email').value, p=document.getElementById('nuevo-vendedor-pass').value; if(n&&e) createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); }); }
+        window.cargarVendedores = () => onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (s) => { let h=""; s.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-logout" style="padding:4px 8px; font-size:0.7rem;" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">Borrar</button></td></tr>`; }); document.getElementById('tabla-vendedores-body').innerHTML = h; });
+        window.cerrarSesion = () => { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href = "login.html"); }
     </script>
 </body>
 </html>
