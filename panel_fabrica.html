@@ -19,11 +19,12 @@
         .grupo-input { margin-bottom: 15px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); }
         .grupo-input input, .grupo-input select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; box-sizing: border-box; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .btn-primario { background: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;}
+        .btn-primario { background: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;}
+        .btn-primario:hover { filter: brightness(1.1); }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px;} 
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 700px;} 
         th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border);} 
-        td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
+        td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: top;}
         
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} 
         .badge.pendiente { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251,191,36,0.3);} 
@@ -31,12 +32,11 @@
         .badge.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3);}
         .badge-porton { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 0.7rem; font-weight: bold; }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} 
+        /* Sistema de Modales Elegantes */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px);} 
         .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.5);} 
         .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; align-items: center;}
         
-        /* Modal elegante de Flete */
-        #modal-flete { z-index: 105; }
         .input-flete-modal { width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--primary); background: #020617; color: white; margin-bottom: 15px; text-align: center; box-sizing: border-box;}
 
         .toast { position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;} 
@@ -59,8 +59,9 @@
     </div>
 
     <div class="main-content">
+        <!-- SECCIÓN VENTAS / CRM -->
         <div id="seccion-ventas" class="seccion activa">
-            <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Salir</button></div>
+            <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button></div>
             <div class="card" style="padding: 0; overflow-x:auto;">
                 <table>
                     <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente / Terreno</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
@@ -69,32 +70,34 @@
             </div>
         </div>
 
+        <!-- SECCIÓN VENDEDORES -->
         <div id="seccion-equipo" class="seccion">
-            <div class="header-top"><h2>Vendedores</h2></div>
+            <div class="header-top"><h2>Equipo Comercial</h2></div>
             <div class="card">
                 <div class="grid-3">
-                    <div class="grupo-input"><label>Nombre</label><input type="text" id="nuevo-vendedor-nombre"></div>
-                    <div class="grupo-input"><label>Correo</label><input type="email" id="nuevo-vendedor-email"></div>
-                    <div class="grupo-input"><label>Clave</label><input type="text" id="nuevo-vendedor-pass" value="Ventas123" readonly style="color: var(--warning);"></div>
+                    <div class="grupo-input"><label>Nombre del Vendedor</label><input type="text" id="nuevo-vendedor-nombre"></div>
+                    <div class="grupo-input"><label>Correo (Login)</label><input type="email" id="nuevo-vendedor-email"></div>
+                    <div class="grupo-input"><label>Contraseña Asignada</label><input type="text" id="nuevo-vendedor-pass" value="Ventas123" readonly style="color: var(--warning);"></div>
                 </div>
-                <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta</button>
+                <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta para Vendedor</button>
             </div>
             <div class="card" style="overflow-x:auto;">
                 <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
             </div>
         </div>
 
+        <!-- SECCIÓN CONFIGURACIÓN -->
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
             
             <div class="card">
                 <div class="grid-3">
-                    <div class="grupo-input"><label>Nombre Comercial</label><input type="text" id="config-nombre"></div>
-                    <div class="grupo-input"><label>WhatsApp</label><input type="tel" id="config-whatsapp"></div>
-                    <div class="grupo-input"><label>Moneda</label><input type="text" id="config-moneda" value="Gs."></div>
+                    <div class="grupo-input"><label>Nombre Comercial de la Fábrica</label><input type="text" id="config-nombre"></div>
+                    <div class="grupo-input"><label>WhatsApp de Atención</label><input type="tel" id="config-whatsapp"></div>
+                    <div class="grupo-input"><label>Moneda Local</label><input type="text" id="config-moneda" value="Gs."></div>
                 </div>
                 <div style="margin-top: 10px;">
-                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Enlace de Ventas Exclusivo:</label>
+                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Tu Enlace de Ventas Exclusivo (Compartir en Redes):</label>
                     <div style="background: rgba(56,189,248,0.1); padding: 10px; border-radius: 6px; margin-top:5px; font-family: monospace; color: var(--primary);" id="link-exclusivo">Cargando...</div>
                 </div>
             </div>
@@ -135,12 +138,12 @@
                     <div class="grupo-input"><label>Encastre (cm)</label><input type="number" id="config-encastre"></div>
                     <div class="grupo-input"><label>Peso 1 Columna (Kg)</label><input type="number" id="config-peso-col"></div>
                 </div>
-                <button class="btn-primario" onclick="guardarConfiguracion()">💾 Guardar ERP</button>
+                <button class="btn-primario" onclick="guardarConfiguracion()">💾 Guardar Configuración ERP</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DESGLOSE FINANCIERO -->
+    <!-- 1. MODAL DESGLOSE FINANCIERO -->
     <div id="modal-desglose" class="modal-overlay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Análisis de Rentabilidad</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
@@ -151,19 +154,15 @@
 
             <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
             
-            <!-- DESGLOSE TRANSPARENTE MURO VS PORTÓN -->
             <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 15px; border-radius: 6px; margin: 15px 0;">
                 <div class="fila-desglose" style="border:none; padding:0; margin-bottom:8px;">
-                    <span style="color:var(--text-muted);">🧱 Ingreso por Muro:</span>
-                    <span id="m-ingreso-muro" style="color:white;">Gs. 0</span>
+                    <span style="color:var(--text-muted);">🧱 Ingreso por Muro:</span><span id="m-ingreso-muro" style="color:white;">Gs. 0</span>
                 </div>
                 <div class="fila-desglose" id="caja-ingreso-porton" style="border:none; padding:0; margin-bottom:8px; display:none;">
-                    <span id="m-label-porton" style="color:var(--warning);">🚪 Ingreso Portones:</span>
-                    <span id="m-ingreso-porton" style="color:var(--warning);">Gs. 0</span>
+                    <span id="m-label-porton" style="color:var(--warning);">🚪 Ingreso Portones:</span><span id="m-ingreso-porton" style="color:var(--warning);">Gs. 0</span>
                 </div>
                 <div class="fila-desglose" style="border-bottom:none; border-top:1px dashed var(--border); padding-top:10px; margin-bottom:0; font-size:1.05rem; font-weight:bold;">
-                    <span>Ingreso Bruto Total:</span>
-                    <span id="m-ingreso-total" style="color:white;">Gs. 0</span>
+                    <span>Ingreso Bruto Total:</span><span id="m-ingreso-total" style="color:white;">Gs. 0</span>
                 </div>
             </div>
 
@@ -178,15 +177,27 @@
         </div>
     </div>
 
-    <!-- MODAL ELEGANTE FLETE -->
+    <!-- 2. MODAL ELEGANTE FLETE -->
     <div id="modal-flete" class="modal-overlay">
         <div class="modal-box" style="text-align: center;">
             <h3 style="color:var(--primary); margin-top:0;">🚚 Cargar Costo de Flete</h3>
             <p style="font-size:0.85rem; color:var(--text-muted);">Ingresá cuánto cobrará el camionero por llevar los materiales a esta obra.</p>
             <input type="number" id="input-flete-valor" class="input-flete-modal" placeholder="Ej: 800000">
             <div class="grid-2">
-                <button class="btn-primario" style="background:var(--border); color:white;" onclick="cerrarModalFlete()">Cancelar</button>
+                <button class="btn-primario" style="background:transparent; border:1px solid var(--border); color:white;" onclick="cerrarModalFlete()">Cancelar</button>
                 <button class="btn-primario" onclick="guardarFleteModal()">Guardar Flete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. NUEVO MODAL ELEGANTE PARA CONFIRMAR BORRADO -->
+    <div id="modal-borrar" class="modal-overlay" style="z-index: 200;">
+        <div class="modal-box" style="text-align: center; max-width: 350px;">
+            <h3 id="borrar-titulo" style="color:var(--danger); margin-top:0;">⚠️ Eliminar Registro</h3>
+            <p id="borrar-mensaje" style="font-size:0.9rem; color:var(--text-muted);">¿Estás seguro de que deseas borrar esto? Esta acción no se puede deshacer.</p>
+            <div class="grid-2" style="margin-top: 20px;">
+                <button class="btn-primario" style="background:transparent; border:1px solid var(--border); color:white;" onclick="cerrarModalBorrar()">Cancelar</button>
+                <button class="btn-primario" style="background:var(--danger); color:white;" onclick="ejecutarBorrado()">Sí, Eliminar</button>
             </div>
         </div>
     </div>
@@ -202,12 +213,11 @@
         const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
 
         let propietarioUID = ""; let listaVentasGlobal = []; 
-        let currentVentaKeyForFlete = ""; 
-        let currentIndexDesglose = 0; 
+        let currentVentaKeyForFlete = ""; let currentIndexDesglose = 0; 
+        
         let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 120000, cInst: 40000, cAlz: 30, tipoLogistica: 'destajo', com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
-        // AQUÍ ESTABA EL ERROR: EL LOGIN QUE HACE QUE EL PANEL VEA TUS DATOS
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 propietarioUID = user.uid; 
@@ -227,8 +237,7 @@
                 document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
                 document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; 
                 document.getElementById('config-tipo-logistica').value = cfg.tipoLogistica || 'destajo';
-                document.getElementById('config-costo-alz').value = cfg.cAlz;
-                document.getElementById('config-comision').value = cfg.com;
+                document.getElementById('config-costo-alz').value = cfg.cAlz; document.getElementById('config-comision').value = cfg.com;
                 document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
                 document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
                 
@@ -286,9 +295,25 @@
                     
                     let portonBadge = calc.p > 0 ? `<br><div class="badge-porton">🚪 ${calc.p} Portón ${v.portonesTipo || ''}</div>` : '';
 
+                    // NUEVO: BOTÓN WHATSAPP DINÁMICO
+                    let btnWa = '';
+                    if (v.telefono) {
+                        let numLimpio = v.telefono.replace(/[^0-9]/g, '');
+                        let nombreEmp = cfg.nombreEmpresa || 'nuestra fábrica';
+                        let msjWa = encodeURIComponent(`Hola ${v.cliente}, somos de ${nombreEmp}. Vimos tu cotización por un muro de ${calc.m}m. ¿Te gustaría que coordinemos una visita o hablemos de los detalles?`);
+                        btnWa = `<br><a href="https://wa.me/${numLimpio}?text=${msjWa}" target="_blank" style="display:inline-block; margin-top:8px; background:#25D366; color:#020617; padding:4px 8px; border-radius:4px; text-decoration:none; font-size:0.7rem; font-weight:bold;">💬 Contactar</a>`;
+                    } else {
+                        btnWa = `<br><span style="display:inline-block; margin-top:8px; color:var(--text-muted); font-size:0.7rem;">Sin teléfono</span>`;
+                    }
+
                     html += `<tr>
                         <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vend}</td>
-                        <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small><br><small style="color:var(--text-muted)">🗺️ ${terrenoTxt}</small></td>
+                        <td>
+                            <strong>${v.cliente}</strong><br>
+                            <small style="color:var(--danger)">📍 ${v.ciudad}</small><br>
+                            <small style="color:var(--text-muted)">🗺️ ${terrenoTxt}</small>
+                            ${btnWa}
+                        </td>
                         <td>
                             <span style="color:var(--primary)">${calc.columnas} Col / ${calc.placasEnteras} Placas Enteras</span>
                             ${pCorte}
@@ -304,15 +329,6 @@
                 });
                 document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">No hay cotizaciones aún.</td></tr>`;
             });
-        }
-
-        // FUNCION DE BORRADO 100% SEGURA
-        window.borrarCotizacion = function(key) {
-            if(confirm("¿Estás seguro de que deseas borrar esta cotización?")) {
-                remove(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}`))
-                .then(() => mostrarToast("Cotización eliminada correctamente."))
-                .catch(err => alert("Error al borrar: " + err));
-            }
         }
 
         window.cambiarEstadoVenta = (key, est) => { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), est.includes("Aprobada") ? "Rechazada ❌" : est.includes("Rechazada") ? "Pendiente (Web)" : "Aprobada ✅"); }
@@ -364,30 +380,56 @@
             document.getElementById('modal-desglose').style.display = 'flex';
         }
         
-        window.abrirModalFlete = (key, fActual) => {
-            currentVentaKeyForFlete = key;
-            document.getElementById('input-flete-valor').value = fActual > 0 ? fActual : '';
-            document.getElementById('modal-flete').style.display = 'flex';
-        }
-        
+        window.abrirModalFlete = (key, fActual) => { currentVentaKeyForFlete = key; document.getElementById('input-flete-valor').value = fActual > 0 ? fActual : ''; document.getElementById('modal-flete').style.display = 'flex'; }
         window.cerrarModalFlete = () => { document.getElementById('modal-flete').style.display = 'none'; }
 
         window.guardarFleteModal = () => {
-            let val = document.getElementById('input-flete-valor').value;
-            let m = parseFloat(val.replace(/[^0-9]/g, ''));
+            let val = document.getElementById('input-flete-valor').value; let m = parseFloat(val.replace(/[^0-9]/g, ''));
             if(!isNaN(m)) {
                 set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { 
-                    cerrarModalFlete(); 
-                    mostrarToast("🚚 Costo guardado");
-                    listaVentasGlobal[currentIndexDesglose].v.fleteReal = m;
-                    abrirDesglose(currentIndexDesglose);
+                    cerrarModalFlete(); mostrarToast("🚚 Costo guardado");
+                    listaVentasGlobal[currentIndexDesglose].v.fleteReal = m; abrirDesglose(currentIndexDesglose);
                 });
             } else { cerrarModalFlete(); }
         }
 
         window.cerrarModal = () => document.getElementById('modal-desglose').style.display = 'none';
-        window.guardarVendedor = () => { let n=document.getElementById('nuevo-vendedor-nombre').value, e=document.getElementById('nuevo-vendedor-email').value, p=document.getElementById('nuevo-vendedor-pass').value; if(n&&e) createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); }); }
-        window.cargarVendedores = () => onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (s) => { let h=""; s.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-logout" style="padding:4px 8px; font-size:0.7rem;" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">Borrar</button></td></tr>`; }); document.getElementById('tabla-vendedores-body').innerHTML = h; });
+        
+        // --- SISTEMA DE BORRADO ELEGANTE SIN ALERTAS BLANCAS ---
+        let accionBorradoPendiente = null;
+        window.abrirModalBorrar = function(accion, titulo, mensaje) {
+            accionBorradoPendiente = accion;
+            document.getElementById('borrar-titulo').innerText = titulo;
+            document.getElementById('borrar-mensaje').innerText = mensaje;
+            document.getElementById('modal-borrar').style.display = 'flex';
+        }
+        window.cerrarModalBorrar = function() {
+            accionBorradoPendiente = null; document.getElementById('modal-borrar').style.display = 'none';
+        }
+        window.ejecutarBorrado = function() {
+            if (accionBorradoPendiente) accionBorradoPendiente();
+            cerrarModalBorrar();
+        }
+
+        window.borrarCotizacion = function(key) {
+            abrirModalBorrar(
+                () => { remove(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}`)).then(() => mostrarToast("🗑️ Cotización eliminada.")); },
+                "⚠️ Eliminar Cotización",
+                "¿Estás seguro de que deseas borrar esta cotización del CRM? Esta acción no se puede deshacer."
+            );
+        }
+
+        window.borrarVendedor = function(key) {
+            abrirModalBorrar(
+                () => { remove(ref(db, `empresas/${propietarioUID}/vendedores/${key}`)).then(() => mostrarToast("🗑️ Vendedor eliminado.")); },
+                "⚠️ Eliminar Vendedor",
+                "¿Estás seguro de que deseas quitar a este vendedor del equipo comercial?"
+            );
+        }
+
+        window.guardarVendedor = () => { let n=document.getElementById('nuevo-vendedor-nombre').value, e=document.getElementById('nuevo-vendedor-email').value, p=document.getElementById('nuevo-vendedor-pass').value; if(n&&e) createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); document.getElementById('nuevo-vendedor-nombre').value=''; document.getElementById('nuevo-vendedor-email').value=''; }); }
+        window.cargarVendedores = () => onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (s) => { let h=""; s.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><small style="cursor:pointer; color:var(--danger);" onclick="borrarVendedor('${c.key}')">🗑️ Borrar</small></td></tr>`; }); document.getElementById('tabla-vendedores-body').innerHTML = h; });
+        
         window.cerrarSesion = () => { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href = "login.html"); }
     </script>
 </body>
