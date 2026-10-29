@@ -3,282 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Fábrica | Turing CRM</title>
+    <title>TuringSaaS | ERP Prefabricados</title>
     <style>
-        :root { 
-            --bg-base: #0f172a; --bg-card: #1e293b; --border: #334155; 
-            --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; 
-            --warning: #fbbf24; --danger: #ef4444; --success: #10b981; 
+        :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
+        .logo-text { font-size: 1.5rem; font-weight: 700; margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
+        .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .menu-btn:hover { background-color: rgba(56, 189, 248, 0.1); color: var(--primary); } .menu-btn.activo { background-color: var(--primary); color: #0f172a; font-weight: 600; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
+        .btn-logout { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;}
+        .seccion { display: none; } .seccion.activa { display: block; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 20px;}
+        .grupo-input { margin-bottom: 15px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); }
+        .grupo-input input, .grupo-input select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; box-sizing: border-box; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .btn-primario { background: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;}
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px;} 
+        th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border);} 
+        td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} 
+        .badge.pendiente { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251,191,36,0.3);} 
+        .badge.activo { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.3);}
+        .badge.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3);}
+        .badge-porton { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 0.7rem; font-weight: bold; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} 
+        .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.5);} 
+        .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; align-items: center;}
+        
+        /* Modal elegante de Flete */
+        #modal-flete { z-index: 105; }
+        .input-flete-modal { width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--primary); background: #020617; color: white; margin-bottom: 15px; text-align: center; box-sizing: border-box;}
+
+        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;} 
+        .toast.mostrar { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 5px; border-right: none; }
+            .logo-text { display: none; } .menu-btn { padding: 8px 12px; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap; }
+            .main-content { padding: 15px; } .grid-2, .grid-3 { grid-template-columns: 1fr; }
         }
-        body { font-family: -apple-system, sans-serif; background: var(--bg-base); color: var(--text-main); margin: 0; padding: 20px; box-sizing: border-box; }
-        .header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
-        
-        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 25px; }
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
-        .card-title { margin-top: 0; color: var(--primary); font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        
-        /* TABLA CRM */
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 800px; }
-        th { color: var(--text-muted); padding: 12px; border-bottom: 1px solid var(--border); }
-        td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-        
-        .badge-porton { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 0.75rem; font-weight: bold; }
-        
-        /* MODAL FINANZAS */
-        #modal-finanzas { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; width: 90%; max-width: 450px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .close-btn { float: right; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); }
-        .close-btn:hover { color: white; }
-        
-        .desglose-ingreso { background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .fila-monto { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
-        
-        .btn-analisis { background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 0; font-size: 0.8rem; margin-top: 8px; display: flex; align-items: center; gap: 4px;}
-        .btn-analisis:hover { color: white; }
-        
-        /* FORMULARIO CONFIG */
-        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; }
-        .form-group input { width: 100%; background: var(--bg-base); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 4px; box-sizing: border-box;}
-        .btn-guardar { background: var(--success); color: #020617; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;}
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h2 style="margin:0; color:var(--primary);">Panel de Fábrica <span style="color:var(--text-muted); font-size:1rem; font-weight:normal;">| Gestión de Obras</span></h2>
+    <div class="sidebar">
+        <h1 class="logo-text" id="header-empresa">Turing<span>SaaS</span></h1>
+        <button class="menu-btn activo" onclick="cambiarTab('ventas')">📊 Gestión de Obras</button>
+        <button class="menu-btn" onclick="cambiarTab('equipo')">👥 Vendedores</button>
+        <button class="menu-btn" onclick="cambiarTab('configuracion')">⚙️ Configuración ERP</button>
     </div>
 
-    <div class="grid-layout">
-        
-        <!-- CRM TABLA DE CLIENTES -->
-        <div class="card">
-            <h3 class="card-title">Cotizaciones y Obras</h3>
-            <div class="table-container">
+    <div class="main-content">
+        <div id="seccion-ventas" class="seccion activa">
+            <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Salir</button></div>
+            <div class="card" style="padding: 0; overflow-x:auto;">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Cliente / Terreno</th>
-                            <th>Plan de Producción</th>
-                            <th>Presupuesto</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-crm">
-                        <tr><td colspan="5" align="center">Cargando datos...</td></tr>
-                    </tbody>
+                    <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente / Terreno</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                    <tbody id="tabla-ventas-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- CONFIGURACIÓN DE PRECIOS -->
-        <div class="card" style="margin-top:20px;">
-            <h3 class="card-title">Configuración de Precios y Costos</h3>
-            <div class="config-grid">
-                <div>
-                    <h4 style="color:var(--success); margin-bottom:15px; font-size:0.9rem;">Precios de Venta (Por Metro)</h4>
-                    <div class="form-group"><label>Obra Terminada</label><input type="number" id="cfg-pLlave"></div>
-                    <div class="form-group"><label>Envío a Obra</label><input type="number" id="cfg-pEnvio"></div>
-                    <div class="form-group"><label>Retiro de Fábrica</label><input type="number" id="cfg-pRetiro"></div>
-                    <div class="form-group"><label>Precio Base Portón</label><input type="number" id="cfg-pPorton"></div>
+        <div id="seccion-equipo" class="seccion">
+            <div class="header-top"><h2>Vendedores</h2></div>
+            <div class="card">
+                <div class="grid-3">
+                    <div class="grupo-input"><label>Nombre</label><input type="text" id="nuevo-vendedor-nombre"></div>
+                    <div class="grupo-input"><label>Correo</label><input type="email" id="nuevo-vendedor-email"></div>
+                    <div class="grupo-input"><label>Clave</label><input type="text" id="nuevo-vendedor-pass" value="Ventas123" readonly style="color: var(--warning);"></div>
                 </div>
-                <div>
-                    <h4 style="color:var(--danger); margin-bottom:15px; font-size:0.9rem;">Costos Operativos (Fábrica)</h4>
-                    <div class="form-group"><label>Costo Fabricación (Por Metro)</label><input type="number" id="cfg-costoFab"></div>
-                    <div class="form-group"><label>Costo Instalación (Por Metro)</label><input type="number" id="cfg-costoInst"></div>
-                    <div class="form-group"><label>Pago Alzador (Por Kg)</label><input type="number" id="cfg-pagoAlzador"></div>
+                <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta</button>
+            </div>
+            <div class="card" style="overflow-x:auto;">
+                <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
+            </div>
+        </div>
+
+        <div id="seccion-configuracion" class="seccion">
+            <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
+            
+            <div class="card">
+                <div class="grid-3">
+                    <div class="grupo-input"><label>Nombre Comercial</label><input type="text" id="config-nombre"></div>
+                    <div class="grupo-input"><label>WhatsApp</label><input type="tel" id="config-whatsapp"></div>
+                    <div class="grupo-input"><label>Moneda</label><input type="text" id="config-moneda" value="Gs."></div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Enlace de Ventas Exclusivo:</label>
+                    <div style="background: rgba(56,189,248,0.1); padding: 10px; border-radius: 6px; margin-top:5px; font-family: monospace; color: var(--primary);" id="link-exclusivo">Cargando...</div>
                 </div>
             </div>
-            <button class="btn-guardar" onclick="guardarConfig()">💾 Guardar Cambios</button>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="color: var(--success); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Precios de Venta (Por Metro)</h3>
+                    <div class="grupo-input"><label>Obra Terminada (Material + Inst.)</label><input type="number" id="config-precio-llave"></div>
+                    <div class="grupo-input"><label>Envío a Obra (Solo material)</label><input type="number" id="config-precio-envio"></div>
+                    <div class="grupo-input"><label>Retiro de Fábrica</label><input type="number" id="config-precio-retiro"></div>
+                    <div class="grupo-input"><label>Precio Base Portón</label><input type="number" id="config-precio-porton"></div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--danger); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Costos Operativos (Fábrica)</h3>
+                    <div class="grupo-input"><label>Costo Fabricación (Por Metro)</label><input type="number" id="config-costo-fab"></div>
+                    <div class="grupo-input"><label>Costo Instalación (Por Metro)</label><input type="number" id="config-costo-inst"></div>
+                    <div class="grupo-input"><label>Comisión Vendedor (%)</label><input type="number" id="config-comision"></div>
+                    
+                    <div class="grupo-input">
+                        <label>Tipo de Contrato Logístico (Alzadores)</label>
+                        <select id="config-tipo-logistica">
+                            <option value="destajo">A destajo (Pago por Kg alzado)</option>
+                            <option value="fijo">Personal Fijo Mensual (No descuenta por obra)</option>
+                        </select>
+                    </div>
+                    <div class="grupo-input" id="caja-pago-kg"><label>Pago Alzador (Por Kg)</label><input type="number" id="config-costo-alz"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--warning); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Ficha Técnica Estructural</h3>
+                <div class="grid-3">
+                    <div class="grupo-input"><label>Largo Placa (cm)</label><input type="number" id="config-largo-placa"></div>
+                    <div class="grupo-input"><label>Alto Placa (cm)</label><input type="number" id="config-alto-placa"></div>
+                    <div class="grupo-input"><label>Peso 1 Placa (Kg)</label><input type="number" id="config-peso-placa"></div>
+                    <div class="grupo-input"><label>Ancho Columna (cm)</label><input type="number" id="config-ancho-col"></div>
+                    <div class="grupo-input"><label>Encastre (cm)</label><input type="number" id="config-encastre"></div>
+                    <div class="grupo-input"><label>Peso 1 Columna (Kg)</label><input type="number" id="config-peso-col"></div>
+                </div>
+                <button class="btn-primario" onclick="guardarConfiguracion()">💾 Guardar ERP</button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL DE ANÁLISIS FINANCIERO -->
-    <div id="modal-finanzas">
-        <div class="modal-content">
-            <span class="close-btn" onclick="document.getElementById('modal-finanzas').style.display='none'">×</span>
-            <h3 style="margin-top:0; color:var(--primary);">Análisis de Rentabilidad</h3>
+    <!-- MODAL DESGLOSE FINANCIERO -->
+    <div id="modal-desglose" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Análisis de Rentabilidad</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
             
-            <div style="background: rgba(255,255,255,0.05); padding:10px; border-radius:4px; font-size:0.85rem; margin-bottom:15px;">
-                🗺️ <span id="m-terreno">Terreno</span> (<strong style="color:var(--primary)" id="m-metros">0</strong>m reales)
-            </div>
-            
-            <div class="fila-monto" style="border-bottom: 1px solid var(--border); padding-bottom:10px;">
-                <span style="color:var(--text-muted)">Tipo de Contrato:</span>
-                <strong style="color:var(--warning)" id="m-contrato">Llave en mano</strong>
+            <div class="fila-desglose" style="background: rgba(14,165,233,0.1); padding: 8px; border-radius: 6px; border:none; margin-bottom:15px;">
+                <span style="color:var(--text-main); font-size:0.8rem;">🗺️ <span id="m-terreno">Terreno: Medida Manual</span> (<strong id="m-metros-reales" style="color:var(--primary);">0m</strong> reales)</span>
             </div>
 
-            <!-- AQUÍ ESTÁ LA MAGIA: EL DESGLOSE DE INGRESOS TRANSPARENTE -->
-            <div class="desglose-ingreso">
-                <div class="fila-monto" style="color:var(--text-muted);">
-                    <span>🧱 Ingreso por Muro:</span>
-                    <span id="m-ingreso-muro">Gs. 0</span>
+            <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
+            
+            <!-- DESGLOSE TRANSPARENTE MURO VS PORTÓN -->
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 15px; border-radius: 6px; margin: 15px 0;">
+                <div class="fila-desglose" style="border:none; padding:0; margin-bottom:8px;">
+                    <span style="color:var(--text-muted);">🧱 Ingreso por Muro:</span>
+                    <span id="m-ingreso-muro" style="color:white;">Gs. 0</span>
                 </div>
-                <div class="fila-monto" id="caja-ingreso-porton" style="color:var(--warning); display:none;">
-                    <span id="m-label-porton">🚪 Ingreso por Portones:</span>
-                    <span id="m-ingreso-porton">Gs. 0</span>
+                <div class="fila-desglose" id="caja-ingreso-porton" style="border:none; padding:0; margin-bottom:8px; display:none;">
+                    <span id="m-label-porton" style="color:var(--warning);">🚪 Ingreso Portones:</span>
+                    <span id="m-ingreso-porton" style="color:var(--warning);">Gs. 0</span>
                 </div>
-                <div class="fila-monto" style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); font-size:1.05rem; color:var(--text-main); font-weight:bold;">
+                <div class="fila-desglose" style="border-bottom:none; border-top:1px dashed var(--border); padding-top:10px; margin-bottom:0; font-size:1.05rem; font-weight:bold;">
                     <span>Ingreso Bruto Total:</span>
-                    <span id="m-ingreso-total">Gs. 0</span>
+                    <span id="m-ingreso-total" style="color:white;">Gs. 0</span>
                 </div>
             </div>
 
-            <div class="fila-monto" style="color:var(--danger)">
-                <span>Fabricación de Material:</span>
-                <span id="m-costo-fab">- Gs. 0</span>
+            <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                <div class="fila-desglose"><span>Fabricación de Material:</span><span id="m-costo-fab" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-flete"><span>Flete (Camión):</span><div id="m-costo-flete-contenedor"></div></div>
+                <div class="fila-desglose" id="fila-alzadores"><span>Logística (Alzadores):</span><span id="m-costo-alzada" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-inst"><span>Cuadrilla Instalación:</span><span id="m-costo-inst" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-comision"><span>Comisión de Venta:</span><span id="m-comision" style="color:var(--danger)">0</span></div>
             </div>
-            <div class="fila-monto" style="color:var(--danger)">
-                <span>Logística (Alzadores):</span>
-                <span id="m-costo-alza">- Gs. 0 <small style="color:var(--text-muted)" id="m-ton-alza"></small></span>
-            </div>
-            <div class="fila-monto" style="color:var(--danger); border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:15px;">
-                <span>Cuadrilla Instalación:</span>
-                <span id="m-costo-inst">- Gs. 0</span>
-            </div>
+            <div class="fila-desglose" style="font-size:1.1rem; color:var(--success); font-weight:bold; border:none; margin-top:10px;"><span>GANANCIA NETA OBRA:</span><span id="m-ganancia">0</span></div>
+        </div>
+    </div>
 
-            <div class="fila-monto" style="font-size:1.2rem; font-weight:bold; color:var(--success);">
-                <span>GANANCIA NETA OBRA:</span>
-                <span id="m-ganancia">Gs. 0</span>
+    <!-- MODAL ELEGANTE FLETE -->
+    <div id="modal-flete" class="modal-overlay">
+        <div class="modal-box" style="text-align: center;">
+            <h3 style="color:var(--primary); margin-top:0;">🚚 Cargar Costo de Flete</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Ingresá cuánto cobrará el camionero por llevar los materiales a esta obra.</p>
+            <input type="number" id="input-flete-valor" class="input-flete-modal" placeholder="Ej: 800000">
+            <div class="grid-2">
+                <button class="btn-primario" style="background:var(--border); color:white;" onclick="cerrarModalFlete()">Cancelar</button>
+                <button class="btn-primario" onclick="guardarFleteModal()">Guardar Flete</button>
             </div>
         </div>
     </div>
+
+    <div id="toast" class="toast"><span id="toast-mensaje"></span></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-        
-        const db = getDatabase(initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" }));
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" });
+        const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
+
+        let propietarioUID = ""; let listaVentasGlobal = []; 
+        let currentVentaKeyForFlete = ""; 
+        let currentIndexDesglose = 0; 
+        let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 120000, cInst: 40000, cAlz: 30, tipoLogistica: 'destajo', com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
-        
-        let uid = new URLSearchParams(window.location.search).get('empresa'); 
-        if(!uid) uid = "TU_ID_DE_PRUEBA"; // Reemplaza si pruebas sin URL
 
-        let cfg = {};
-
-        // 1. CARGAR CONFIGURACIÓN
-        onValue(ref(db, `empresas/${uid}/configuracion`), (snap) => {
-            if(snap.exists()) {
-                cfg = snap.val();
-                document.getElementById('cfg-pLlave').value = cfg.pLlave || 340000;
-                document.getElementById('cfg-pEnvio').value = cfg.pEnvio || 250000;
-                document.getElementById('cfg-pRetiro').value = cfg.pRetiro || 180000;
-                document.getElementById('cfg-pPorton').value = cfg.pPorton || 4000000;
-                document.getElementById('cfg-costoFab').value = cfg.costoFab || 120000;
-                document.getElementById('cfg-costoInst').value = cfg.costoInst || 40000;
-                document.getElementById('cfg-pagoAlzador').value = cfg.pagoAlzador || 30;
-            }
+        // AQUÍ ESTABA EL ERROR: EL LOGIN QUE HACE QUE EL PANEL VEA TUS DATOS
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                propietarioUID = user.uid; 
+                document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
+                cargarConfiguracion(); cargarVendedores(); cargarVentas();
+            } else { window.location.href = "login.html"; }
         });
 
-        // 2. CARGAR TABLA CRM
-        onValue(ref(db, `empresas/${uid}/cotizaciones`), (snap) => {
-            let html = "";
-            if(snap.exists()) {
-                snap.forEach(cotSnap => {
-                    let c = cotSnap.val();
-                    let key = cotSnap.key;
-                    let fecha = c.fecha ? new Date(c.fecha).toLocaleDateString() : 'Reciente';
+        window.cambiarTab = (t) => { document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa')); document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('activo')); document.getElementById('seccion-' + t).classList.add('activa'); }
+        const mostrarToast = (msg) => { const t = document.getElementById('toast'); document.getElementById('toast-mensaje').innerText = msg; t.classList.add('mostrar'); setTimeout(() => t.classList.remove('mostrar'), 3000); }
+
+        window.cargarConfiguracion = function() {
+            get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
+                if(s.exists()) cfg = { ...cfg, ...s.val() };
+                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
+                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
+                document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
+                document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; 
+                document.getElementById('config-tipo-logistica').value = cfg.tipoLogistica || 'destajo';
+                document.getElementById('config-costo-alz').value = cfg.cAlz;
+                document.getElementById('config-comision').value = cfg.com;
+                document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
+                document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
+                
+                document.getElementById('config-tipo-logistica').addEventListener('change', (e) => {
+                    document.getElementById('caja-pago-kg').style.display = e.target.value === 'fijo' ? 'none' : 'block';
+                });
+                if(cfg.tipoLogistica === 'fijo') document.getElementById('caja-pago-kg').style.display = 'none';
+            });
+        }
+
+        window.guardarConfiguracion = function() {
+            cfg = {
+                nombreEmpresa: document.getElementById('config-nombre').value, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", 
+                pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
+                cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), 
+                tipoLogistica: document.getElementById('config-tipo-logistica').value, cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
+                largoPlaca: Number(document.getElementById('config-largo-placa').value), altoPlaca: Number(document.getElementById('config-alto-placa').value), pesoPlaca: Number(document.getElementById('config-peso-placa').value),
+                anchoCol: Number(document.getElementById('config-ancho-col').value), encastre: Number(document.getElementById('config-encastre').value), pesoCol: Number(document.getElementById('config-peso-col').value)
+            };
+            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ ERP Guardado."); });
+        }
+
+        function calcularReales(metros, portonesStr, tipo) {
+            let m = parseFloat(metros)||0; let p = parseInt(portonesStr)||0; 
+            let mCm = m * 100; let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
+            let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo); if (modulos < 0) modulos = 0;
+            let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo); let sobrante = largoTeorico - mCm; 
+            let placaFinalSize = Math.round(cfg.largoPlaca - sobrante);
+            let placasPorColumna = Math.ceil(200 / cfg.altoPlaca);
+            let placasEnteras = (modulos - 1) * placasPorColumna; let placasCorte = placasPorColumna; 
+            if(placaFinalSize >= cfg.largoPlaca || placaFinalSize <= 0) { placasEnteras = modulos * placasPorColumna; placasCorte = 0; placaFinalSize = 0; }
+            if (placasEnteras < 0) placasEnteras = 0;
+            let totalPlacasFisicas = placasEnteras + placasCorte; let columnas = modulos + 1 + (p > 0 ? p + 1 : 0);
+            let kg = (columnas * cfg.pesoCol) + (totalPlacasFisicas * cfg.pesoPlaca); let ton = (kg / 1000).toFixed(2);
+            let pMetro = cfg.pEnvio; tipo = tipo || "Llave en mano";
+            if(tipo.includes("Llave")) pMetro = cfg.pLlave; else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
+            let total = (m * pMetro) + (p * cfg.pPorton); 
+            return { placasEnteras, placasCorte, columnas, kg, ton, total, m, p, tipo, placaFinalSize };
+        }
+
+        window.cargarVentas = function() {
+            onValue(ref(db, 'empresas/' + propietarioUID + '/cotizaciones'), (snap) => {
+                let vArr = []; snap.forEach(c => { let v = c.val(); v.key = c.key; vArr.push(v); }); vArr.reverse();
+                let html = ""; listaVentasGlobal = []; let i = 0;
+                
+                vArr.forEach((v) => {
+                    let calc = calcularReales(v.metros, v.portonesCantidad || v.portones, v.tipoVenta); 
+                    listaVentasGlobal.push({v: v, calc: calc}); 
                     
-                    // LÓGICA VISUAL DEL PORTÓN EN LA TABLA
-                    let portonHtml = "";
-                    if (c.portonesCantidad && c.portonesCantidad > 0) {
-                        portonHtml = `<br><div class="badge-porton">🚪 ${c.portonesCantidad} Portón ${c.portonesTipo}</div>`;
-                    }
+                    let pCorte = (calc.placaFinalSize > 0 && calc.placasCorte > 0) ? `<br><span style="color:var(--warning); font-size:0.7rem;">✂️ +${calc.placasCorte} Placas de ${calc.placaFinalSize}cm</span>` : "";
+                    let vend = v.vendedor && v.vendedor !== "Venta Directa" ? `<br><small style="color:var(--primary)">Vend: ${v.vendedor}</small>` : "";
+                    let b = "pendiente"; if(v.estado && v.estado.includes("Aprobada")) b = "activo"; if(v.estado && v.estado.includes("Rechazada")) b = "danger";
+                    let estadoTxt = v.estado || "Pendiente (Web)"; let presuTxt = v.ingresoTotal || calc.total;
+                    let terrenoTxt = v.tipoTerreno || "Medida Manual"; if (terrenoTxt.length > 20) terrenoTxt = terrenoTxt.substring(0, 20) + "..."; 
+                    
+                    let portonBadge = calc.p > 0 ? `<br><div class="badge-porton">🚪 ${calc.p} Portón ${v.portonesTipo || ''}</div>` : '';
 
                     html += `<tr>
-                        <td><small style="color:var(--text-muted)">${fecha}</small></td>
+                        <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vend}</td>
+                        <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small><br><small style="color:var(--text-muted)">🗺️ ${terrenoTxt}</small></td>
                         <td>
-                            <strong style="color:var(--text-main); font-size:1rem;">${c.cliente || 'Sin Nombre'}</strong><br>
-                            <small style="color:var(--danger)">📍 ${c.ciudad || 'No especificada'}</small><br>
-                            <small style="color:var(--primary)">🗺️ ${c.tipoTerreno || 'Manual'}</small>
+                            <span style="color:var(--primary)">${calc.columnas} Col / ${calc.placasEnteras} Placas Enteras</span>
+                            ${pCorte}
+                            <br><small style="color:var(--text-muted)">⚖️ ${calc.ton} Ton (${calc.m}m Reales)</small>
+                            ${portonBadge}
                         </td>
+                        <td>${cfg.moneda} ${fm(presuTxt)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Análisis Finanzas</small></td>
                         <td>
-                            <span style="color:var(--primary); font-weight:bold;">${c.columnas} Col / ${c.placasEnteras} Placas Enteras</span><br>
-                            ${c.placasCorte > 0 ? `✂️ <small style="color:var(--warning)">+${c.placasCorte} Placas de ${c.placaFinalSize}cm</small><br>` : ''}
-                            ⚖️ <small style="color:var(--text-muted)">${c.ton} Ton (${c.metros}m Reales)</small>
-                            ${portonHtml}
+                            <span class="badge ${b}" style="cursor:pointer;" onclick="cambiarEstadoVenta('${v.key}', '${estadoTxt}')">${estadoTxt} 🔄</span>
+                            <br><small style="cursor:pointer; color:var(--danger); margin-top:5px; display:inline-block;" onclick="borrarCotizacion('${v.key}')">🗑️ Borrar</small>
                         </td>
-                        <td>
-                            <strong style="color:var(--text-main);">Gs. ${fm(c.ingresoTotal)}</strong>
-                            <button class="btn-analisis" onclick='abrirFinanzas(${JSON.stringify(c)})'>👁️ Análisis Finanzas</button>
-                        </td>
-                        <td>
-                            <div style="background:rgba(251,191,36,0.1); color:var(--warning); border:1px solid var(--warning); padding:4px 8px; border-radius:4px; font-size:0.7rem; display:inline-block; font-weight:bold; margin-bottom:5px;">Pendiente (Web)</div><br>
-                            <button style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:0.75rem;" onclick="eliminar('${key}')">🗑️ Borrar</button>
-                        </td>
-                    </tr>`;
+                    </tr>`; i++;
                 });
+                document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">No hay cotizaciones aún.</td></tr>`;
+            });
+        }
+
+        // FUNCION DE BORRADO 100% SEGURA
+        window.borrarCotizacion = function(key) {
+            if(confirm("¿Estás seguro de que deseas borrar esta cotización?")) {
+                remove(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}`))
+                .then(() => mostrarToast("Cotización eliminada correctamente."))
+                .catch(err => alert("Error al borrar: " + err));
             }
-            document.getElementById('tabla-crm').innerHTML = html || '<tr><td colspan="5" align="center">No hay cotizaciones aún.</td></tr>';
-        });
+        }
 
-        // 3. LÓGICA DEL MODAL (Con desglose matemático corregido)
-        window.abrirFinanzas = function(c) {
-            document.getElementById('m-terreno').innerText = c.tipoTerreno || 'Medida Manual';
-            document.getElementById('m-metros').innerText = c.metros;
-            document.getElementById('m-contrato').innerText = c.tipoVenta;
+        window.cambiarEstadoVenta = (key, est) => { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), est.includes("Aprobada") ? "Rechazada ❌" : est.includes("Rechazada") ? "Pendiente (Web)" : "Aprobada ✅"); }
+
+        window.abrirDesglose = function(idx) {
+            currentIndexDesglose = idx;
+            let data = listaVentasGlobal[idx]; let v = data.v; let c = data.calc; 
+             
+            let cFab = c.m * cfg.cFab; 
+            let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; 
+            let flete = c.tipo.includes("Retiro") ? 0 : (v.fleteReal || 0);
+            let cAlz = 0; if(cfg.tipoLogistica === 'destajo') { cAlz = (parseFloat(c.ton) * 1000) * cfg.cAlz; }
             
-            let pPortonGlobal = cfg.pPorton || 4000000;
-            let cFab = cfg.costoFab || 120000;
-            let cInst = cfg.costoInst || 40000;
-            let pAlzador = cfg.pagoAlzador || 30;
-
-            // CÁLCULO DE INGRESOS SEPARADOS
-            let cantidadPortones = c.portonesCantidad || 0;
-            let ingresoPortones = cantidadPortones * pPortonGlobal;
-            let ingresoTotal = c.ingresoTotal;
-            let ingresoMuro = ingresoTotal - ingresoPortones; // Deducción simple para no errar el precio por metro
+            let totalPresu = v.ingresoTotal || c.total;
+            let comision = (v.vendedor && v.vendedor !== "Venta Directa") ? totalPresu * (cfg.com / 100) : 0;
             
-            // Mostrar en el modal
-            document.getElementById('m-ingreso-muro').innerText = `Gs. ${fm(ingresoMuro)}`;
-            document.getElementById('m-ingreso-total').innerText = `Gs. ${fm(ingresoTotal)}`;
+            let ingresoPortones = c.p * cfg.pPorton;
+            let ingresoMuro = totalPresu - ingresoPortones;
 
-            if(cantidadPortones > 0) {
-                document.getElementById('m-label-porton').innerText = `🚪 Portones (${cantidadPortones}x ${c.portonesTipo}):`;
-                document.getElementById('m-ingreso-porton').innerText = `Gs. ${fm(ingresoPortones)}`;
+            document.getElementById('m-terreno').innerText = v.tipoTerreno || "Medida Manual";
+            document.getElementById('m-metros-reales').innerText = `${c.m}m`;
+            document.getElementById('m-tipo').innerText = c.tipo; 
+            
+            document.getElementById('m-ingreso-muro').innerText = `${cfg.moneda} ${fm(ingresoMuro)}`;
+            if(c.p > 0) {
+                document.getElementById('m-label-porton').innerText = `🚪 Portones (${c.p}x):`;
+                document.getElementById('m-ingreso-porton').innerText = `${cfg.moneda} ${fm(ingresoPortones)}`;
                 document.getElementById('caja-ingreso-porton').style.display = 'flex';
             } else {
                 document.getElementById('caja-ingreso-porton').style.display = 'none';
             }
+            document.getElementById('m-ingreso-total').innerText = `${cfg.moneda} ${fm(totalPresu)}`; 
 
-            // COSTOS
-            let kg = (parseFloat(c.ton) || 0) * 1000;
-            let costoMaterial = c.metros * cFab;
-            let costoAlza = kg * pAlzador;
-            let costoInstalacion = c.tipoVenta.includes("Llave") ? c.metros * cInst : 0;
+            document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
             
-            let gastos = costoMaterial + costoAlza + costoInstalacion;
-            let ganancia = ingresoTotal - gastos;
-
-            document.getElementById('m-costo-fab').innerText = `- Gs. ${fm(costoMaterial)}`;
-            document.getElementById('m-costo-alza').innerText = `- Gs. ${fm(costoAlza)}`;
-            document.getElementById('m-ton-alza').innerText = `(${c.ton}T)`;
-            document.getElementById('m-costo-inst').innerText = c.tipoVenta.includes("Llave") ? `- Gs. ${fm(costoInstalacion)}` : 'Gs. 0 (Sin instalación)';
+            let txtFlete = flete > 0 ? `- ${cfg.moneda} ${fm(flete)}` : "Aún no cargado";
+            document.getElementById('m-costo-flete-contenedor').innerHTML = `<span style="color:var(--danger); font-weight:bold; margin-right:10px;">${txtFlete}</span><button onclick="abrirModalFlete('${v.key}', ${flete})" style="background:var(--primary); color:#020617; border:none; border-radius:4px; font-size:0.75rem; font-weight:bold; padding:4px 8px; cursor:pointer;">✏️ Cargar Flete</button>`;
             
-            document.getElementById('m-ganancia').innerText = `Gs. ${fm(ganancia)}`;
-            document.getElementById('modal-finanzas').style.display = 'flex';
+            if(cfg.tipoLogistica === 'fijo') {
+                document.getElementById('m-costo-alzada').innerHTML = `<span style="color:var(--text-muted)">Sueldo Fijo Mensual</span>`;
+            } else {
+                document.getElementById('m-costo-alzada').innerHTML = `- ${cfg.moneda} ${fm(cAlz)} <span style="font-size:0.7rem">(${c.ton}T)</span>`;
+            }
+
+            document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
+            document.getElementById('fila-comision').style.display = comision > 0 ? 'flex' : 'none'; document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)} (${v.vendedor})`;
+            
+            document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(totalPresu - (cFab + cInst + cAlz + flete + comision))}`;
+            document.getElementById('modal-desglose').style.display = 'flex';
+        }
+        
+        window.abrirModalFlete = (key, fActual) => {
+            currentVentaKeyForFlete = key;
+            document.getElementById('input-flete-valor').value = fActual > 0 ? fActual : '';
+            document.getElementById('modal-flete').style.display = 'flex';
+        }
+        
+        window.cerrarModalFlete = () => { document.getElementById('modal-flete').style.display = 'none'; }
+
+        window.guardarFleteModal = () => {
+            let val = document.getElementById('input-flete-valor').value;
+            let m = parseFloat(val.replace(/[^0-9]/g, ''));
+            if(!isNaN(m)) {
+                set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { 
+                    cerrarModalFlete(); 
+                    mostrarToast("🚚 Costo guardado");
+                    listaVentasGlobal[currentIndexDesglose].v.fleteReal = m;
+                    abrirDesglose(currentIndexDesglose);
+                });
+            } else { cerrarModalFlete(); }
         }
 
-        window.guardarConfig = function() {
-            let updates = {
-                pLlave: Number(document.getElementById('cfg-pLlave').value),
-                pEnvio: Number(document.getElementById('cfg-pEnvio').value),
-                pRetiro: Number(document.getElementById('cfg-pRetiro').value),
-                pPorton: Number(document.getElementById('cfg-pPorton').value),
-                costoFab: Number(document.getElementById('cfg-costoFab').value),
-                costoInst: Number(document.getElementById('cfg-costoInst').value),
-                pagoAlzador: Number(document.getElementById('cfg-pagoAlzador').value)
-            };
-            set(ref(db, `empresas/${uid}/configuracion`), {...cfg, ...updates})
-            .then(() => alert('Configuración actualizada correctamente.'));
-        }
-
-        window.eliminar = function(key) {
-            if(confirm('¿Borrar esta cotización?')) remove(ref(db, `empresas/${uid}/cotizaciones/${key}`));
-        }
+        window.cerrarModal = () => document.getElementById('modal-desglose').style.display = 'none';
+        window.guardarVendedor = () => { let n=document.getElementById('nuevo-vendedor-nombre').value, e=document.getElementById('nuevo-vendedor-email').value, p=document.getElementById('nuevo-vendedor-pass').value; if(n&&e) createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); }); }
+        window.cargarVendedores = () => onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (s) => { let h=""; s.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-logout" style="padding:4px 8px; font-size:0.7rem;" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">Borrar</button></td></tr>`; }); document.getElementById('tabla-vendedores-body').innerHTML = h; });
+        window.cerrarSesion = () => { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href = "login.html"); }
     </script>
 </body>
 </html>
