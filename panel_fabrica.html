@@ -27,9 +27,16 @@
         th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600;} 
         td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: middle;}
         
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} .badge.pendiente { background-color: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3);} .badge.activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3);}
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box;} .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px;}
-        .toast-notificacion { position: fixed; bottom: 30px; right: 30px; background-color: var(--success); color: #020617; padding: 12px 24px; border-radius: 8px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000;} .toast-notificacion.mostrar { transform: translateY(0); opacity: 1; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} 
+        .badge.pendiente { background-color: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3);} 
+        .badge.activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3);}
+        .badge.danger { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3);}
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px;} 
+        .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box;} 
+        .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px;}
+        .toast-notificacion { position: fixed; bottom: 30px; right: 30px; background-color: var(--success); color: #020617; padding: 12px 24px; border-radius: 8px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000;} 
+        .toast-notificacion.mostrar { transform: translateY(0); opacity: 1; }
         .enlace-empresa { background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; margin-top:10px; font-family: monospace; color: var(--primary); word-break: break-all;}
         .subtitulo-cfg { font-size: 1rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 15px; margin-top: 0;}
 
@@ -149,10 +156,10 @@
             <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
             <div class="fila-desglose"><span style="color:var(--text-muted)">Ingreso Bruto:</span><strong id="m-ingreso" style="color:white;">0</strong></div>
             <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
-                <div class="fila-desglose"><span>Costo Fabricación:</span><span id="m-costo-fab" style="color:var(--danger)">- 0</span></div>
-                <div class="fila-desglose"><span>Logística/Personal (Por Kg):</span><span id="m-costo-alzada" style="color:var(--danger)">- 0</span></div>
-                <div class="fila-desglose" id="fila-inst"><span>Instalación en Obra:</span><span id="m-costo-inst" style="color:var(--danger)">- 0</span></div>
-                <div class="fila-desglose"><span>Comisión Vendedor:</span><span id="m-comision" style="color:var(--danger)">- 0</span></div>
+                <div class="fila-desglose"><span>Costo Fabricación:</span><span id="m-costo-fab" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose"><span>Logística/Personal (Por Kg):</span><span id="m-costo-alzada" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-inst"><span>Instalación en Obra:</span><span id="m-costo-inst" style="color:var(--danger)">0</span></div>
+                <div class="fila-desglose" id="fila-comision"><span>Comisión Vendedor:</span><span id="m-comision" style="color:var(--danger)">0</span></div>
             </div>
             <div class="fila-desglose" style="font-size:1.1rem; color:var(--success); font-weight:bold; border:none; margin-top:10px;"><span>GANANCIA NETA:</span><span id="m-ganancia">0</span></div>
         </div>
@@ -166,35 +173,67 @@
         import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
         const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" });
-        const auth = getAuth(app); const db = getDatabase(app);
+        const auth = getAuth(app); 
+        const db = getDatabase(app);
         const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
 
-        let propietarioUID = ""; let listaVentasGlobal = []; let logoBase64Temporal = "";
+        let propietarioUID = ""; 
+        let listaVentasGlobal = []; 
+        let logoBase64Temporal = "";
         
         let cfg = { moneda: "Gs.", logoUrl: "", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 140000, cInst: 50000, cAlz: 30, com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                propietarioUID = user.uid; document.getElementById('email-usuario-actual').innerText = user.email; document.getElementById('email-usuario-actual').style.display = "block";
+                propietarioUID = user.uid; 
+                document.getElementById('email-usuario-actual').innerText = user.email; 
+                document.getElementById('email-usuario-actual').style.display = "block";
                 document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
-                cargarConfiguracion(); cargarVendedores(); cargarVentas();
-            } else { window.location.href = "login.html"; }
+                cargarConfiguracion(); 
+                cargarVendedores(); 
+                cargarVentas();
+            } else { 
+                window.location.href = "login.html"; 
+            }
         });
 
-        window.cambiarTab = function(t) { document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa')); document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('activo')); document.getElementById('seccion-' + t).classList.add('activa'); }
-        function mostrarToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-mensaje').innerText = msg; t.classList.add('mostrar'); setTimeout(() => t.classList.remove('mostrar'), 3000); }
+        window.cambiarTab = function(t) { 
+            document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa')); 
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('activo')); 
+            document.getElementById('seccion-' + t).classList.add('activa'); 
+        }
+
+        function mostrarToast(msg) { 
+            const t = document.getElementById('toast'); 
+            document.getElementById('toast-mensaje').innerText = msg; 
+            t.classList.add('mostrar'); 
+            setTimeout(() => t.classList.remove('mostrar'), 3000); 
+        }
 
         window.cargarConfiguracion = function() {
             get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
-                let c = s.exists() ? s.val() : {}; cfg = { ...cfg, ...c };
-                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
-                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
+                let c = s.exists() ? s.val() : {}; 
+                cfg = { ...cfg, ...c };
+                document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; 
+                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
+                document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; 
+                document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
                 if(cfg.logoUrl) logoBase64Temporal = cfg.logoUrl;
-                document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
-                document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; document.getElementById('config-costo-alz').value = cfg.cAlz; document.getElementById('config-comision').value = cfg.com;
-                document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
-                document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
+                document.getElementById('config-precio-llave').value = cfg.pLlave; 
+                document.getElementById('config-precio-envio').value = cfg.pEnvio; 
+                document.getElementById('config-precio-retiro').value = cfg.pRetiro; 
+                document.getElementById('config-precio-porton').value = cfg.pPorton;
+                document.getElementById('config-costo-fab').value = cfg.cFab; 
+                document.getElementById('config-costo-inst').value = cfg.cInst; 
+                document.getElementById('config-costo-alz').value = cfg.cAlz; 
+                document.getElementById('config-comision').value = cfg.com;
+                document.getElementById('config-largo-placa').value = cfg.largoPlaca; 
+                document.getElementById('config-alto-placa').value = cfg.altoPlaca; 
+                document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
+                document.getElementById('config-ancho-col').value = cfg.anchoCol; 
+                document.getElementById('config-encastre').value = cfg.encastre; 
+                document.getElementById('config-peso-col').value = cfg.pesoCol;
             });
         }
 
@@ -205,7 +244,10 @@
                     const file = e.target.files[0];
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = function(uploadEvent) { logoBase64Temporal = uploadEvent.target.result; mostrarToast("📁 Logo cargado. Guardá los cambios."); };
+                        reader.onload = function(uploadEvent) { 
+                            logoBase64Temporal = uploadEvent.target.result; 
+                            mostrarToast("📁 Logo cargado. Guardá los cambios."); 
+                        };
                         reader.readAsDataURL(file);
                     }
                 });
@@ -214,60 +256,165 @@
 
         window.guardarConfiguracion = function() {
             cfg = {
-                nombreEmpresa: document.getElementById('config-nombre').value, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", logoUrl: logoBase64Temporal,
-                pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
-                cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
-                largoPlaca: Number(document.getElementById('config-largo-placa').value), altoPlaca: Number(document.getElementById('config-alto-placa').value), pesoPlaca: Number(document.getElementById('config-peso-placa').value),
-                anchoCol: Number(document.getElementById('config-ancho-col').value), encastre: Number(document.getElementById('config-encastre').value), pesoCol: Number(document.getElementById('config-peso-col').value)
+                nombreEmpresa: document.getElementById('config-nombre').value, 
+                whatsapp: document.getElementById('config-whatsapp').value, 
+                moneda: document.getElementById('config-moneda').value || "Gs.", 
+                logoUrl: logoBase64Temporal,
+                pLlave: Number(document.getElementById('config-precio-llave').value), 
+                pEnvio: Number(document.getElementById('config-precio-envio').value), 
+                pRetiro: Number(document.getElementById('config-precio-retiro').value), 
+                pPorton: Number(document.getElementById('config-precio-porton').value),
+                cFab: Number(document.getElementById('config-costo-fab').value), 
+                cInst: Number(document.getElementById('config-costo-inst').value), 
+                cAlz: Number(document.getElementById('config-costo-alz').value), 
+                com: Number(document.getElementById('config-comision').value),
+                largoPlaca: Number(document.getElementById('config-largo-placa').value), 
+                altoPlaca: Number(document.getElementById('config-alto-placa').value), 
+                pesoPlaca: Number(document.getElementById('config-peso-placa').value),
+                anchoCol: Number(document.getElementById('config-ancho-col').value), 
+                encastre: Number(document.getElementById('config-encastre').value), 
+                pesoCol: Number(document.getElementById('config-peso-col').value)
             };
-            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ Valores Guardados."); });
+            set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { 
+                document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; 
+                mostrarToast("✅ Valores Guardados."); 
+            });
         }
 
         function calcularReales(metros, portonesStr, tipo) {
-            let m = parseFloat(metros)||0; let p = parseInt(portonesStr)||0; let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
-            let modulos = Math.ceil(m / largoModulo); let placas = modulos * Math.ceil(200 / cfg.altoPlaca); let columnas = modulos + 1 + p;
-            let kg = (columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca); let ton = (kg / 1000).toFixed(2);
-            let pMetro = cfg.pEnvio; if(tipo.includes("Llave")) pMetro = cfg.pLlave; else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
-            let total = (m * pMetro) + (p * cfg.pPorton); return { placas, columnas, kg, ton, total, m, p, tipo, largoModulo };
+            let m = parseFloat(metros)||0; 
+            let p = parseInt(portonesStr)||0; 
+            let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
+            let modulos = Math.ceil(m / largoModulo); 
+            let corteCm = Math.round(((modulos * largoModulo) - m) * 100); 
+            let placas = modulos * Math.ceil(200 / cfg.altoPlaca); 
+            let columnas = modulos + 1 + p;
+            let kg = (columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca); 
+            let ton = (kg / 1000).toFixed(2);
+            let pMetro = cfg.pEnvio; 
+            if(tipo.includes("Llave")) pMetro = cfg.pLlave; 
+            else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
+            let total = (m * pMetro) + (p * cfg.pPorton); 
+            return { placas, columnas, kg, ton, total, m, p, tipo, largoModulo, corteCm };
         }
 
         window.cargarVentas = function() {
             onValue(ref(db, 'empresas/' + propietarioUID + '/cotizaciones'), (snap) => {
-                let html = ""; listaVentasGlobal = []; let i = 0;
+                let ventasArray = [];
                 snap.forEach((c) => {
-                    let v = c.val(); let calc = calcularReales(v.metros, v.portonesCantidad || v.portones, v.tipoVenta); listaVentasGlobal.push(calc); 
+                    let v = c.val(); 
+                    v.key = c.key; 
+                    ventasArray.push(v);
+                });
+                
+                ventasArray.reverse();
+
+                let html = ""; 
+                listaVentasGlobal = []; 
+                let i = 0;
+                
+                ventasArray.forEach((v) => {
+                    let calc = calcularReales(v.metros, v.portonesCantidad || v.portones, v.tipoVenta); 
+                    listaVentasGlobal.push({v: v, calc: calc}); 
+                    
+                    let textoCorte = calc.corteCm > 0 ? `<br><span style="color:var(--warning); font-size:0.7rem;">✂️ Corte placa: ${calc.corteCm}cm</span>` : "";
+                    let vendedorTexto = v.vendedor && v.vendedor !== "Venta Directa" ? `<br><small style="color:var(--primary)">Vendedor: ${v.vendedor}</small>` : "";
+                    
+                    let badgeClass = "pendiente";
+                    if(v.estado.includes("Aprobada")) badgeClass = "activo";
+                    if(v.estado.includes("Rechazada")) badgeClass = "danger";
+
                     html += `<tr>
-                        <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small></td>
+                        <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vendedorTexto}</td>
                         <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small></td>
-                        <td><span style="color:var(--primary)">${calc.m}m (${calc.columnas} Col / ${calc.placas} Plac)</span><br><small style="color:var(--warning)">⚖️ ${calc.ton} Ton</small></td>
+                        <td><span style="color:var(--primary)">${calc.m}m (${calc.columnas} Col / ${calc.placas} Plac)</span>${textoCorte}<br><small style="color:var(--warning)">⚖️ ${calc.ton} Ton</small></td>
                         <td>${cfg.moneda} ${fm(calc.total)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Ver Desglose</small></td>
-                        <td><span class="badge pendiente">${v.estado}</span><br><small style="cursor:pointer; color:var(--danger)" onclick="if(confirm('Borrar?')) remove(ref(db, 'empresas/${propietarioUID}/cotizaciones/${c.key}'))">🗑️ Borrar</small></td>
-                    </tr>`; i++;
+                        <td>
+                            <span class="badge ${badgeClass}" style="cursor:pointer;" onclick="cambiarEstadoVenta('${v.key}', '${v.estado}')">${v.estado} 🔄</span>
+                            <br><small style="cursor:pointer; color:var(--danger); margin-top:5px; display:inline-block;" onclick="if(confirm('Borrar?')) remove(ref(db, 'empresas/${propietarioUID}/cotizaciones/${v.key}'))">🗑️ Borrar</small>
+                        </td>
+                    </tr>`; 
+                    i++;
                 });
                 document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">Sin ventas</td></tr>`;
             });
         }
 
+        window.cambiarEstadoVenta = function(key, estadoActual) {
+            let nuevoEstado = "Aprobada ✅";
+            if(estadoActual.includes("Aprobada")) nuevoEstado = "Rechazada ❌";
+            else if(estadoActual.includes("Rechazada")) nuevoEstado = "Pendiente (Web)";
+            
+            set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), nuevoEstado);
+        }
+
         window.abrirDesglose = function(idx) {
-            let c = listaVentasGlobal[idx]; let cFab = c.m * cfg.cFab; let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; let cAlz = c.kg * cfg.cAlz; let comision = c.total * (cfg.com / 100);
-            document.getElementById('m-tipo').innerText = c.tipo; document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(c.total)}`; document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
-            document.getElementById('m-costo-alzada').innerText = `- ${cfg.moneda} ${fm(cAlz)} (${c.ton} Ton)`; document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
-            document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)}`; document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(c.total - (cFab+cInst+cAlz+comision))}`;
+            let data = listaVentasGlobal[idx]; 
+            let c = data.calc; 
+            let v = data.v;
+            
+            let cFab = c.m * cfg.cFab; 
+            let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; 
+            let cAlz = c.kg * cfg.cAlz; 
+            
+            let comision = 0;
+            let esVendedor = (v.vendedor && v.vendedor !== "Venta Directa");
+            if (esVendedor) {
+                comision = c.total * (cfg.com / 100);
+            }
+
+            document.getElementById('m-tipo').innerText = c.tipo; 
+            document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(c.total)}`; 
+            document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
+            document.getElementById('m-costo-alzada').innerText = `- ${cfg.moneda} ${fm(cAlz)} (${c.ton} Ton)`; 
+            
+            document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; 
+            document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
+            
+            let filaComision = document.getElementById('fila-comision');
+            if(esVendedor) {
+                filaComision.style.display = 'flex';
+                document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)} (${v.vendedor})`;
+            } else {
+                filaComision.style.display = 'none';
+            }
+            
+            document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(c.total - (cFab+cInst+cAlz+comision))}`;
             document.getElementById('modal-desglose').style.display = 'flex';
         }
-        window.cerrarModal = function() { document.getElementById('modal-desglose').style.display = 'none'; }
+
+        window.cerrarModal = function() { 
+            document.getElementById('modal-desglose').style.display = 'none'; 
+        }
         
         window.guardarVendedor = function() {
-            let n = document.getElementById('nuevo-vendedor-nombre').value, e = document.getElementById('nuevo-vendedor-email').value, p = document.getElementById('nuevo-vendedor-pass').value; if(!n||!e) return;
-            createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); });
+            let n = document.getElementById('nuevo-vendedor-nombre').value;
+            let e = document.getElementById('nuevo-vendedor-email').value;
+            let p = document.getElementById('nuevo-vendedor-pass').value; 
+            if(!n||!e) return;
+            
+            createUserWithEmailAndPassword(authSecundario, e, p).then(() => { 
+                signOut(authSecundario); 
+                set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); 
+                mostrarToast("✅ Vendedor creado."); 
+            });
         }
+
         window.cargarVendedores = function() {
             onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (snap) => {
-                let h = ""; snap.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-eliminar" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">🗑️</button></td></tr>`; });
+                let h = ""; 
+                snap.forEach(c => { 
+                    let v=c.val(); 
+                    h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><button class="btn-eliminar" onclick="if(confirm('Seguro?')) remove(ref(db, 'empresas/${propietarioUID}/vendedores/${c.key}'))">🗑️</button></td></tr>`; 
+                });
                 document.getElementById('tabla-vendedores-body').innerHTML = h;
             });
         }
-        window.cerrarSesion = function() { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href = "login.html"); }
+
+        window.cerrarSesion = function() { 
+            localStorage.removeItem("turing_ultimo_panel"); 
+            signOut(auth).then(() => window.location.href = "login.html"); 
+        }
     </script>
 </body>
 </html>

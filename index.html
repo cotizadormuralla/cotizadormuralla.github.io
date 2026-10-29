@@ -206,25 +206,31 @@
             if(!m) return alert("Por favor, ingresá o seleccioná los metros lineales.");
             let t = document.getElementById('c-tipo').value;
             
-            let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100;
-            let modulos = Math.ceil(m / largoModulo); let placas = modulos * Math.ceil(200 / cfg.altoPlaca); let columnas = modulos + 1 + pCant;
+            // Lógica matemática corregida con cálculo de corte
+            let largoModulo = (cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre)) / 100; // en metros
+            let modulosExactos = m / largoModulo;
+            let modulos = Math.ceil(modulosExactos); // Redondeo hacia arriba para cantidad de columnas
+            
+            let metrosSobrantes = (modulos * largoModulo) - m;
+            let corteCm = Math.round(metrosSobrantes * 100); // Centímetros que hay que cortarle a la última placa
+            let textoCorte = corteCm > 0 ? `<br><small style="color:var(--warning)">* Incluye corte de placa de ${corteCm} cm.</small>` : "";
+
+            let placas = modulos * Math.ceil(200 / cfg.altoPlaca); 
+            let columnas = modulos + 1 + pCant;
             let ton = (((columnas * cfg.pesoCol) + (placas * cfg.pesoPlaca)) / 1000).toFixed(2);
             
             let pMetro = cfg.pEnvio; if(t.includes("Llave")) pMetro = cfg.pLlave; else if(t.includes("Retiro")) pMetro = cfg.pRetiro;
             let total = (m * pMetro) + (pCant * cfg.pPorton);
             
             coti = { 
-                cliente: document.getElementById('c-nombre').value, 
-                telefono: telCliente,
-                pais: document.getElementById('c-pais').value, 
-                depto: document.getElementById('c-depto').value, 
-                ciudad: document.getElementById('c-ciudad').value, 
-                metros: m, portonesCantidad: pCant, portonesTipo: pTipo, tipoVenta: t, ingresoTotal: total, 
-                fecha: new Date().toISOString(), estado: "Pendiente (Web)" 
+                cliente: document.getElementById('c-nombre').value, telefono: telCliente,
+                pais: document.getElementById('c-pais').value, depto: document.getElementById('c-depto').value, ciudad: document.getElementById('c-ciudad').value, 
+                metros: m, corteCm: corteCm, portonesCantidad: pCant, portonesTipo: pTipo, tipoVenta: t, ingresoTotal: total, 
+                fecha: new Date().toISOString(), estado: "Pendiente (Web)", vendedor: "Venta Directa" // Se marca como venta directa
             };
             
             document.getElementById('r-monto').innerText = `${cfg.moneda} ${fm(total)}`;
-            document.getElementById('r-desglose').innerHTML = `Materiales: <strong>${columnas} Columnas</strong> y <strong>${placas} Placas</strong>.<br>Portón: <strong>${pCant} (${pTipo})</strong>.<br>Carga pesada estimada: <strong>${ton} Toneladas</strong>.`;
+            document.getElementById('r-desglose').innerHTML = `Materiales: <strong>${columnas} Columnas</strong> y <strong>${placas} Placas</strong>.${textoCorte}<br>Portón: <strong>${pCant} (${pTipo})</strong>.<br>Carga pesada estimada: <strong>${ton} Toneladas</strong>.`;
             document.getElementById('resultado-box').style.display = 'block';
         }
 
