@@ -37,6 +37,10 @@
         .toast { position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;} 
         .toast.mostrar { transform: translateY(0); opacity: 1; }
 
+        /* NUEVOS ESTILOS PARA EL MODAL DE FLETE */
+        #modal-flete { z-index: 105; }
+        .input-flete-modal { width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--primary); background: #020617; color: white; margin-bottom: 15px; text-align: center;}
+
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
             .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 5px; border-right: none; }
@@ -58,7 +62,7 @@
             <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Salir</button></div>
             <div class="card" style="padding: 0; overflow-x:auto;">
                 <table>
-                    <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                    <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente / Terreno</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
                     <tbody id="tabla-ventas-body"></tbody>
                 </table>
             </div>
@@ -139,18 +143,37 @@
     <div id="modal-desglose" class="modal-overlay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Análisis de Rentabilidad</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
+            
+            <!-- Mostrar tipo de terreno en el modal -->
+            <div class="fila-desglose" style="background: rgba(14,165,233,0.1); padding: 8px; border-radius: 6px; border:none; margin-bottom:15px;">
+                <span style="color:var(--text-main); font-size:0.8rem;">🗺️ <span id="m-terreno">Terreno: Medida Manual</span> (<strong id="m-metros-reales" style="color:var(--primary);">0m</strong> reales)</span>
+            </div>
+
             <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
             <div class="fila-desglose"><span style="color:var(--text-muted)">Ingreso Bruto Total:</span><strong id="m-ingreso" style="color:white;">0</strong></div>
             <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
                 <div class="fila-desglose"><span>Fabricación de Material:</span><span id="m-costo-fab" style="color:var(--danger)">0</span></div>
                 
-                <div class="fila-desglose" id="fila-flete"><span>Flete (Camión Tercerizado):</span><div id="m-costo-flete-contenedor"></div></div>
+                <div class="fila-desglose" id="fila-flete"><span>Flete (Camión):</span><div id="m-costo-flete-contenedor"></div></div>
                 
                 <div class="fila-desglose" id="fila-alzadores"><span>Logística (Alzadores):</span><span id="m-costo-alzada" style="color:var(--danger)">0</span></div>
                 <div class="fila-desglose" id="fila-inst"><span>Cuadrilla Instalación:</span><span id="m-costo-inst" style="color:var(--danger)">0</span></div>
                 <div class="fila-desglose" id="fila-comision"><span>Comisión de Venta:</span><span id="m-comision" style="color:var(--danger)">0</span></div>
             </div>
             <div class="fila-desglose" style="font-size:1.1rem; color:var(--success); font-weight:bold; border:none; margin-top:10px;"><span>GANANCIA NETA OBRA:</span><span id="m-ganancia">0</span></div>
+        </div>
+    </div>
+
+    <!-- NUEVO MODAL ELEGANTE PARA INGRESAR FLETE -->
+    <div id="modal-flete" class="modal-overlay">
+        <div class="modal-box" style="text-align: center;">
+            <h3 style="color:var(--primary); margin-top:0;">🚚 Cargar Costo de Flete</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Ingresá cuánto cobrará el camionero por llevar los materiales a esta obra.</p>
+            <input type="number" id="input-flete-valor" class="input-flete-modal" placeholder="Ej: 800000">
+            <div class="grid-2">
+                <button class="btn-primario" style="background:var(--border); color:white;" onclick="cerrarModalFlete()">Cancelar</button>
+                <button class="btn-primario" onclick="guardarFleteModal()">Guardar Flete</button>
+            </div>
         </div>
     </div>
 
@@ -165,6 +188,9 @@
         const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
 
         let propietarioUID = ""; let listaVentasGlobal = []; 
+        let currentVentaKeyForFlete = ""; // Para saber a qué venta le estamos cargando el flete en el modal
+        let currentIndexDesglose = 0; // Para recargar el desglose actual tras guardar el flete
+
         let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 140000, cInst: 50000, cAlz: 30, tipoLogistica: 'destajo', com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
@@ -213,41 +239,22 @@
             set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa; mostrarToast("✅ ERP Guardado."); });
         }
 
-        // CÁLCULO ESTRUCTURAL (Para recalcular datos viejos)
         function calcularReales(metros, portonesStr, tipo) {
-            let m = parseFloat(metros)||0; 
-            let p = parseInt(portonesStr)||0; 
-            
-            let mCm = m * 100;
-            let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
-            
-            let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo);
-            if (modulos < 0) modulos = 0;
-            
-            let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo);
-            let sobrante = largoTeorico - mCm; 
+            let m = parseFloat(metros)||0; let p = parseInt(portonesStr)||0; 
+            let mCm = m * 100; let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
+            let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo); if (modulos < 0) modulos = 0;
+            let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo); let sobrante = largoTeorico - mCm; 
             
             let placaFinalSize = Math.round(cfg.largoPlaca - sobrante);
             let placasPorColumna = Math.ceil(200 / cfg.altoPlaca);
-            
-            let placasEnteras = (modulos - 1) * placasPorColumna;
-            let placasCorte = placasPorColumna; 
-            if(placaFinalSize >= cfg.largoPlaca || placaFinalSize <= 0) {
-                placasEnteras = modulos * placasPorColumna;
-                placasCorte = 0;
-                placaFinalSize = 0;
-            }
+            let placasEnteras = (modulos - 1) * placasPorColumna; let placasCorte = placasPorColumna; 
+            if(placaFinalSize >= cfg.largoPlaca || placaFinalSize <= 0) { placasEnteras = modulos * placasPorColumna; placasCorte = 0; placaFinalSize = 0; }
             if (placasEnteras < 0) placasEnteras = 0;
 
-            let totalPlacasFisicas = placasEnteras + placasCorte;
-            let columnas = modulos + 1 + (p > 0 ? p + 1 : 0);
-            let kg = (columnas * cfg.pesoCol) + (totalPlacasFisicas * cfg.pesoPlaca); 
-            let ton = (kg / 1000).toFixed(2);
-            let pMetro = cfg.pEnvio; 
-            
-            tipo = tipo || "Llave en mano";
-            if(tipo.includes("Llave")) pMetro = cfg.pLlave; 
-            else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
+            let totalPlacasFisicas = placasEnteras + placasCorte; let columnas = modulos + 1 + (p > 0 ? p + 1 : 0);
+            let kg = (columnas * cfg.pesoCol) + (totalPlacasFisicas * cfg.pesoPlaca); let ton = (kg / 1000).toFixed(2);
+            let pMetro = cfg.pEnvio; tipo = tipo || "Llave en mano";
+            if(tipo.includes("Llave")) pMetro = cfg.pLlave; else if(tipo.includes("Retiro")) pMetro = cfg.pRetiro;
             let total = (m * pMetro) + (p * cfg.pPorton); 
             
             return { placasEnteras, placasCorte, columnas, kg, ton, total, m, p, tipo, placaFinalSize };
@@ -265,20 +272,19 @@
                     let pCorte = (calc.placaFinalSize > 0 && calc.placasCorte > 0) ? `<br><span style="color:var(--warning); font-size:0.7rem;">✂️ +${calc.placasCorte} Placas de ${calc.placaFinalSize}cm</span>` : "";
                     let vend = v.vendedor && v.vendedor !== "Venta Directa" ? `<br><small style="color:var(--primary)">Vend: ${v.vendedor}</small>` : "";
                     
-                    let b = "pendiente"; 
-                    if(v.estado && v.estado.includes("Aprobada")) b = "activo"; 
-                    if(v.estado && v.estado.includes("Rechazada")) b = "danger";
+                    let b = "pendiente"; if(v.estado && v.estado.includes("Aprobada")) b = "activo"; if(v.estado && v.estado.includes("Rechazada")) b = "danger";
+                    let estadoTxt = v.estado || "Pendiente (Web)"; let presuTxt = v.ingresoTotal || calc.total;
                     
-                    let estadoTxt = v.estado || "Pendiente (Web)";
-                    let presuTxt = v.ingresoTotal || calc.total;
+                    let terrenoTxt = v.tipoTerreno || "Medida Manual";
+                    if (terrenoTxt.length > 20) terrenoTxt = terrenoTxt.substring(0, 20) + "..."; // Acortar si es muy largo para la tabla
 
                     html += `<tr>
                         <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vend}</td>
-                        <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small></td>
+                        <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small><br><small style="color:var(--text-muted)">🗺️ ${terrenoTxt}</small></td>
                         <td>
                             <span style="color:var(--primary)">${calc.columnas} Col / ${calc.placasEnteras} Placas Enteras</span>
                             ${pCorte}
-                            <br><small style="color:var(--text-muted)">⚖️ ${calc.ton} Ton</small>
+                            <br><small style="color:var(--text-muted)">⚖️ ${calc.ton} Ton (${calc.m}m Reales)</small>
                         </td>
                         <td>${cfg.moneda} ${fm(presuTxt)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Análisis Finanzas</small></td>
                         <td>
@@ -294,9 +300,8 @@
         window.cambiarEstadoVenta = (key, est) => { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), est.includes("Aprobada") ? "Rechazada ❌" : est.includes("Rechazada") ? "Pendiente (Web)" : "Aprobada ✅"); }
 
         window.abrirDesglose = function(idx) {
-            let data = listaVentasGlobal[idx];
-            let v = data.v;
-            let c = data.calc; 
+            currentIndexDesglose = idx;
+            let data = listaVentasGlobal[idx]; let v = data.v; let c = data.calc; 
              
             let cFab = c.m * cfg.cFab; 
             let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; 
@@ -305,19 +310,21 @@
             let flete = c.tipo.includes("Retiro") ? 0 : (v.fleteReal || 0);
             
             // Logística (Alzadores)
-            let cAlz = 0;
-            if(cfg.tipoLogistica === 'destajo') { cAlz = (parseFloat(c.ton) * 1000) * cfg.cAlz; }
+            let cAlz = 0; if(cfg.tipoLogistica === 'destajo') { cAlz = (parseFloat(c.ton) * 1000) * cfg.cAlz; }
             
             let totalPresu = v.ingresoTotal || c.total;
             let comision = (v.vendedor && v.vendedor !== "Venta Directa") ? totalPresu * (cfg.com / 100) : 0;
+            
+            document.getElementById('m-terreno').innerText = v.tipoTerreno || "Medida Manual";
+            document.getElementById('m-metros-reales').innerText = `${c.m}m`;
 
             document.getElementById('m-tipo').innerText = c.tipo; 
             document.getElementById('m-ingreso').innerText = `${cfg.moneda} ${fm(totalPresu)}`; 
             document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
             
-            // Flete interactivo
+            // Flete interactivo CON MODAL ELEGANTE
             let txtFlete = flete > 0 ? `- ${cfg.moneda} ${fm(flete)}` : "Aún no cargado";
-            document.getElementById('m-costo-flete-contenedor').innerHTML = `<span style="color:var(--danger); font-weight:bold; margin-right:10px;">${txtFlete}</span><button onclick="asignarFlete('${v.key}', ${flete})" style="background:var(--primary); color:#020617; border:none; border-radius:4px; font-size:0.75rem; font-weight:bold; padding:4px 8px; cursor:pointer;">✏️ Cargar Flete</button>`;
+            document.getElementById('m-costo-flete-contenedor').innerHTML = `<span style="color:var(--danger); font-weight:bold; margin-right:10px;">${txtFlete}</span><button onclick="abrirModalFlete('${v.key}', ${flete})" style="background:var(--primary); color:#020617; border:none; border-radius:4px; font-size:0.75rem; font-weight:bold; padding:4px 8px; cursor:pointer;">✏️ Cargar Flete</button>`;
             
             let filaAlz = document.getElementById('fila-alzadores');
             if(cfg.tipoLogistica === 'fijo') {
@@ -329,14 +336,35 @@
             document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
             document.getElementById('fila-comision').style.display = comision > 0 ? 'flex' : 'none'; document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)} (${v.vendedor})`;
             
+            // EL CALCULO DE GANANCIA AHORA DESCUENTA EL FLETE CORRECTAMENTE
             document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(totalPresu - (cFab + cInst + cAlz + flete + comision))}`;
             document.getElementById('modal-desglose').style.display = 'flex';
         }
         
-        window.asignarFlete = (key, fActual) => {
-            let m = prompt("🚚 Ingresá el costo real que cobró el camión para llevar el material:", fActual || 0);
-            if(m !== null && m.trim() !== "" && !isNaN(parseFloat(m.replace(/[^0-9]/g, '')))) {
-                set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/fleteReal`), parseFloat(m.replace(/[^0-9]/g, ''))).then(() => { cerrarModal(); mostrarToast("🚚 Costo guardado"); });
+        // NUEVAS FUNCIONES PARA EL MODAL ELEGANTE DE FLETE
+        window.abrirModalFlete = (key, fActual) => {
+            currentVentaKeyForFlete = key;
+            document.getElementById('input-flete-valor').value = fActual > 0 ? fActual : '';
+            document.getElementById('modal-flete').style.display = 'flex';
+        }
+        
+        window.cerrarModalFlete = () => {
+            document.getElementById('modal-flete').style.display = 'none';
+        }
+
+        window.guardarFleteModal = () => {
+            let val = document.getElementById('input-flete-valor').value;
+            let m = parseFloat(val.replace(/[^0-9]/g, ''));
+            if(!isNaN(m)) {
+                set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { 
+                    cerrarModalFlete(); 
+                    mostrarToast("🚚 Costo guardado y restado de la ganancia");
+                    // Recargamos silenciosamente los datos para que el modal de desglose se actualice al instante sin cerrarse
+                    listaVentasGlobal[currentIndexDesglose].v.fleteReal = m;
+                    abrirDesglose(currentIndexDesglose);
+                });
+            } else {
+                cerrarModalFlete();
             }
         }
 

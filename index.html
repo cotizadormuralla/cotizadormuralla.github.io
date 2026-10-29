@@ -90,11 +90,11 @@
             <div class="grupo-input">
                 <label>📐 Seleccionar Terreno o Medida Rápida</label>
                 <select id="c-terreno" onchange="calcularMetrosTerreno()">
-                    <option value="manual">Ingresar Metros Manuales</option>
-                    <option value="12x30_4lados" data-metros="84">Terreno 12x30 (4 Lados Ciegos = 84 mts)</option>
-                    <option value="12x30_3lados" data-metros="72">Terreno 12x30 (3 Lados = 72 mts)</option>
-                    <option value="10x30_4lados" data-metros="80">Terreno 10x30 (4 Lados Ciegos = 80 mts)</option>
-                    <option value="10x30_3lados" data-metros="70">Terreno 10x30 (3 Lados = 70 mts)</option>
+                    <option value="Manual">Ingresar Metros Manuales</option>
+                    <option value="Terreno 12x30 (4 Lados Ciegos = 84 mts)" data-metros="84">Terreno 12x30 (4 Lados Ciegos = 84 mts)</option>
+                    <option value="Terreno 12x30 (3 Lados = 72 mts)" data-metros="72">Terreno 12x30 (3 Lados = 72 mts)</option>
+                    <option value="Terreno 10x30 (4 Lados Ciegos = 80 mts)" data-metros="80">Terreno 10x30 (4 Lados Ciegos = 80 mts)</option>
+                    <option value="Terreno 10x30 (3 Lados = 70 mts)" data-metros="70">Terreno 10x30 (3 Lados = 70 mts)</option>
                 </select>
                 <div id="aviso-terreno" class="aviso-terreno">Se han descontado metros por el portón.</div>
             </div>
@@ -179,7 +179,7 @@
             let aviso = document.getElementById('aviso-terreno');
             let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
             
-            if(select.value === 'manual') {
+            if(select.value === 'Manual') {
                 aviso.style.display = 'none';
                 return;
             }
@@ -203,6 +203,7 @@
             let m = parseFloat(document.getElementById('c-metros').value); 
             let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
             let pTipo = document.getElementById('c-portones-tipo').value;
+            let tipoTerreno = document.getElementById('c-terreno').value; // NUEVO: Capturar qué terreno eligió
             
             if(!telCliente) return alert("Ingresá tu WhatsApp.");
             if(!m || m <= 0) return alert("Ingresá los metros.");
@@ -240,11 +241,13 @@
                 cliente: document.getElementById('c-nombre').value, telefono: telCliente,
                 pais: document.getElementById('c-pais').value, depto: document.getElementById('c-depto').value, ciudad: document.getElementById('c-ciudad').value, 
                 metros: m, portonesCantidad: pCant, portonesTipo: pTipo, tipoVenta: t, ingresoTotal: total, 
+                tipoTerreno: tipoTerreno, // NUEVO: Guardar el tipo de terreno
                 placaFinalSize: placaFinalSize, placasEnteras: placasEnteras, placasCorte: placasCorte, columnas: columnas, ton: ton,
                 fecha: new Date().toISOString(), estado: "Pendiente (Web)", vendedor: "Venta Directa" 
             };
             
-            let txtDesglose = `🧱 <strong>Producción Requerida:</strong><br>
+            let txtDesglose = `🗺️ <strong>Configuración elegida:</strong> ${tipoTerreno === 'Manual' ? 'Medida Manual' : tipoTerreno}<br><br>
+            🧱 <strong>Producción Requerida:</strong><br>
             • ${columnas} Columnas estructurales<br>
             • ${placasEnteras} Placas enteras (${cfg.largoPlaca}cm)<br>`;
             
@@ -265,7 +268,7 @@
             set(push(ref(db, ruta)), coti).then(() => {
                 document.getElementById('btn-registrar').style.display = 'none';
                 if(whatsappDestino) {
-                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n📐 Metros: ${coti.metros}m\n🏗️ Modalidad: ${coti.tipoVenta}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}`);
+                    let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n🗺️ Terreno: ${coti.tipoTerreno}\n📐 Metros Finales: ${coti.metros}m\n🏗️ Modalidad: ${coti.tipoVenta}\n💰 Presupuesto: ${cfg.moneda} ${fm(coti.ingresoTotal)}`);
                     document.getElementById('btn-whatsapp').href = `https://wa.me/${whatsappDestino}?text=${msg}`;
                     document.getElementById('btn-whatsapp').style.display = 'block';
                 } else { 
