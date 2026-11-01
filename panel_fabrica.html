@@ -22,7 +22,7 @@
         .btn-primario { background: var(--primary); color: #020617; border: none; padding: 14px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s;}
         .btn-primario:hover { filter: brightness(1.1); }
         
-        .ciudades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; background: #020617; padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
+        .ciudades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; background: #020617; padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
         .ciudades-grid label { display: flex; align-items: center; gap: 8px; color: white; font-size: 0.85rem; cursor: pointer; margin: 0 !important; }
         .ciudades-grid input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; margin: 0; }
 
@@ -88,7 +88,7 @@
             </div>
         </div>
 
-        <!-- CONFIGURACIÓN ERP CON SELECTORES GLOBALES -->
+        <!-- CONFIGURACIÓN ERP CON SISTEMA EN CASCADA (PAÍS -> DEPTO -> CIUDAD) -->
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
             
@@ -101,34 +101,37 @@
                     <div class="grupo-input"><label>Moneda Local</label><input type="text" id="config-moneda" value="Gs."></div>
                 </div>
                 
-                <!-- ZONA DE TERRITORIO GLOBAL DINÁMICA -->
+                <!-- ZONA DE TERRITORIO ORDENADA -->
                 <div style="margin-top: 10px; background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(56, 189, 248, 0.3);">
-                    <div class="grid-2">
+                    <div class="grid-3">
                         <div class="grupo-input">
-                            <label style="color:var(--primary);">📍 País Operativo</label>
-                            <select id="config-pais" onchange="actualizarCiudades()">
+                            <label style="color:var(--primary);">🌍 País Operativo</label>
+                            <select id="config-pais" onchange="actualizarDepartamentos()">
                                 <option value="Paraguay">Paraguay</option>
                                 <option value="Argentina">Argentina</option>
                                 <option value="Bolivia">Bolivia</option>
                                 <option value="Chile">Chile</option>
-                                <option value="Colombia">Colombia</option>
                                 <option value="Mexico">México</option>
-                                <option value="Peru">Perú</option>
-                                <option value="Uruguay">Uruguay</option>
+                            </select>
+                        </div>
+                        <div class="grupo-input">
+                            <label style="color:var(--primary);">🗺️ Departamento / Estado</label>
+                            <select id="config-departamento" onchange="actualizarCiudades()">
+                                <!-- Se llena por JS -->
                             </select>
                         </div>
                         <div class="grupo-input">
                             <label style="color:var(--primary);">🏭 Ciudad Base (Fábrica)</label>
                             <select id="config-ciudad">
-                                <!-- Se rellena con JavaScript según el país -->
+                                <!-- Se llena por JS -->
                             </select>
                         </div>
                     </div>
                     
                     <div class="grupo-input" style="margin-bottom:0;">
-                        <label style="color:var(--primary); margin-bottom:10px;">🚚 Zonas que cubro (Tilda todas las ciudades donde envías material)</label>
+                        <label style="color:var(--primary); margin-bottom:10px;">🚚 Zonas que cubro (Tilda las ciudades de este departamento donde envías material)</label>
                         <div class="ciudades-grid" id="grid-cobertura">
-                            <!-- Se rellena con JavaScript según el país -->
+                            <!-- Se llena con Checkboxes por JS -->
                         </div>
                     </div>
                 </div>
@@ -232,52 +235,89 @@
         const app = initializeApp(appConfig); const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(appConfig, "AppSec"));
 
         let propietarioUID = ""; 
-        // Valores por defecto seguros para evitar NaN
-        let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 120000, cInst: 40000, cAlz: 30, tipoLogistica: 'destajo', com: 5, pais: "Paraguay", ciudad: "", cobertura: "" };
+        let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 120000, cInst: 40000, cAlz: 30, tipoLogistica: 'destajo', com: 5, pais: "Paraguay", departamento: "", ciudad: "", cobertura: "" };
         const fm = (num) => Number(num).toLocaleString('es-ES');
         let listaVentasGlobal = []; let currentVentaKeyForFlete = ""; let currentIndexDesglose = 0; 
 
-        // DICCIONARIO GLOBAL DE CIUDADES
+        // 🌟 EL SÚPER DICCIONARIO GLOBAL ORDENADO 🌟
         const locaciones = {
-            "Paraguay": ["Areguá", "Asunción", "Caacupé", "Capiatá", "Ciudad del Este", "Coronel Oviedo", "Encarnación", "Fernando de la Mora", "Guarambaré", "Itá", "Itauguá", "J. Augusto Saldívar", "Lambaré", "Limpio", "Luque", "Mariano Roque Alonso", "Nueva Italia", "Ñemby", "Paraguarí", "San Antonio", "San Lorenzo", "Villa Elisa", "Villeta", "Ypacaraí", "Ypané"],
-            "Argentina": ["Buenos Aires", "Catamarca", "Córdoba", "Corrientes", "Entre Ríos", "Formosa", "Mendoza", "Misiones", "Neuquén", "Río Negro", "Rosario", "Salta", "San Juan", "Santa Cruz", "Santa Fe", "Tucumán"],
-            "Bolivia": ["Cochabamba", "La Paz", "Oruro", "Potosí", "Santa Cruz de la Sierra", "Sucre", "Tarija"],
-            "Chile": ["Antofagasta", "Concepción", "Iquique", "La Serena", "Santiago", "Temuco", "Valparaíso"],
-            "Colombia": ["Barranquilla", "Bogotá", "Bucaramanga", "Cali", "Cartagena", "Cúcuta", "Medellín", "Pereira"],
-            "Mexico": ["Cancún", "Ciudad de México", "Guadalajara", "León", "Monterrey", "Puebla", "Tijuana", "Toluca"],
-            "Peru": ["Arequipa", "Chiclayo", "Cusco", "Huancayo", "Iquitos", "Lima", "Piura", "Trujillo"],
-            "Uruguay": ["Canelones", "Colonia", "Maldonado", "Montevideo", "Paysandú", "Punta del Este", "Salto"]
+            "Paraguay": {
+                "Asunción (Capital)": ["Asunción"],
+                "Concepción": ["Concepción", "Belén", "Horqueta", "Loreto", "San Lázaro", "Yby Yaú", "Sgt. José F. López", "San Alfredo", "Paso Barreto", "Azotey", "Arroyito", "Itacuá"],
+                "San Pedro": ["San Pedro de Ycuamandiyú", "Antequera", "Choré", "Gral. Aquino", "Itacurubí del Rosario", "Lima", "Nueva Germania", "San Estanislao", "San Pablo", "Tacuatí", "Unión", "25 de Diciembre", "Villa del Rosario", "Gral. Resquín", "Yataity del Norte", "Guayaibí", "Capiibary", "Santa Rosa del Aguaray", "Yrybucuá", "San Vicente Pancholo"],
+                "Cordillera": ["Caacupé", "Altos", "Arroyos y Esteros", "Atyrá", "Caraguatay", "Emboscada", "Eusebio Ayala", "Isla Pucú", "Itacurubí de la Cord.", "Juan de Mena", "Loma Grande", "Mbocayaty del Yhaguy", "Nueva Colombia", "Piribebuy", "1ro de Marzo", "San Bernardino", "Santa Elena", "Tobatí", "Valenzuela", "San José Obrero"],
+                "Guairá": ["Villarrica", "Borja", "Cap. Mauricio J. Troche", "Cnel. Martínez", "Félix Pérez Cardozo", "Gral. Eugenio A. Garay", "Independencia", "Itapé", "Iturbe", "José Fassardi", "Mbocayaty", "Natalicio Talavera", "Ñumí", "San Salvador", "Yataity", "Dr. Botrell", "Paso Yobái", "Tebicuary"],
+                "Caaguazú": ["Coronel Oviedo", "Caaguazú", "Carayaó", "Dr. Cecilio Báez", "Santa Rosa del Mbutuy", "Dr. Juan M. Frutos", "Repatriación", "Nueva Londres", "San Joaquín", "San José de los Arroyos", "Yhú", "Dr. J. Eulogio Estigarribia", "R.I. 3 Corrales", "Raúl A. Oviedo", "José D. Ocampos", "Mcal. López", "La Pastora", "3 de Febrero", "Simón Bolívar", "Vaquería", "Tembiaporá"],
+                "Caazapá": ["Caazapá", "Abaí", "Buena Vista", "Dr. Moisés Bertoni", "Gral. Higinio Morínigo", "Maciel", "San Juan Nepomuceno", "Tavai", "Yuty", "3 de Mayo", "Fulgencio Yegros"],
+                "Itapúa": ["Encarnación", "Alto Verá", "Bella Vista", "Cambyretá", "Capitán Meza", "Capitán Miranda", "Carlos A. López", "Carmen del Paraná", "Coronel Bogado", "Edelira", "Fram", "Gral. Artigas", "Gral. Delgado", "Hohenau", "Itapúa Poty", "Jesús", "La Paz", "Mayor Otaño", "Natalio", "Nueva Alborada", "Obligado", "San Cosme y Damián", "San Juan del Paraná", "San Pedro del Paraná", "Santa Rita", "Tomás R. Pereira", "Trinidad", "Yatytay"],
+                "Misiones": ["San Juan Bautista", "Ayolas", "San Ignacio", "Santa María", "Santa Rosa", "Santiago", "Villa Florida", "Yabebyry", "San Patricio", "San Miguel"],
+                "Paraguarí": ["Paraguarí", "Acahay", "Caapucú", "Carapeguá", "Escobar", "Gral. Bernardino Caballero", "La Colmena", "Mbuyapey", "Pirayú", "Quiindy", "Quyquyhó", "San Roque González", "Sapucai", "Tebicuarymí", "Yaguarón", "Ybycuí", "Ybytymí", "María Antonia"],
+                "Alto Paraná": ["Ciudad del Este", "Presidente Franco", "Domingo M. de Irala", "Dr. J.L. Mallorquín", "Hernandarias", "Itakyry", "Juan E. O'Leary", "Los Cedrales", "Mbaracayú", "Minga Guazú", "Minga Porá", "Naranjal", "Ñacunday", "San Alberto", "San Cristóbal", "Santa Fe del Paraná", "Santa Rita", "Santa Rosa del Monday", "Tavapy"],
+                "Central": ["Areguá", "Capiatá", "Fernando de la Mora", "Guarambaré", "Itá", "Itauguá", "J. Augusto Saldívar", "Lambaré", "Limpio", "Luque", "Mariano Roque Alonso", "Nueva Italia", "Ñemby", "San Antonio", "San Lorenzo", "Villa Elisa", "Villeta", "Ypacaraí", "Ypané"],
+                "Ñeembucú": ["Pilar", "Alberdi", "Cerrito", "Desmochados", "Gral. Díaz", "Guazú Cuá", "Humaitá", "Isla Umbú", "Laureles", "Mayor Martínez", "Paso de Patria", "San Juan Bautista de Ñ.", "Tacuaras", "Villa Franca", "Villalbín", "Zampedri"],
+                "Amambay": ["Pedro Juan Caballero", "Bella Vista Norte", "Capitán Bado", "Zanja Pytá", "Karapaí"],
+                "Canindeyú": ["Salto del Guairá", "Corpus Christi", "Curuguaty", "Villa Ygatimí", "Itanará", "Ypejhú", "Katueté", "La Paloma", "Nueva Esperanza", "Yasy Cañy", "Ybyrarobaná", "Yby Pytá"],
+                "Presidente Hayes": ["Villa Hayes", "Benjamín Aceval", "José Falcón", "Nanawa", "Puerto Pinasco", "Tte. Irala Fernández", "Tte. Esteban Martínez", "Gral. Bruguez", "Nueva Asunción"],
+                "Boquerón": ["Filadelfia", "Loma Plata", "Mcal. Estigarribia", "Boquerón (Neuland)"],
+                "Alto Paraguay": ["Fuerte Olimpo", "Bahía Negra", "Capitán Carmelo Peralta", "Puerto Casado"]
+            },
+            "Argentina": {
+                "Buenos Aires": ["CABA", "La Plata", "Mar del Plata", "Bahía Blanca", "Tandil", "Quilmes"],
+                "Córdoba": ["Córdoba Capital", "Villa Carlos Paz", "Río Cuarto"],
+                "Misiones": ["Posadas", "Puerto Iguazú", "Eldorado", "Oberá"]
+            },
+            "Mexico": {
+                "CDMX": ["Ciudad de México"],
+                "Nuevo León": ["Monterrey", "San Pedro Garza García"],
+                "Jalisco": ["Guadalajara", "Zapopan"]
+            }
         };
 
-        // Función para cambiar las ciudades según el país seleccionado
+        // RUTINAS DE ACTUALIZACIÓN EN CASCADA
+        window.actualizarDepartamentos = function(deptoGuardado = "", ciudadGuardada = "", coberturaGuardada = "") {
+            let pais = document.getElementById('config-pais').value;
+            let deptosDelPais = locaciones[pais] || {};
+            
+            let htmlDepto = '<option value="">Elige un Departamento...</option>';
+            for(let depto in deptosDelPais) {
+                htmlDepto += `<option value="${depto}">${depto}</option>`;
+            }
+            document.getElementById('config-departamento').innerHTML = htmlDepto;
+            if(deptoGuardado && deptosDelPais[deptoGuardado]) {
+                document.getElementById('config-departamento').value = deptoGuardado;
+            }
+            
+            // Llama a la ciudad automáticamente después de setear el departamento
+            actualizarCiudades(ciudadGuardada, coberturaGuardada);
+        }
+
         window.actualizarCiudades = function(ciudadGuardada = "", coberturaGuardada = "") {
             let pais = document.getElementById('config-pais').value;
-            let ciudades = locaciones[pais] || [];
+            let depto = document.getElementById('config-departamento').value;
+            let ciudades = (locaciones[pais] && locaciones[pais][depto]) ? locaciones[pais][depto] : [];
             
-            // 1. Actualizar el selector de la ciudad base
-            let htmlCiudad = '<option value="">Selecciona tu ciudad base...</option>';
+            // 1. Selector de Ciudad Base
+            let htmlCiudad = '<option value="">Elige Ciudad de Fábrica...</option>';
             ciudades.forEach(c => { htmlCiudad += `<option value="${c}">${c}</option>`; });
             document.getElementById('config-ciudad').innerHTML = htmlCiudad;
             if(ciudadGuardada) document.getElementById('config-ciudad').value = ciudadGuardada;
 
-            // 2. Actualizar las casillas de verificación (Zonas de cobertura)
-            let htmlCobertura = '';
-            let arrayCob = coberturaGuardada.split(',');
+            // 2. Grilla de Checkboxes de Cobertura
+            let htmlCob = '';
+            let arrCob = (coberturaGuardada || "").split(',');
             ciudades.forEach(c => {
-                let checked = arrayCob.includes(c) ? 'checked' : '';
-                htmlCobertura += `<label><input type="checkbox" value="${c}" ${checked}> ${c}</label>`;
+                let checked = arrCob.includes(c) ? 'checked' : '';
+                htmlCob += `<label><input type="checkbox" value="${c}" ${checked}> ${c}</label>`;
             });
-            document.getElementById('grid-cobertura').innerHTML = htmlCobertura;
+            document.getElementById('grid-cobertura').innerHTML = htmlCob;
         }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 propietarioUID = user.uid; 
                 document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
-                // Primero descargamos la configuración, Y LUEGO cargamos las ventas para evitar errores NaN
-                cargarConfiguracion().then(() => {
-                    cargarVentas(); 
-                });
+                // Cadena segura de carga para evitar NaN
+                cargarConfiguracion().then(() => { cargarVentas(); });
                 cargarVendedores();
             } else { window.location.href = "login.html"; }
         });
@@ -289,16 +329,16 @@
             return get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
                 if(s.exists()) {
                     let val = s.val();
-                    // Combinación segura: Si falta un dato, se mantiene el valor por defecto
                     for(let key in val) { if(val[key] !== undefined && val[key] !== "") cfg[key] = val[key]; }
                 }
                 
                 document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
                 document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
                 
-                // Actualizar los selectores con las ciudades del país correcto
+                // DISPARADOR DE CASCADA DE PAÍS -> DEPTO -> CIUDAD
                 document.getElementById('config-pais').value = cfg.pais || "Paraguay";
-                actualizarCiudades(cfg.ciudad, cfg.cobertura);
+                let deptoInicial = cfg.departamento || "Central";
+                actualizarDepartamentos(deptoInicial, cfg.ciudad, cfg.cobertura);
 
                 document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
                 document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; 
@@ -310,6 +350,7 @@
 
         window.guardarConfiguracion = function() {
             let pais = document.getElementById('config-pais').value;
+            let depto = document.getElementById('config-departamento').value;
             let ciudad = document.getElementById('config-ciudad').value;
             let nombreEmpresa = document.getElementById('config-nombre').value;
 
@@ -317,12 +358,13 @@
             let ciudadesArray = Array.from(checkboxesMarcados).map(cb => cb.value);
             let coberturaFinal = ciudadesArray.join(',');
 
+            if (!depto) { alert("Debes seleccionar un Departamento."); return; }
             if (!ciudad) { alert("Debes seleccionar una ciudad base (Fábrica)."); return; }
             if (ciudadesArray.length === 0) { alert("Debes marcar al menos una ciudad en tu zona de cobertura."); return; }
 
             cfg = {
                 nombreEmpresa: nombreEmpresa, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", 
-                pais: pais, ciudad: ciudad, cobertura: coberturaFinal,
+                pais: pais, departamento: depto, ciudad: ciudad, cobertura: coberturaFinal,
                 pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
                 cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), 
                 tipoLogistica: document.getElementById('config-tipo-logistica').value, cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
@@ -340,8 +382,7 @@
                 });
                 
                 mostrarToast("✅ ERP y Territorio Guardados"); 
-                // Recargamos las ventas por si los cálculos cambiaron
-                cargarVentas();
+                cargarVentas(); // Recarga para actualizar montos limpios sin NaN
             });
         }
 
