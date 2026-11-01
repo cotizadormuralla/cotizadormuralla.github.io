@@ -3,64 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuringSaaS | Plataforma Global de Prefabricados</title>
+    <title>TuringSaaS | Red Global de Prefabricados</title>
     <style>
-        :root { --primary: #38bdf8; --bg-base: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155; --success: #10b981; }
+        :root { --primary: #38bdf8; --bg-base: #090d16; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155; --success: #10b981; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-base); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; align-items: center; justify-content: center;}
         
-        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; }
-        .card { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); text-align: center; }
+        .hero-container { width: 100%; max-width: 480px; padding: 20px; box-sizing: border-box; }
+        .card-inicio { background: linear-gradient(145deg, #1e293b, #0f172a); padding: 40px 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center; }
         
-        h1 { margin: 0 0 10px 0; font-size: 1.8rem; color: white;}
-        h1 span { color: var(--primary); font-weight: 400; }
-        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
+        .logo-title { font-size: 2.2rem; font-weight: 800; margin: 0 0 5px 0; color: white; letter-spacing: -0.5px; }
+        .logo-title span { color: var(--primary); font-weight: 400; }
+        .sub-title { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; }
 
-        .btn-opcion { background: #020617; border: 1px solid var(--border); color: white; padding: 18px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; text-decoration: none;}
-        .btn-opcion:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); transform: translateY(-2px); }
-        .btn-opcion.principal { background: var(--primary); color: #020617; border: none; }
-        .btn-opcion.principal:hover { filter: brightness(1.1); }
+        .btn-portal { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: white; padding: 16px 20px; border-radius: 10px; font-size: 1rem; font-weight: 600; width: 100%; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.2s ease; text-decoration: none; box-sizing: border-box;}
+        .btn-portal:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.2); transform: translateY(-2px); }
+        .btn-portal.destacado { background: var(--primary); color: #020617; border: none; font-weight: 700; box-shadow: 0 4px 12px rgba(56,189,248,0.3); }
+        .btn-portal.destacado:hover { filter: brightness(1.1); background: var(--primary); }
 
-        /* Estilos del Cotizador (Oculto por defecto hasta que elijan cotizar) */
-        #vista-cotizador { display: none; width: 100%; max-width: 500px; text-align: left; }
+        /* VISTAS INTERNAS (Cotizador y Registro) */
+        .vista-modulo { display: none; width: 100%; max-width: 500px; text-align: left; padding: 20px; box-sizing: border-box; }
+        .card-modulo { background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
-        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
+        .form-group input, .form-group select { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;}
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-main { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-top: 10px;}
         
-        /* Modal y Pantalla de Éxito */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.9); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; backdrop-filter: blur(5px);}
+        .btn-accion { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.05rem; border: none; width: 100%; padding: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px;}
+        .btn-accion:hover { filter: brightness(1.1); }
+        
+        /* Modal y Pantallas de Éxito */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.85); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; backdrop-filter: blur(5px);}
         .modal-card { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--primary); }
         .precio-final { font-size: 2.2rem; font-weight: bold; color: var(--success); margin: 20px 0; }
-        .btn-confirmar { background: var(--success); color: #000; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px;}
-        .btn-cancelar { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-weight: bold; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer;}
-        .pantalla-exito { display: none; flex-direction: column; align-items: center; text-align: center; padding: 40px 20px; }
+        .btn-secundario { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-weight: bold; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; }
+        .pantalla-exito { display: none; text-align: center; padding: 30px; }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE INICIO (PREGUNTA QUÉ DESEA HACER) -->
-    <div class="container" id="vista-eleccion">
-        <div class="card">
-            <h1>Turing<span>SaaS</span></h1>
-            <p>Selecciona qué deseas hacer en la plataforma</p>
+    <!-- PORTADA PRINCIPAL (DISEÑO PROFESIONAL) -->
+    <div class="hero-container" id="vista-inicio">
+        <div class="card-inicio">
+            <h1 class="logo-title">Turing<span>SaaS</span></h1>
+            <p class="sub-title">Plataforma Global de Prefabricados</p>
             
-            <button class="btn-opcion principal" onclick="irACotizar()">
+            <button class="btn-portal destacado" onclick="mostrarModulo('cotizador')">
                 🏗️ Cotizar un Muro o Cerca
             </button>
             
-            <a href="registro.html" class="btn-opcion">
-                🏭 Registrar mi Fábrica de Prefabricados
-            </a>
+            <button class="btn-portal" onclick="mostrarModulo('registro')">
+                🏭 Registrar mi Fábrica (SaaS)
+            </button>
         </div>
     </div>
 
-    <!-- COTIZADOR PÚBLICO (Se abre al elegir cotizar) -->
-    <div class="container" id="vista-cotizador">
-        <div class="card" style="text-align: left;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+    <!-- MÓDULO 1: COTIZADOR PÚBLICO -->
+    <div class="vista-modulo" id="vista-cotizador">
+        <div class="card-modulo">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:20px;">
                 <h3 id="titulo-empresa" style="margin:0; font-size:1.1rem; color:var(--primary);">Cotizador Inteligente</h3>
-                <button onclick="volverInicio()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">← Volver</button>
+                <button onclick="volverInicio()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;">← Volver</button>
             </div>
             
             <div class="form-group">
@@ -105,7 +109,7 @@
                 </div>
             </div>
 
-            <h3 style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1rem;">Tus Datos de Contacto</h3>
+            <h3 style="margin:25px 0 15px 0; border-bottom:1px solid var(--border); padding-bottom:8px; font-size:1rem; color:white;">Tus Datos de Contacto</h3>
             
             <div class="form-group">
                 <label>Nombre Completo</label>
@@ -117,17 +121,41 @@
                 <input type="tel" id="inp-telefono" placeholder="Ej: 0981234567" required>
             </div>
 
-            <button class="btn-main" onclick="calcularPresupuesto()">Calcular Presupuesto</button>
+            <button class="btn-accion" onclick="calcularPresupuesto()">Calcular Presupuesto</button>
         </div>
     </div>
 
-    <!-- PANTALLA DE ÉXITO -->
-    <div class="container pantalla-exito" id="pantalla-exito">
-        <div class="card">
+    <!-- MÓDULO 2: REGISTRO DE NUEVA FÁBRICA (SAAS) -->
+    <div class="vista-modulo" id="vista-registro">
+        <div class="card-modulo">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:20px;">
+                <h3 style="margin:0; font-size:1.1rem; color:var(--primary);">Registro de Fábrica</h3>
+                <button onclick="volverInicio()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;">← Volver</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Nombre Comercial de la Fábrica</label>
+                <input type="text" id="reg-nombre" placeholder="Ej: Prefabricados G.H. Mix" required>
+            </div>
+            <div class="form-group">
+                <label>Correo Electrónico (Para el Panel)</label>
+                <input type="email" id="reg-email" placeholder="fabrica@correo.com" required>
+            </div>
+            <div class="form-group">
+                <label>Contraseña de Acceso</label>
+                <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" required>
+            </div>
+            <button class="btn-accion" onclick="registrarFabricaSaaS()">Crear Cuenta y Acceder</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE ÉXITO COTIZACIÓN -->
+    <div class="hero-container pantalla-exito" id="pantalla-exito">
+        <div class="card-inicio">
             <div style="font-size:3.5rem; margin-bottom:15px;">✅</div>
             <h2 style="color:var(--success); margin-top:0;">¡Cotización Enviada!</h2>
-            <p>Las fábricas disponibles en tu zona acaban de recibir tu presupuesto. Te contactarán por WhatsApp en breve para coordinar los detalles.</p>
-            <button class="btn-cancelar" style="margin-top:20px;" onclick="location.reload()">Hacer otra cotización</button>
+            <p style="color:var(--text-muted);">Las fábricas disponibles en tu zona acaban de recibir tu presupuesto. Te contactarán por WhatsApp en breve.</p>
+            <button class="btn-secundario" style="margin-top:20px;" onclick="location.reload()">Hacer otra cotización</button>
         </div>
     </div>
 
@@ -139,27 +167,29 @@
             <div class="precio-final" id="precio-pantalla">Gs. 0</div>
             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:20px;">*Sujeto a verificación técnica en el terreno.</p>
             
-            <button class="btn-confirmar" id="btn-registrar" onclick="registrarBD()">Enviar y Solicitar Visita</button>
-            <button class="btn-cancelar" onclick="cerrarModal()">Corregir datos</button>
+            <button class="btn-accion" style="background:var(--success); color:#000; margin-bottom:10px;" id="btn-registrar" onclick="registrarBD()">Enviar y Solicitar Visita</button>
+            <button class="btn-secundario" onclick="cerrarModal()">Corregir datos</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getDatabase, ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
         const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" });
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
         let configBase = { pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, moneda: "Gs." };
         let uidEmpresa = null; 
         let cotizacionActual = {};
 
-        // Si entra por link exclusivo de fábrica, salta directo al cotizador con la marca de la fábrica
+        // Manejo de URL exclusiva de fábrica
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('empresa')) {
             uidEmpresa = urlParams.get('empresa');
-            document.getElementById('vista-eleccion').style.display = 'none';
+            document.getElementById('vista-inicio').style.display = 'none';
             document.getElementById('vista-cotizador').style.display = 'block';
             
             get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(snap => {
@@ -172,14 +202,44 @@
             });
         }
 
-        window.irACotizar = function() {
-            document.getElementById('vista-eleccion').style.display = 'none';
-            document.getElementById('vista-cotizador').style.display = 'block';
+        window.mostrarModulo = function(tipo) {
+            document.getElementById('vista-inicio').style.display = 'none';
+            if(tipo === 'cotizador') document.getElementById('vista-cotizador').style.display = 'block';
+            if(tipo === 'registro') document.getElementById('vista-registro').style.display = 'block';
         }
 
         window.volverInicio = function() {
             document.getElementById('vista-cotizador').style.display = 'none';
-            document.getElementById('vista-eleccion').style.display = 'block';
+            document.getElementById('vista-registro').style.display = 'none';
+            document.getElementById('vista-inicio').style.display = 'block';
+        }
+
+        // FUNCIÓN DE REGISTRO DE NUEVA FÁBRICA EN EL SAAS
+        window.registrarFabricaSaaS = function() {
+            let nombre = document.getElementById('reg-nombre').value.trim();
+            let email = document.getElementById('reg-email').value.trim();
+            let pass = document.getElementById('reg-pass').value.trim();
+
+            if(!nombre || !email || !pass) { alert("Completa todos los campos."); return; }
+
+            createUserWithEmailAndPassword(auth, email, pass).then((userCredential) => {
+                let newUid = userCredential.user.uid;
+                // Crear estructura inicial de la empresa en Firebase
+                set(ref(db, `empresas/${newUid}/configuracion`), {
+                    nombreEmpresa: nombre,
+                    pais: "Paraguay",
+                    ciudad: "Itauguá",
+                    cobertura: "Itauguá, Capiatá, Asunción, Luque",
+                    pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000,
+                    cFab: 120000, cInst: 40000, cAlz: 30, com: 5,
+                    largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55
+                }).then(() => {
+                    alert("¡Fábrica registrada con éxito! Entrando al panel...");
+                    window.location.href = "panel_fabrica.html";
+                });
+            }).catch(error => {
+                alert("Error al registrar: " + error.message);
+            });
         }
 
         const fm = (num) => Number(num).toLocaleString('es-ES');
