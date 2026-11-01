@@ -3,51 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotizador Online | Muros Prefabricados</title>
+    <title>TuringSaaS | Plataforma Global de Prefabricados</title>
     <style>
         :root { --primary: #38bdf8; --bg-base: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155; --success: #10b981; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-base); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; align-items: center;}
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-base); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; align-items: center; justify-content: center;}
         
-        .header { background: var(--bg-card); width: 100%; text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);}
-        .header h1 { margin: 0; font-size: 1.8rem; color: white;}
-        .header p { margin: 5px 0 0 0; color: var(--primary); font-weight: 500; font-size: 0.9rem;}
+        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); text-align: center; }
         
-        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; margin-top: 10px; }
-        .card { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        
+        h1 { margin: 0 0 10px 0; font-size: 1.8rem; color: white;}
+        h1 span { color: var(--primary); font-weight: 400; }
+        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
+
+        .btn-opcion { background: #020617; border: 1px solid var(--border); color: white; padding: 18px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; text-decoration: none;}
+        .btn-opcion:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); transform: translateY(-2px); }
+        .btn-opcion.principal { background: var(--primary); color: #020617; border: none; }
+        .btn-opcion.principal:hover { filter: brightness(1.1); }
+
+        /* Estilos del Cotizador (Oculto por defecto hasta que elijan cotizar) */
+        #vista-cotizador { display: none; width: 100%; max-width: 500px; text-align: left; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
-        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;}
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
-        
+        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-main { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-top: 10px;}
         
-        .btn-main { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px;}
-        .btn-main:hover { filter: brightness(1.1); transform: translateY(-1px);}
-        
-        /* Modal de Resultado */
+        /* Modal y Pantalla de Éxito */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.9); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; backdrop-filter: blur(5px);}
-        .modal-card { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--primary); position: relative;}
-        .modal-card h2 { margin-top: 0; color: var(--primary); font-size: 1.4rem;}
+        .modal-card { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--primary); }
         .precio-final { font-size: 2.2rem; font-weight: bold; color: var(--success); margin: 20px 0; }
         .btn-confirmar { background: var(--success); color: #000; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px;}
         .btn-cancelar { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-weight: bold; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer;}
-        
-        /* Pantalla de Éxito */
         .pantalla-exito { display: none; flex-direction: column; align-items: center; text-align: center; padding: 40px 20px; }
-        .icono-exito { font-size: 4rem; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 id="titulo-empresa">TuringSaaS</h1>
-        <p id="subtitulo-empresa">Cotizador Inteligente de Obras</p>
+    <!-- PANTALLA DE INICIO (PREGUNTA QUÉ DESEA HACER) -->
+    <div class="container" id="vista-eleccion">
+        <div class="card">
+            <h1>Turing<span>SaaS</span></h1>
+            <p>Selecciona qué deseas hacer en la plataforma</p>
+            
+            <button class="btn-opcion principal" onclick="irACotizar()">
+                🏗️ Cotizar un Muro o Cerca
+            </button>
+            
+            <a href="registro.html" class="btn-opcion">
+                🏭 Registrar mi Fábrica de Prefabricados
+            </a>
+        </div>
     </div>
 
-    <div class="container" id="contenedor-formulario">
-        <div class="card">
-            <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1.1rem;">Datos del Proyecto</h3>
+    <!-- COTIZADOR PÚBLICO (Se abre al elegir cotizar) -->
+    <div class="container" id="vista-cotizador">
+        <div class="card" style="text-align: left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                <h3 id="titulo-empresa" style="margin:0; font-size:1.1rem; color:var(--primary);">Cotizador Inteligente</h3>
+                <button onclick="volverInicio()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">← Volver</button>
+            </div>
             
             <div class="form-group">
                 <label>Tipo de Terreno o Medida</label>
@@ -61,7 +75,7 @@
             </div>
 
             <div class="grid-2">
-                <div class="form-group" id="caja-metros">
+                <div class="form-group">
                     <label>Metros Lineales (m)</label>
                     <input type="number" id="inp-metros" placeholder="Ej: 30" required>
                 </div>
@@ -91,7 +105,7 @@
                 </div>
             </div>
 
-            <h3 style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1.1rem;">Tus Datos de Contacto</h3>
+            <h3 style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1rem;">Tus Datos de Contacto</h3>
             
             <div class="form-group">
                 <label>Nombre Completo</label>
@@ -107,20 +121,23 @@
         </div>
     </div>
 
-    <div class="pantalla-exito" id="pantalla-exito">
-        <div class="icono-exito">✅</div>
-        <h2 style="color:var(--success);">¡Cotización Enviada!</h2>
-        <p style="color:var(--text-muted); font-size:1.1rem;">Las fábricas disponibles en tu zona acaban de recibir tu presupuesto. Te contactarán por WhatsApp en breve para coordinar los detalles.</p>
-        <button class="btn-cancelar" style="margin-top:30px; max-width:200px;" onclick="location.reload()">Hacer otra cotización</button>
+    <!-- PANTALLA DE ÉXITO -->
+    <div class="container pantalla-exito" id="pantalla-exito">
+        <div class="card">
+            <div style="font-size:3.5rem; margin-bottom:15px;">✅</div>
+            <h2 style="color:var(--success); margin-top:0;">¡Cotización Enviada!</h2>
+            <p>Las fábricas disponibles en tu zona acaban de recibir tu presupuesto. Te contactarán por WhatsApp en breve para coordinar los detalles.</p>
+            <button class="btn-cancelar" style="margin-top:20px;" onclick="location.reload()">Hacer otra cotización</button>
+        </div>
     </div>
 
     <!-- MODAL DE COTIZACIÓN -->
     <div class="modal-overlay" id="modal-cotizacion">
         <div class="modal-card">
-            <h2>Estimación de Inversión</h2>
+            <h2 style="margin-top:0; color:var(--primary);">Estimación de Inversión</h2>
             <p style="color:var(--text-muted); font-size:0.9rem;">El valor aproximado de tu obra es de:</p>
             <div class="precio-final" id="precio-pantalla">Gs. 0</div>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:25px;">*El precio final puede variar según las condiciones exactas del terreno tras la visita técnica.</p>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:20px;">*Sujeto a verificación técnica en el terreno.</p>
             
             <button class="btn-confirmar" id="btn-registrar" onclick="registrarBD()">Enviar y Solicitar Visita</button>
             <button class="btn-cancelar" onclick="cerrarModal()">Corregir datos</button>
@@ -138,18 +155,31 @@
         let uidEmpresa = null; 
         let cotizacionActual = {};
 
+        // Si entra por link exclusivo de fábrica, salta directo al cotizador con la marca de la fábrica
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('empresa')) {
             uidEmpresa = urlParams.get('empresa');
+            document.getElementById('vista-eleccion').style.display = 'none';
+            document.getElementById('vista-cotizador').style.display = 'block';
+            
             get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(snap => {
                 if (snap.exists()) {
                     let c = snap.val();
                     configBase.pLlave = c.pLlave; configBase.pEnvio = c.pEnvio; configBase.pRetiro = c.pRetiro; configBase.pPorton = c.pPorton;
                     configBase.moneda = c.moneda || "Gs.";
                     document.getElementById('titulo-empresa').innerText = c.nombreEmpresa || "Cotizador Directo";
-                    document.getElementById('subtitulo-empresa').innerText = "Fábrica de Prefabricados";
                 }
             });
+        }
+
+        window.irACotizar = function() {
+            document.getElementById('vista-eleccion').style.display = 'none';
+            document.getElementById('vista-cotizador').style.display = 'block';
+        }
+
+        window.volverInicio = function() {
+            document.getElementById('vista-cotizador').style.display = 'none';
+            document.getElementById('vista-eleccion').style.display = 'block';
         }
 
         const fm = (num) => Number(num).toLocaleString('es-ES');
@@ -159,32 +189,11 @@
             let inpMetros = document.getElementById('inp-metros');
             let inpPortones = document.getElementById('inp-portones');
 
-            if (tipo === '12x30_3lados') { 
-                inpMetros.value = 72; // 30 + 30 + 12
-                inpMetros.disabled = true; 
-                inpPortones.value = 0;
-            }
-            else if (tipo === '12x30_4lados') { 
-                inpMetros.value = 80.5; // (12*2 + 30*2 = 84) menos 3.5m de portón estándar
-                inpMetros.disabled = true; 
-                inpPortones.value = 1; 
-            }
-            else if (tipo === '10x30_3lados') { 
-                inpMetros.value = 70; // 30 + 30 + 10
-                inpMetros.disabled = true; 
-                inpPortones.value = 0;
-            }
-            else if (tipo === '10x30_4lados') { 
-                inpMetros.value = 76.5; // (10*2 + 30*2 = 80) menos 3.5m de portón estándar
-                inpMetros.disabled = true; 
-                inpPortones.value = 1; 
-            }
-            else { 
-                inpMetros.value = ''; 
-                inpMetros.disabled = false; 
-                inpPortones.value = 0;
-                inpMetros.focus(); 
-            }
+            if (tipo === '12x30_3lados') { inpMetros.value = 72; inpMetros.disabled = true; inpPortones.value = 0; }
+            else if (tipo === '12x30_4lados') { inpMetros.value = 80.5; inpMetros.disabled = true; inpPortones.value = 1; }
+            else if (tipo === '10x30_3lados') { inpMetros.value = 70; inpMetros.disabled = true; inpPortones.value = 0; }
+            else if (tipo === '10x30_4lados') { inpMetros.value = 76.5; inpMetros.disabled = true; inpPortones.value = 1; }
+            else { inpMetros.value = ''; inpMetros.disabled = false; inpPortones.value = 0; inpMetros.focus(); }
         }
 
         window.calcularPresupuesto = function() {
@@ -255,10 +264,10 @@
             }
         }
 
-        function mostrarExito() {
+        window.mostrarExito = function() {
             document.getElementById('modal-cotizacion').style.display = 'none';
-            document.getElementById('contenedor-formulario').style.display = 'none';
-            document.getElementById('pantalla-exito').style.display = 'flex';
+            document.getElementById('vista-cotizador').style.display = 'none';
+            document.getElementById('pantalla-exito').style.display = 'block';
         }
     </script>
 </body>
