@@ -3,310 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuringCotizador | Plataforma Global</title>
+    <title>Cotizador Online | Muros Prefabricados</title>
     <style>
-        :root { --bg-body: #020617; --bg-card: #0f172a; --border: #1e293b; --text-main: #f8fafc; --text-muted: #64748b; --primary: #0ea5e9; --success: #10b981; --warning: #fbbf24; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at top, #0f172a 0%, #020617 60%); padding: 15px;}
+        :root { --primary: #38bdf8; --bg-base: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155; --success: #10b981; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-base); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; align-items: center;}
         
-        #vista-menu { width: 100%; max-width: 400px; padding: 40px 30px; background-color: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); box-sizing: border-box; text-align: center; }
-        .logo-text { font-size: 1.7rem; font-weight: 700; color: var(--text-main); margin: 0 0 5px 0; }
-        .logo-text span { color: var(--primary); font-weight: 400;}
-        .sub-text { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 30px 0; }
-        .btn-opcion { display: flex; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 12px; background-color: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; text-align: left;}
-        .btn-opcion:hover { border-color: var(--primary); background-color: rgba(14, 165, 233, 0.05); }
-        .btn-text span { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 400; margin-top: 2px;}
-
-        #vista-cotizador { display: none; width: 100%; max-width: 550px; padding: 25px 15px; box-sizing: border-box; }
-        .header-brand { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo-empresa { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-        .grupo-input { margin-bottom: 16px; text-align: left; } 
-        .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500;}
-        .grupo-input input, .grupo-input select { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid var(--border); background-color: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        @media (max-width: 500px) { .grid-2 { grid-template-columns: 1fr; } }
-        .btn-calcular { width: 100%; background-color: var(--primary); color: #020617; border: none; padding: 14px; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.2s;}
-        .btn-calcular:hover { background-color: #0284c7; color: white;}
-        #resultado-box { display: none; margin-top: 25px; padding: 20px; background: rgba(14, 165, 233, 0.05); border: 1px solid var(--primary); border-radius: 8px; text-align: center; }
-        .monto-destacado { font-size: 1.6rem; font-weight: 700; color: var(--success); margin: 10px 0;}
-        .btn-wa { background-color: #25D366; color: #020617; text-decoration: none; padding: 14px; border-radius: 6px; font-weight: bold; display: none; margin-top:15px; }
-        .aviso-terreno { font-size: 0.75rem; color: var(--warning); margin-top: 5px; display: none;}
+        .header { background: var(--bg-card); width: 100%; text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);}
+        .header h1 { margin: 0; font-size: 1.8rem; color: white;}
+        .header p { margin: 5px 0 0 0; color: var(--primary); font-weight: 500; font-size: 0.9rem;}
+        
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; margin-top: 20px; }
+        .card { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
+        .form-group input, .form-group select { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;}
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .btn-main { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px;}
+        .btn-main:hover { filter: brightness(1.1); transform: translateY(-1px);}
+        
+        /* Modal de Resultado */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.9); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; backdrop-filter: blur(5px);}
+        .modal-card { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--primary); position: relative;}
+        .modal-card h2 { margin-top: 0; color: var(--primary); font-size: 1.4rem;}
+        .precio-final { font-size: 2.2rem; font-weight: bold; color: var(--success); margin: 20px 0; }
+        .btn-confirmar { background: var(--success); color: #000; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px;}
+        .btn-cancelar { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-weight: bold; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer;}
+        
+        /* Pantalla de Éxito */
+        .pantalla-exito { display: none; flex-direction: column; align-items: center; text-align: center; padding: 40px 20px; }
+        .icono-exito { font-size: 4rem; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="vista-menu">
-        <div class="header-central">
-            <h1 class="logo-text">Turing<span>Cotizador</span></h1>
-            <p class="sub-text">SaaS Global de Prefabricados</p>
-        </div>
-        <button class="btn-opcion" onclick="abrirCotizadorPublico()">
-            <div class="btn-text">🛒 Acceso Cliente<span>Cotizar proyecto en la web pública</span></div>
-        </button>
-        <button class="btn-opcion" onclick="window.location.href='login.html'">
-            <div class="btn-text">💼 Portal Asesor / 🏭 Administración<span>Gestión de ventas y configuración de fábrica</span></div>
-        </button>
+    <div class="header">
+        <h1 id="titulo-empresa">TuringSaaS</h1>
+        <p id="subtitulo-empresa">Cotizador Inteligente de Obras</p>
     </div>
 
-    <div id="vista-cotizador" class="cotizador-container">
-        <div class="header-brand">
-            <img id="img-logo" class="logo-empresa" src="" alt="Logo">
-            <h1 class="logo-text" id="nombre-empresa-titulo" style="font-size:1.8rem;">Turing<span>Cotizador</span></h1>
-            <p style="color:var(--text-muted); font-size:0.85rem;">Presupuesto Inteligente Global</p>
-        </div>
+    <div class="container" id="contenedor-formulario">
         <div class="card">
-            <div class="grid-2">
-                <div class="grupo-input"><label>Tu Nombre Completo</label><input type="text" id="c-nombre" placeholder="Ej: Juan Pérez" required></div>
-                <div class="grupo-input"><label>WhatsApp / Teléfono *</label><input type="tel" id="c-whatsapp-cliente" placeholder="Ej: +595 981..." required></div>
-            </div>
+            <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1.1rem;">Datos del Proyecto</h3>
             
             <div class="grid-2">
-                <div class="grupo-input">
-                    <label>País</label>
-                    <input list="paises-lista" id="c-pais" placeholder="Escribí tu país..." onchange="actualizarPreciosPais()">
-                    <datalist id="paises-lista">
-                        <option value="Argentina"><option value="Bolivia"><option value="Brasil"><option value="Chile"><option value="Colombia"><option value="Ecuador"><option value="España"><option value="Estados Unidos"><option value="México"><option value="Paraguay"><option value="Perú"><option value="Uruguay"><option value="Venezuela">
-                    </datalist>
+                <div class="form-group">
+                    <label>Metros Lineales (m)</label>
+                    <input type="number" id="inp-metros" placeholder="Ej: 30" required>
                 </div>
-                <div class="grupo-input"><label>Depto / Estado</label><input type="text" id="c-depto" placeholder="Ej: Central o Rio de Janeiro"></div>
+                <div class="form-group">
+                    <label>Portones (Cantidad)</label>
+                    <input type="number" id="inp-portones" placeholder="Ej: 1" value="0">
+                </div>
             </div>
 
-            <div class="grupo-input"><label>Ciudad donde se construirá</label><input type="text" id="c-ciudad" placeholder="Ej: Itauguá o Copacabana"></div>
-            
-            <div class="grupo-input">
-                <label>Cantidad de Portones</label>
-                <input type="number" id="c-portones-cant" value="0" min="0" max="5" onchange="calcularMetrosTerreno()">
-            </div>
-            
-            <div class="grupo-input">
-                <label>Tipo de Portón (Asumimos 3.5m c/u por defecto)</label>
-                <select id="c-portones-tipo">
-                    <option value="Sin Portón">Sin Portón</option>
-                    <option value="Corredizo">Portón Corredizo</option>
-                    <option value="Basculante">Portón Basculante</option>
+            <div class="form-group">
+                <label>Tipo de Servicio</label>
+                <select id="inp-tipo-venta">
+                    <option value="Llave en mano (Material e Instalación)">Llave en mano (Material e Instalación)</option>
+                    <option value="Solo Envío a Obra">Solo Envío a Obra (Sin instalación)</option>
+                    <option value="Retiro de Fábrica">Retiro de Fábrica</option>
                 </select>
             </div>
 
-            <div class="grupo-input">
-                <label>📐 Seleccionar Terreno o Medida Rápida</label>
-                <select id="c-terreno" onchange="calcularMetrosTerreno()">
-                    <option value="Manual">Ingresar Metros Manuales</option>
-                    <option value="Terreno 12x30 (4 Lados Ciegos = 84 mts)" data-metros="84">Terreno 12x30 (4 Lados Ciegos = 84 mts)</option>
-                    <option value="Terreno 12x30 (3 Lados = 72 mts)" data-metros="72">Terreno 12x30 (3 Lados = 72 mts)</option>
-                    <option value="Terreno 10x30 (4 Lados Ciegos = 80 mts)" data-metros="80">Terreno 10x30 (4 Lados Ciegos = 80 mts)</option>
-                    <option value="Terreno 10x30 (3 Lados = 70 mts)" data-metros="70">Terreno 10x30 (3 Lados = 70 mts)</option>
-                </select>
-                <div id="aviso-terreno" class="aviso-terreno">Se han descontado metros por el portón.</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>País de la Obra</label>
+                    <input type="text" id="inp-pais" placeholder="Ej: Paraguay" required>
+                </div>
+                <div class="form-group">
+                    <label>Ciudad de la Obra</label>
+                    <input type="text" id="inp-ciudad" placeholder="Ej: Itaugua" required>
+                </div>
             </div>
 
-            <div class="grupo-input">
-                <label>Metros Lineales Reales a Construir</label>
-                <input type="number" id="c-metros" step="0.01" min="1" placeholder="Ej: 20">
+            <h3 style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1.1rem;">Tus Datos de Contacto</h3>
+            
+            <div class="form-group">
+                <label>Nombre Completo</label>
+                <input type="text" id="inp-cliente" placeholder="Ej: Juan Pérez" required>
             </div>
             
-            <div class="grupo-input">
-                <label>Modalidad de Contrato</label>
-                <select id="c-tipo">
-                    <option value="Llave en mano">1. Obra Terminada (Material + Instalación)</option>
-                    <option value="Solo Materiales (Envío a Obra)">2. Solo Materiales (Envío a Obra)</option>
-                    <option value="Solo Materiales (Retiro de Fábrica)">3. Solo Materiales (Retiro de Fábrica)</option>
-                </select>
+            <div class="form-group">
+                <label>WhatsApp (Sin espacios)</label>
+                <input type="tel" id="inp-telefono" placeholder="Ej: 0981234567" required>
             </div>
-            
-            <button class="btn-calcular" onclick="procesar()">Calcular Presupuesto</button>
 
-            <div id="resultado-box">
-                <div style="font-size:0.85rem; color:var(--text-muted);">PRESUPUESTO ESTIMADO</div>
-                <div class="monto-destacado" id="r-monto">0</div>
-                <div id="r-desglose" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; line-height:1.6; text-align:left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;"></div>
-                <button class="btn-calcular" style="background:var(--success);" id="btn-registrar" onclick="registrarBD()">Guardar Presupuesto</button>
-                <a id="btn-whatsapp" class="btn-wa" target="_blank" href="#">💬 Enviar a Fábrica por WhatsApp</a>
-            </div>
+            <button class="btn-main" onclick="calcularPresupuesto()">Calcular Presupuesto</button>
+        </div>
+    </div>
+
+    <div class="pantalla-exito" id="pantalla-exito">
+        <div class="icono-exito">✅</div>
+        <h2 style="color:var(--success);">¡Cotización Enviada!</h2>
+        <p style="color:var(--text-muted); font-size:1.1rem;">Las fábricas disponibles en tu zona acaban de recibir tu presupuesto. Te contactarán por WhatsApp en breve para coordinar los detalles.</p>
+        <button class="btn-cancelar" style="margin-top:30px; max-width:200px;" onclick="location.reload()">Hacer otra cotización</button>
+    </div>
+
+    <!-- MODAL DE COTIZACIÓN -->
+    <div class="modal-overlay" id="modal-cotizacion">
+        <div class="modal-card">
+            <h2>Estimación de Inversión</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">El valor aproximado de tu obra es de:</p>
+            <div class="precio-final" id="precio-pantalla">Gs. 0</div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:25px;">*El precio final puede variar según las condiciones exactas del terreno tras la visita técnica.</p>
+            
+            <button class="btn-confirmar" id="btn-registrar" onclick="registrarBD()">Enviar y Solicitar Visita</button>
+            <button class="btn-cancelar" onclick="cerrarModal()">Corregir datos</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getDatabase, ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-        const db = getDatabase(initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com", projectId: "gestorinmobiliario-d68b3" }));
-        const fm = (num) => Number(num).toLocaleString('es-ES');
 
-        let uidEmpresa = new URLSearchParams(window.location.search).get('empresa');
-        let nombreEmpresaDestino = "TuringCotizador Global";
-        let whatsappDestino = ""; let coti = null;
-        
-        // CONFIGURACIÓN POR DEFECTO 
-        let cfg = { moneda:"Gs.", largoPlaca:160, altoPlaca:40, pesoPlaca:64, anchoCol:15, encastre:5, pesoCol:55, pLlave:340000, pEnvio:250000, pRetiro:180000, pPorton:3850000 };
+        // Conexión a la Base de Datos Central
+        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" });
+        const db = getDatabase(app);
 
-        // DICCIONARIO LATAM 
-        const valoresMercadoGlobal = {
-            "Paraguay":  { moneda: "Gs.",  pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000 },
-            "Argentina": { moneda: "ARS$", pLlave: 45000,  pEnvio: 35000,  pRetiro: 32000,  pPorton: 450000 },
-            "Brasil":    { moneda: "R$",   pLlave: 250,    pEnvio: 180,    pRetiro: 130,    pPorton: 2800 },
-            "Bolivia":   { moneda: "Bs",   pLlave: 350,    pEnvio: 250,    pRetiro: 200,    pPorton: 3500 },
-            "Chile":     { moneda: "CLP$", pLlave: 45000,  pEnvio: 35000,  pRetiro: 25000,  pPorton: 450000 },
-            "Uruguay":   { moneda: "$U",   pLlave: 2000,   pEnvio: 1500,   pRetiro: 1100,   pPorton: 22000 },
-            "México":    { moneda: "MXN$", pLlave: 850,    pEnvio: 650,    pRetiro: 500,    pPorton: 9500 },
-            "DEFAULT":   { moneda: "USD$", pLlave: 45,     pEnvio: 35,     pRetiro: 25,     pPorton: 500 }
-        };
+        // Precios por defecto (Por si entra a la web global sin un enlace de fábrica específico)
+        let configBase = { pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, moneda: "Gs." };
+        let uidEmpresa = null; 
+        let cotizacionActual = {};
 
-        if(uidEmpresa) {
-            document.getElementById('vista-menu').style.display = 'none';
-            document.getElementById('vista-cotizador').style.display = 'block';
-            get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(s => {
-                if(s.exists()) {
-                    let c = s.val(); cfg = {...cfg, ...c}; 
-                    if(c.nombreEmpresa) { 
-                        nombreEmpresaDestino = c.nombreEmpresa; 
-                        document.getElementById('nombre-empresa-titulo').innerHTML = `<span style="color:white;">Cotizador de</span> <span style="color:var(--primary)">${c.nombreEmpresa}</span>`; 
-                    }
-                    if(c.whatsapp) whatsappDestino = c.whatsapp;
-                    if(c.logoUrl) { document.getElementById('img-logo').src = c.logoUrl; document.getElementById('img-logo').style.display = 'block'; }
+        // 1. LECTURA DE URL: Verificar si el cliente entró por un Link Exclusivo de una Fábrica
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('empresa')) {
+            uidEmpresa = urlParams.get('empresa');
+            get(ref(db, `empresas/${uidEmpresa}/configuracion`)).then(snap => {
+                if (snap.exists()) {
+                    let c = snap.val();
+                    configBase.pLlave = c.pLlave; configBase.pEnvio = c.pEnvio; configBase.pRetiro = c.pRetiro; configBase.pPorton = c.pPorton;
+                    configBase.moneda = c.moneda || "Gs.";
+                    document.getElementById('titulo-empresa').innerText = c.nombreEmpresa || "Cotizador Directo";
+                    document.getElementById('subtitulo-empresa').innerText = "Fábrica de Prefabricados";
                 }
             });
         }
 
-        window.abrirCotizadorPublico = function() {
-            document.getElementById('vista-menu').style.display = 'none';
-            document.getElementById('vista-cotizador').style.display = 'block';
-            actualizarPreciosPais();
-        }
+        const fm = (num) => Number(num).toLocaleString('es-ES');
 
-        window.actualizarPreciosPais = function() {
-            if (uidEmpresa) return; 
-            let p = document.getElementById('c-pais').value.trim();
-            let v = valoresMercadoGlobal[p] || valoresMercadoGlobal["DEFAULT"];
-            cfg.moneda = v.moneda; cfg.pLlave = v.pLlave; cfg.pEnvio = v.pEnvio; cfg.pRetiro = v.pRetiro; cfg.pPorton = v.pPorton;
-        }
+        window.calcularPresupuesto = function() {
+            let metros = parseFloat(document.getElementById('inp-metros').value);
+            let portones = parseInt(document.getElementById('inp-portones').value) || 0;
+            let tipoVenta = document.getElementById('inp-tipo-venta').value;
+            let pais = document.getElementById('inp-pais').value;
+            let ciudad = document.getElementById('inp-ciudad').value;
+            let cliente = document.getElementById('inp-cliente').value;
+            let telefono = document.getElementById('inp-telefono').value;
 
-        window.calcularMetrosTerreno = function() {
-            let select = document.getElementById('c-terreno');
-            let mInput = document.getElementById('c-metros');
-            let aviso = document.getElementById('aviso-terreno');
-            let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
-            
-            if(select.value === 'Manual') { aviso.style.display = 'none'; return; }
-            
-            let metrosTeoricos = parseFloat(select.options[select.selectedIndex].getAttribute('data-metros'));
-            let anchoPortonAsumido = 3.5; 
-            
-            if (pCant > 0) {
-                let descuento = pCant * anchoPortonAsumido;
-                mInput.value = (metrosTeoricos - descuento).toFixed(2);
-                aviso.innerText = `Se descontaron ${descuento}m por ${pCant} portón(es).`;
-                aviso.style.display = 'block';
-            } else {
-                mInput.value = metrosTeoricos;
-                aviso.style.display = 'none';
+            if(!metros || !pais || !ciudad || !cliente || !telefono) {
+                alert("Por favor, completa todos los campos del formulario.");
+                return;
             }
-        }
 
-        window.procesar = function() {
-            let telCliente = document.getElementById('c-whatsapp-cliente').value.trim();
-            let m = parseFloat(document.getElementById('c-metros').value); 
-            let pCant = parseInt(document.getElementById('c-portones-cant').value) || 0;
-            let pTipo = document.getElementById('c-portones-tipo').value;
-            let tipoTerreno = document.getElementById('c-terreno').value; 
-            
-            actualizarPreciosPais();
+            let precioMetro = configBase.pLlave;
+            if(tipoVenta.includes("Envío")) precioMetro = configBase.pEnvio;
+            if(tipoVenta.includes("Retiro")) precioMetro = configBase.pRetiro;
 
-            if(!telCliente) return alert("Ingresá tu WhatsApp para continuar.");
-            if(!m || m <= 0) return alert("Los metros lineales deben ser mayores a 0.");
-            
-            let t = document.getElementById('c-tipo').value;
-            
-            // CÁLCULO ESTRUCTURAL FINO
-            let mCm = m * 100; let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
-            let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo); if (modulos < 0) modulos = 0;
-            let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo); let sobrante = largoTeorico - mCm; 
-            
-            let placaFinalSize = Math.round(cfg.largoPlaca - sobrante);
-            let placasPorColumna = Math.ceil(200 / cfg.altoPlaca);
-            
-            let placasEnteras = (modulos - 1) * placasPorColumna; let placasCorte = placasPorColumna;
-            if(placaFinalSize >= cfg.largoPlaca || placaFinalSize <= 0) { placasEnteras = modulos * placasPorColumna; placasCorte = 0; placaFinalSize = 0; }
+            let total = (metros * precioMetro) + (portones * configBase.pPorton);
 
-            let totalPlacasFisicas = placasEnteras + placasCorte;
-            let columnas = modulos + 1 + (pCant > 0 ? pCant + 1 : 0); 
-            let ton = (((columnas * cfg.pesoCol) + (totalPlacasFisicas * cfg.pesoPlaca)) / 1000).toFixed(2);
-            
-            let pMetro = cfg.pEnvio; if(t.includes("Llave")) pMetro = cfg.pLlave; else if(t.includes("Retiro")) pMetro = cfg.pRetiro;
-            let total = (m * pMetro) + (pCant * cfg.pPorton);
-            
-            coti = { 
-                cliente: document.getElementById('c-nombre').value, telefono: telCliente,
-                pais: document.getElementById('c-pais').value || "No especificado", depto: document.getElementById('c-depto').value || "No especificado", ciudad: document.getElementById('c-ciudad').value || "No especificado", 
-                metros: m, portonesCantidad: pCant, portonesTipo: pTipo, tipoVenta: t, ingresoTotal: total, 
-                tipoTerreno: tipoTerreno, placaFinalSize: placaFinalSize, placasEnteras: placasEnteras, placasCorte: placasCorte, columnas: columnas, ton: ton,
-                fecha: new Date().toISOString(), estado: "Nuevo Lead (Web Global)", vendedor: "Asignación Automática" 
+            cotizacionActual = {
+                metros: metros, portonesCantidad: portones, tipoVenta: tipoVenta,
+                pais: pais, ciudad: ciudad, cliente: cliente, telefono: telefono,
+                ingresoTotal: total, fecha: new Date().toISOString(), estado: "Pendiente (Web)",
+                vendedor: "Venta Directa Web"
             };
-            
-            let txtDesglose = `🗺️ <strong>Configuración elegida:</strong> ${tipoTerreno === 'Manual' ? 'Medida Manual' : tipoTerreno}<br><br>
-            🧱 <strong>Producción Requerida:</strong><br>
-            • ${columnas} Columnas estructurales<br>
-            • ${placasEnteras} Placas enteras (${cfg.largoPlaca}cm)<br>`;
-            
-            if(placasCorte > 0) { txtDesglose += `• ${placasCorte} Placas para remate de <span style="color:var(--warning)">${placaFinalSize}cm</span><br>`; }
-            
-            txtDesglose += `<br>🚪 <strong>Portones:</strong> ${pCant} (${pTipo})<br>
-            ⚖️ <strong>Carga Estimada:</strong> ${ton} Toneladas`;
 
-            document.getElementById('r-monto').innerText = `${cfg.moneda} ${fm(total)}`;
-            document.getElementById('r-desglose').innerHTML = txtDesglose;
-            document.getElementById('resultado-box').style.display = 'block';
+            document.getElementById('precio-pantalla').innerText = `${configBase.moneda} ${fm(total)}`;
+            document.getElementById('modal-cotizacion').style.display = 'flex';
         }
 
+        window.cerrarModal = () => document.getElementById('modal-cotizacion').style.display = 'none';
+
+        // 2. EL CEREBRO DEL SISTEMA: ALGORITMO MATCHMAKING 🚀
         window.registrarBD = function() {
-            document.getElementById('btn-registrar').innerText = "Procesando...";
-            document.getElementById('btn-registrar').style.pointerEvents = "none";
+            let btn = document.getElementById('btn-registrar');
+            btn.innerText = "Procesando..."; btn.style.pointerEvents = "none";
 
             if (uidEmpresa) {
-                // Va directo al panel privado de la fábrica.
-                set(push(ref(db, `empresas/${uidEmpresa}/cotizaciones`)), coti).then(finalizarRegistro);
+                // RUTA PRIVADA: Si entró por el link de la fábrica (Ej: El link de tu TikTok)
+                set(push(ref(db, `empresas/${uidEmpresa}/cotizaciones`)), cotizacionActual).then(mostrarExito);
             } else {
-                // Algoritmo Matchmaking
-                let paisLimpio = coti.pais.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-                let ciudadLimpia = coti.ciudad.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+                // RUTA GLOBAL UBER-STYLE: Si entró al index.html principal
+                let paisLimpio = cotizacionActual.pais.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+                let ciudadLimpia = cotizacionActual.ciudad.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
                 
                 let refDirectorio = ref(db, `sistema_matchmaking/${paisLimpio}/${ciudadLimpia}`);
                 
                 get(refDirectorio).then(snapshot => {
                     if (snapshot.exists()) {
+                        // ¡HAY MATCH! Leemos cuántas fábricas cubren esta ciudad
                         let empresasEnCiudad = snapshot.val();
                         let idsEmpresas = Object.keys(empresasEnCiudad);
-                        let empresaAsignadaID = idsEmpresas[0]; 
+                        let enviosMultiples = [];
                         
-                        set(push(ref(db, `empresas/${empresaAsignadaID}/cotizaciones`)), coti).then(finalizarRegistro);
+                        // Enviamos la cotización a TODAS las empresas que cubren la zona
+                        idsEmpresas.forEach(empresaID => {
+                            enviosMultiples.push( set(push(ref(db, `empresas/${empresaID}/cotizaciones`)), cotizacionActual) );
+                        });
+                        
+                        Promise.all(enviosMultiples).then(mostrarExito);
                     } else {
-                        // Huérfano: Se guarda en la ruta exacta de la Bolsa Global
+                        // Si nadie cubre la zona, se va a la Bolsa Global del Panel Master
                         let rutaBolsa = `bolsa_global_huerfanos/${paisLimpio || 'desconocido'}/${ciudadLimpia || 'desconocida'}`;
-                        set(push(ref(db, rutaBolsa)), coti).then(finalizarRegistro);
+                        set(push(ref(db, rutaBolsa)), cotizacionActual).then(mostrarExito);
                     }
                 }).catch(error => {
-                    // Fallback de seguridad si falla la lectura
+                    // Fallback por si hay error en la lectura
                     let rutaBolsa = `bolsa_global_huerfanos/${paisLimpio || 'desconocido'}/${ciudadLimpia || 'desconocida'}`;
-                    set(push(ref(db, rutaBolsa)), coti).then(finalizarRegistro);
+                    set(push(ref(db, rutaBolsa)), cotizacionActual).then(mostrarExito);
                 });
             }
         }
 
-        function finalizarRegistro() {
-            document.getElementById('btn-registrar').style.display = 'none';
-            if(whatsappDestino) {
-                // Novedad: Texto inteligente de portones para WhatsApp
-                let textoPorton = coti.portonesCantidad > 0 ? `\n🚪 Portones: ${coti.portonesCantidad} (${coti.portonesTipo})` : "";
-                
-                let msg = encodeURIComponent(`👋 ¡Hola! Coticé en la web de ${nombreEmpresaDestino}:\n👤 Cliente: ${coti.cliente} (${coti.telefono})\n🗺️ Terreno: ${coti.tipoTerreno}\n📐 Metros Muro: ${coti.metros}m${textoPorton}\n🏗️ Modalidad: ${coti.tipoVenta}\n💰 Presupuesto Total: ${cfg.moneda} ${fm(coti.ingresoTotal)}`);
-                
-                document.getElementById('btn-whatsapp').href = `https://wa.me/${whatsappDestino}?text=${msg}`;
-                document.getElementById('btn-whatsapp').style.display = 'block';
-            } else { 
-                let aviso = document.createElement('div');
-                aviso.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:#020617; padding:12px 24px; border-radius:8px; font-weight:bold; font-size: 0.9rem; z-index:1000;";
-                aviso.innerText = "✅ ¡Presupuesto enviado a las fábricas de tu zona!";
-                document.body.appendChild(aviso);
-                setTimeout(() => location.reload(), 3000);
-            }
+        function mostrarExito() {
+            document.getElementById('modal-cotizacion').style.display = 'none';
+            document.getElementById('contenedor-formulario').style.display = 'none';
+            document.getElementById('pantalla-exito').style.display = 'flex';
         }
     </script>
 </body>
