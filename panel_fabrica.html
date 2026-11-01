@@ -17,10 +17,16 @@
         .seccion { display: none; } .seccion.activa { display: block; }
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 20px;}
         .grupo-input { margin-bottom: 15px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); }
-        .grupo-input input, .grupo-input select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; }
+        .grupo-input input, .grupo-input select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; outline:none; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .btn-primario { background: var(--primary); color: #020617; border: none; padding: 14px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s;}
         .btn-primario:hover { filter: brightness(1.1); }
+        
+        /* DISEÑO DE LA GRILLA DE CIUDADES */
+        .ciudades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 180px; overflow-y: auto; background: #020617; padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
+        .ciudades-grid label { display: flex; align-items: center; gap: 8px; color: white; font-size: 0.85rem; cursor: pointer; margin: 0 !important; }
+        .ciudades-grid input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; margin: 0; }
+
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 650px;} 
         th { text-align: left; padding: 12px 10px; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap;} 
@@ -83,7 +89,7 @@
             </div>
         </div>
 
-        <!-- CONFIGURACIÓN ERP (AQUÍ ESTÁN LOS CAMPOS NUEVOS DE TERRITORIO) -->
+        <!-- CONFIGURACIÓN ERP CON SELECTORES INTELIGENTES -->
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
             
@@ -96,11 +102,72 @@
                     <div class="grupo-input"><label>Moneda Local</label><input type="text" id="config-moneda" value="Gs."></div>
                 </div>
                 
-                <!-- ESTOS SON LOS CAMPOS QUE FALTABAN -->
-                <div class="grid-3" style="margin-top: 10px; background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(56, 189, 248, 0.3);">
-                    <div class="grupo-input"><label style="color:var(--primary);">📍 País</label><input type="text" id="config-pais" placeholder="Ej: Paraguay"></div>
-                    <div class="grupo-input"><label style="color:var(--primary);">🏭 Ciudad (Ubicación de Fábrica)</label><input type="text" id="config-ciudad" placeholder="Ej: Itauguá"></div>
-                    <div class="grupo-input"><label style="color:var(--primary);">🚚 Ciudades que cubro (separadas por coma)</label><input type="text" id="config-cobertura" placeholder="Ej: Itauguá, Capiatá, Asunción"></div>
+                <!-- ZONA DE TERRITORIO SIN ESCRITURA MANUAL -->
+                <div style="margin-top: 10px; background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(56, 189, 248, 0.3);">
+                    <div class="grid-2">
+                        <div class="grupo-input">
+                            <label style="color:var(--primary);">📍 País Operativo</label>
+                            <select id="config-pais">
+                                <option value="Paraguay">Paraguay</option>
+                            </select>
+                        </div>
+                        <div class="grupo-input">
+                            <label style="color:var(--primary);">🏭 Ciudad Base (Fábrica)</label>
+                            <select id="config-ciudad">
+                                <option value="">Selecciona tu ciudad...</option>
+                                <option value="aregua">Areguá</option>
+                                <option value="asuncion">Asunción</option>
+                                <option value="caacupe">Caacupé</option>
+                                <option value="capiata">Capiatá</option>
+                                <option value="ciudaddeleste">Ciudad del Este</option>
+                                <option value="fernandodelamora">Fernando de la Mora</option>
+                                <option value="guarambare">Guarambaré</option>
+                                <option value="ita">Itá</option>
+                                <option value="itaugua">Itauguá</option>
+                                <option value="jaugustosaldivar">J. Augusto Saldívar</option>
+                                <option value="lambare">Lambaré</option>
+                                <option value="limpio">Limpio</option>
+                                <option value="luque">Luque</option>
+                                <option value="marianoroquealonso">Mariano Roque Alonso</option>
+                                <option value="nuevaitalia">Nueva Italia</option>
+                                <option value="nemby">Ñemby</option>
+                                <option value="sanantonio">San Antonio</option>
+                                <option value="sanlorenzo">San Lorenzo</option>
+                                <option value="villaelisa">Villa Elisa</option>
+                                <option value="villeta">Villeta</option>
+                                <option value="ypacarai">Ypacaraí</option>
+                                <option value="ypane">Ypané</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grupo-input" style="margin-bottom:0;">
+                        <label style="color:var(--primary); margin-bottom:10px;">🚚 Zonas que cubro (Tilda todas las ciudades donde envías material)</label>
+                        <div class="ciudades-grid" id="grid-cobertura">
+                            <label><input type="checkbox" value="aregua"> Areguá</label>
+                            <label><input type="checkbox" value="asuncion"> Asunción</label>
+                            <label><input type="checkbox" value="caacupe"> Caacupé</label>
+                            <label><input type="checkbox" value="capiata"> Capiatá</label>
+                            <label><input type="checkbox" value="ciudaddeleste"> C. del Este</label>
+                            <label><input type="checkbox" value="fernandodelamora"> F. de la Mora</label>
+                            <label><input type="checkbox" value="guarambare"> Guarambaré</label>
+                            <label><input type="checkbox" value="ita"> Itá</label>
+                            <label><input type="checkbox" value="itaugua"> Itauguá</label>
+                            <label><input type="checkbox" value="jaugustosaldivar"> J. A. Saldívar</label>
+                            <label><input type="checkbox" value="lambare"> Lambaré</label>
+                            <label><input type="checkbox" value="limpio"> Limpio</label>
+                            <label><input type="checkbox" value="luque"> Luque</label>
+                            <label><input type="checkbox" value="marianoroquealonso"> M. R. Alonso</label>
+                            <label><input type="checkbox" value="nuevaitalia"> Nueva Italia</label>
+                            <label><input type="checkbox" value="nemby"> Ñemby</label>
+                            <label><input type="checkbox" value="sanantonio"> San Antonio</label>
+                            <label><input type="checkbox" value="sanlorenzo"> San Lorenzo</label>
+                            <label><input type="checkbox" value="villaelisa"> Villa Elisa</label>
+                            <label><input type="checkbox" value="villeta"> Villeta</label>
+                            <label><input type="checkbox" value="ypacarai"> Ypacaraí</label>
+                            <label><input type="checkbox" value="ypane"> Ypané</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div style="margin-top: 15px;">
@@ -221,10 +288,16 @@
                 document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
                 document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
                 
-                // CARGAR CAMPOS DE TERRITORIO
-                document.getElementById('config-pais').value = cfg.pais || "";
+                // CARGAR SELECTORES Y CHECKBOXES
+                document.getElementById('config-pais').value = cfg.pais || "Paraguay";
                 document.getElementById('config-ciudad').value = cfg.ciudad || "";
-                document.getElementById('config-cobertura').value = cfg.cobertura || "";
+                
+                // Marcar las casillas de cobertura guardadas
+                let coberturaCargada = cfg.cobertura || "";
+                let arrayCobertura = coberturaCargada.split(',');
+                document.querySelectorAll('#grid-cobertura input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = arrayCobertura.includes(checkbox.value);
+                });
 
                 document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
                 document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; 
@@ -235,14 +308,21 @@
         }
 
         window.guardarConfiguracion = function() {
-            let pais = document.getElementById('config-pais').value.trim();
-            let ciudad = document.getElementById('config-ciudad').value.trim();
-            let cobertura = document.getElementById('config-cobertura').value.trim();
+            let pais = document.getElementById('config-pais').value;
+            let ciudad = document.getElementById('config-ciudad').value;
             let nombreEmpresa = document.getElementById('config-nombre').value;
+
+            // Recolectar las casillas marcadas
+            let checkboxesMarcados = document.querySelectorAll('#grid-cobertura input[type="checkbox"]:checked');
+            let ciudadesArray = Array.from(checkboxesMarcados).map(cb => cb.value);
+            let coberturaFinal = ciudadesArray.join(','); // "itaugua,asuncion,capiata"
+
+            if (!ciudad) { alert("Debes seleccionar una ciudad base (Fábrica)."); return; }
+            if (ciudadesArray.length === 0) { alert("Debes marcar al menos una ciudad en tu zona de cobertura."); return; }
 
             cfg = {
                 nombreEmpresa: nombreEmpresa, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", 
-                pais: pais, ciudad: ciudad, cobertura: cobertura, // SE GUARDA EN EL ERP
+                pais: pais, ciudad: ciudad, cobertura: coberturaFinal, // Guarda la lista en el ERP
                 pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
                 cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), 
                 tipoLogistica: document.getElementById('config-tipo-logistica').value, cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
@@ -253,16 +333,13 @@
             set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { 
                 document.getElementById('header-empresa').innerHTML = nombreEmpresa; 
                 
-                // ACTUALIZAR MATCHMAKING
-                if (pais && cobertura) {
-                    let paisLimpio = pais.toLowerCase().replace(/[^a-z0-9]/g, "");
-                    let ciudadesArray = cobertura.split(','); 
-                    ciudadesArray.forEach(ciudadStr => {
-                        let ciudadLimpia = ciudadStr.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-                        if(ciudadLimpia) { set(ref(db, `sistema_matchmaking/${paisLimpio}/${ciudadLimpia}/${propietarioUID}`), { nombre: nombreEmpresa, activo: true }); }
-                    });
-                }
-                mostrarToast("✅ ERP y Territorio Actualizados"); 
+                // ACTUALIZAR MATCHMAKING AUTOMÁTICO
+                let paisLimpio = pais.toLowerCase().replace(/[^a-z0-9]/g, "");
+                ciudadesArray.forEach(ciudadVal => {
+                    set(ref(db, `sistema_matchmaking/${paisLimpio}/${ciudadVal}/${propietarioUID}`), { nombre: nombreEmpresa, activo: true });
+                });
+                
+                mostrarToast("✅ ERP y Territorio Guardados"); 
             });
         }
 
@@ -318,8 +395,6 @@
                     </tr>`; i++;
                 });
                 document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">No hay cotizaciones aún.</td></tr>`;
-            }, (error) => {
-                document.getElementById('tabla-ventas-body').innerHTML = `<tr><td colspan="5" align="center" style="color:red;">Error de conexión</td></tr>`;
             });
         }
 
