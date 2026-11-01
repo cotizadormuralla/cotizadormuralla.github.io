@@ -12,12 +12,12 @@
         .header h1 { margin: 0; font-size: 1.8rem; color: white;}
         .header p { margin: 5px 0 0 0; color: var(--primary); font-weight: 500; font-size: 0.9rem;}
         
-        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; margin-top: 20px; }
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; margin-top: 10px; }
         .card { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
-        .form-group input, .form-group select { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;}
+        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;}
         .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -49,8 +49,19 @@
         <div class="card">
             <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1.1rem;">Datos del Proyecto</h3>
             
+            <div class="form-group">
+                <label>Tipo de Terreno o Medida</label>
+                <select id="inp-terreno" onchange="verificarTerreno()">
+                    <option value="manual">Medida manual por Metros Lineales</option>
+                    <option value="12x30_3lados">Terreno estándar 12x30 m (Cercar 3 lados)</option>
+                    <option value="12x30_4lados">Terreno estándar 12x30 m (Cercar 4 lados / Perímetro completo)</option>
+                    <option value="10x30_3lados">Terreno 10x30 m (Cercar 3 lados)</option>
+                    <option value="10x30_4lados">Terreno 10x30 m (Cercar 4 lados / Perímetro completo)</option>
+                </select>
+            </div>
+
             <div class="grid-2">
-                <div class="form-group">
+                <div class="form-group" id="caja-metros">
                     <label>Metros Lineales (m)</label>
                     <input type="number" id="inp-metros" placeholder="Ej: 30" required>
                 </div>
@@ -120,16 +131,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getDatabase, ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        // Conexión a la Base de Datos Central
         const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" });
         const db = getDatabase(app);
 
-        // Precios por defecto (Por si entra a la web global sin un enlace de fábrica específico)
         let configBase = { pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, moneda: "Gs." };
         let uidEmpresa = null; 
         let cotizacionActual = {};
 
-        // 1. LECTURA DE URL: Verificar si el cliente entró por un Link Exclusivo de una Fábrica
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('empresa')) {
             uidEmpresa = urlParams.get('empresa');
@@ -146,7 +154,18 @@
 
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
+        window.verificarTerreno = function() {
+            let tipo = document.getElementById('inp-terreno').value;
+            let inpMetros = document.getElementById('inp-metros');
+            if (tipo === '12x30_3lados') { inpMetros.value = 54; inpMetros.disabled = true; }
+            else if (tipo === '12x30_4lados') { inpMetros.value = 84; inpMetros.disabled = true; }
+            else if (tipo === '10x30_3lados') { inpMetros.value = 50; inpMetros.disabled = true; }
+            else if (tipo === '10x30_4lados') { inpMetros.value = 80; inpMetros.disabled = true; }
+            else { inpMetros.value = ''; inpMetros.disabled = false; inpMetros.focus(); }
+        }
+
         window.calcularPresupuesto = function() {
+            let tipoTerrenoTxt = document.getElementById('inp-terreno').options[document.getElementById('inp-terreno').selectedIndex].text;
             let metros = parseFloat(document.getElementById('inp-metros').value);
             let portones = parseInt(document.getElementById('inp-portones').value) || 0;
             let tipoVenta = document.getElementById('inp-tipo-venta').value;
@@ -170,7 +189,7 @@
                 metros: metros, portonesCantidad: portones, tipoVenta: tipoVenta,
                 pais: pais, ciudad: ciudad, cliente: cliente, telefono: telefono,
                 ingresoTotal: total, fecha: new Date().toISOString(), estado: "Pendiente (Web)",
-                vendedor: "Venta Directa Web"
+                vendedor: "Venta Directa Web", tipoTerreno: tipoTerrenoTxt
             };
 
             document.getElementById('precio-pantalla').innerText = `${configBase.moneda} ${fm(total)}`;
@@ -179,16 +198,13 @@
 
         window.cerrarModal = () => document.getElementById('modal-cotizacion').style.display = 'none';
 
-        // 2. EL CEREBRO DEL SISTEMA: ALGORITMO MATCHMAKING 🚀
         window.registrarBD = function() {
             let btn = document.getElementById('btn-registrar');
             btn.innerText = "Procesando..."; btn.style.pointerEvents = "none";
 
             if (uidEmpresa) {
-                // RUTA PRIVADA: Si entró por el link de la fábrica (Ej: El link de tu TikTok)
                 set(push(ref(db, `empresas/${uidEmpresa}/cotizaciones`)), cotizacionActual).then(mostrarExito);
             } else {
-                // RUTA GLOBAL UBER-STYLE: Si entró al index.html principal
                 let paisLimpio = cotizacionActual.pais.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
                 let ciudadLimpia = cotizacionActual.ciudad.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
                 
@@ -196,24 +212,20 @@
                 
                 get(refDirectorio).then(snapshot => {
                     if (snapshot.exists()) {
-                        // ¡HAY MATCH! Leemos cuántas fábricas cubren esta ciudad
                         let empresasEnCiudad = snapshot.val();
                         let idsEmpresas = Object.keys(empresasEnCiudad);
                         let enviosMultiples = [];
                         
-                        // Enviamos la cotización a TODAS las empresas que cubren la zona
                         idsEmpresas.forEach(empresaID => {
                             enviosMultiples.push( set(push(ref(db, `empresas/${empresaID}/cotizaciones`)), cotizacionActual) );
                         });
                         
                         Promise.all(enviosMultiples).then(mostrarExito);
                     } else {
-                        // Si nadie cubre la zona, se va a la Bolsa Global del Panel Master
                         let rutaBolsa = `bolsa_global_huerfanos/${paisLimpio || 'desconocido'}/${ciudadLimpia || 'desconocida'}`;
                         set(push(ref(db, rutaBolsa)), cotizacionActual).then(mostrarExito);
                     }
                 }).catch(error => {
-                    // Fallback por si hay error en la lectura
                     let rutaBolsa = `bolsa_global_huerfanos/${paisLimpio || 'desconocido'}/${ciudadLimpia || 'desconocida'}`;
                     set(push(ref(db, rutaBolsa)), cotizacionActual).then(mostrarExito);
                 });
