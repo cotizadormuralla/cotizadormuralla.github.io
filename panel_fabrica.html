@@ -22,8 +22,7 @@
         .btn-primario { background: var(--primary); color: #020617; border: none; padding: 14px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s;}
         .btn-primario:hover { filter: brightness(1.1); }
         
-        /* DISEÑO DE LA GRILLA DE CIUDADES */
-        .ciudades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 180px; overflow-y: auto; background: #020617; padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
+        .ciudades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; background: #020617; padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
         .ciudades-grid label { display: flex; align-items: center; gap: 8px; color: white; font-size: 0.85rem; cursor: pointer; margin: 0 !important; }
         .ciudades-grid input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; margin: 0; }
 
@@ -89,7 +88,7 @@
             </div>
         </div>
 
-        <!-- CONFIGURACIÓN ERP CON SELECTORES INTELIGENTES -->
+        <!-- CONFIGURACIÓN ERP CON SELECTORES GLOBALES -->
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
             
@@ -102,41 +101,26 @@
                     <div class="grupo-input"><label>Moneda Local</label><input type="text" id="config-moneda" value="Gs."></div>
                 </div>
                 
-                <!-- ZONA DE TERRITORIO SIN ESCRITURA MANUAL -->
+                <!-- ZONA DE TERRITORIO GLOBAL DINÁMICA -->
                 <div style="margin-top: 10px; background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(56, 189, 248, 0.3);">
                     <div class="grid-2">
                         <div class="grupo-input">
                             <label style="color:var(--primary);">📍 País Operativo</label>
-                            <select id="config-pais">
+                            <select id="config-pais" onchange="actualizarCiudades()">
                                 <option value="Paraguay">Paraguay</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Bolivia">Bolivia</option>
+                                <option value="Chile">Chile</option>
+                                <option value="Colombia">Colombia</option>
+                                <option value="Mexico">México</option>
+                                <option value="Peru">Perú</option>
+                                <option value="Uruguay">Uruguay</option>
                             </select>
                         </div>
                         <div class="grupo-input">
                             <label style="color:var(--primary);">🏭 Ciudad Base (Fábrica)</label>
                             <select id="config-ciudad">
-                                <option value="">Selecciona tu ciudad...</option>
-                                <option value="aregua">Areguá</option>
-                                <option value="asuncion">Asunción</option>
-                                <option value="caacupe">Caacupé</option>
-                                <option value="capiata">Capiatá</option>
-                                <option value="ciudaddeleste">Ciudad del Este</option>
-                                <option value="fernandodelamora">Fernando de la Mora</option>
-                                <option value="guarambare">Guarambaré</option>
-                                <option value="ita">Itá</option>
-                                <option value="itaugua">Itauguá</option>
-                                <option value="jaugustosaldivar">J. Augusto Saldívar</option>
-                                <option value="lambare">Lambaré</option>
-                                <option value="limpio">Limpio</option>
-                                <option value="luque">Luque</option>
-                                <option value="marianoroquealonso">Mariano Roque Alonso</option>
-                                <option value="nuevaitalia">Nueva Italia</option>
-                                <option value="nemby">Ñemby</option>
-                                <option value="sanantonio">San Antonio</option>
-                                <option value="sanlorenzo">San Lorenzo</option>
-                                <option value="villaelisa">Villa Elisa</option>
-                                <option value="villeta">Villeta</option>
-                                <option value="ypacarai">Ypacaraí</option>
-                                <option value="ypane">Ypané</option>
+                                <!-- Se rellena con JavaScript según el país -->
                             </select>
                         </div>
                     </div>
@@ -144,28 +128,7 @@
                     <div class="grupo-input" style="margin-bottom:0;">
                         <label style="color:var(--primary); margin-bottom:10px;">🚚 Zonas que cubro (Tilda todas las ciudades donde envías material)</label>
                         <div class="ciudades-grid" id="grid-cobertura">
-                            <label><input type="checkbox" value="aregua"> Areguá</label>
-                            <label><input type="checkbox" value="asuncion"> Asunción</label>
-                            <label><input type="checkbox" value="caacupe"> Caacupé</label>
-                            <label><input type="checkbox" value="capiata"> Capiatá</label>
-                            <label><input type="checkbox" value="ciudaddeleste"> C. del Este</label>
-                            <label><input type="checkbox" value="fernandodelamora"> F. de la Mora</label>
-                            <label><input type="checkbox" value="guarambare"> Guarambaré</label>
-                            <label><input type="checkbox" value="ita"> Itá</label>
-                            <label><input type="checkbox" value="itaugua"> Itauguá</label>
-                            <label><input type="checkbox" value="jaugustosaldivar"> J. A. Saldívar</label>
-                            <label><input type="checkbox" value="lambare"> Lambaré</label>
-                            <label><input type="checkbox" value="limpio"> Limpio</label>
-                            <label><input type="checkbox" value="luque"> Luque</label>
-                            <label><input type="checkbox" value="marianoroquealonso"> M. R. Alonso</label>
-                            <label><input type="checkbox" value="nuevaitalia"> Nueva Italia</label>
-                            <label><input type="checkbox" value="nemby"> Ñemby</label>
-                            <label><input type="checkbox" value="sanantonio"> San Antonio</label>
-                            <label><input type="checkbox" value="sanlorenzo"> San Lorenzo</label>
-                            <label><input type="checkbox" value="villaelisa"> Villa Elisa</label>
-                            <label><input type="checkbox" value="villeta"> Villeta</label>
-                            <label><input type="checkbox" value="ypacarai"> Ypacaraí</label>
-                            <label><input type="checkbox" value="ypane"> Ypané</label>
+                            <!-- Se rellena con JavaScript según el país -->
                         </div>
                     </div>
                 </div>
@@ -268,14 +231,54 @@
         const appConfig = { apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" };
         const app = initializeApp(appConfig); const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(appConfig, "AppSec"));
 
-        let propietarioUID = ""; let cfg = {}; const fm = (num) => Number(num).toLocaleString('es-ES');
+        let propietarioUID = ""; 
+        // Valores por defecto seguros para evitar NaN
+        let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 120000, cInst: 40000, cAlz: 30, tipoLogistica: 'destajo', com: 5, pais: "Paraguay", ciudad: "", cobertura: "" };
+        const fm = (num) => Number(num).toLocaleString('es-ES');
         let listaVentasGlobal = []; let currentVentaKeyForFlete = ""; let currentIndexDesglose = 0; 
+
+        // DICCIONARIO GLOBAL DE CIUDADES
+        const locaciones = {
+            "Paraguay": ["Areguá", "Asunción", "Caacupé", "Capiatá", "Ciudad del Este", "Coronel Oviedo", "Encarnación", "Fernando de la Mora", "Guarambaré", "Itá", "Itauguá", "J. Augusto Saldívar", "Lambaré", "Limpio", "Luque", "Mariano Roque Alonso", "Nueva Italia", "Ñemby", "Paraguarí", "San Antonio", "San Lorenzo", "Villa Elisa", "Villeta", "Ypacaraí", "Ypané"],
+            "Argentina": ["Buenos Aires", "Catamarca", "Córdoba", "Corrientes", "Entre Ríos", "Formosa", "Mendoza", "Misiones", "Neuquén", "Río Negro", "Rosario", "Salta", "San Juan", "Santa Cruz", "Santa Fe", "Tucumán"],
+            "Bolivia": ["Cochabamba", "La Paz", "Oruro", "Potosí", "Santa Cruz de la Sierra", "Sucre", "Tarija"],
+            "Chile": ["Antofagasta", "Concepción", "Iquique", "La Serena", "Santiago", "Temuco", "Valparaíso"],
+            "Colombia": ["Barranquilla", "Bogotá", "Bucaramanga", "Cali", "Cartagena", "Cúcuta", "Medellín", "Pereira"],
+            "Mexico": ["Cancún", "Ciudad de México", "Guadalajara", "León", "Monterrey", "Puebla", "Tijuana", "Toluca"],
+            "Peru": ["Arequipa", "Chiclayo", "Cusco", "Huancayo", "Iquitos", "Lima", "Piura", "Trujillo"],
+            "Uruguay": ["Canelones", "Colonia", "Maldonado", "Montevideo", "Paysandú", "Punta del Este", "Salto"]
+        };
+
+        // Función para cambiar las ciudades según el país seleccionado
+        window.actualizarCiudades = function(ciudadGuardada = "", coberturaGuardada = "") {
+            let pais = document.getElementById('config-pais').value;
+            let ciudades = locaciones[pais] || [];
+            
+            // 1. Actualizar el selector de la ciudad base
+            let htmlCiudad = '<option value="">Selecciona tu ciudad base...</option>';
+            ciudades.forEach(c => { htmlCiudad += `<option value="${c}">${c}</option>`; });
+            document.getElementById('config-ciudad').innerHTML = htmlCiudad;
+            if(ciudadGuardada) document.getElementById('config-ciudad').value = ciudadGuardada;
+
+            // 2. Actualizar las casillas de verificación (Zonas de cobertura)
+            let htmlCobertura = '';
+            let arrayCob = coberturaGuardada.split(',');
+            ciudades.forEach(c => {
+                let checked = arrayCob.includes(c) ? 'checked' : '';
+                htmlCobertura += `<label><input type="checkbox" value="${c}" ${checked}> ${c}</label>`;
+            });
+            document.getElementById('grid-cobertura').innerHTML = htmlCobertura;
+        }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 propietarioUID = user.uid; 
                 document.getElementById('link-exclusivo').innerText = window.location.origin + window.location.pathname.replace('panel_fabrica.html', '') + "index.html?empresa=" + propietarioUID;
-                cargarConfiguracion(); cargarVendedores(); cargarVentas(); 
+                // Primero descargamos la configuración, Y LUEGO cargamos las ventas para evitar errores NaN
+                cargarConfiguracion().then(() => {
+                    cargarVentas(); 
+                });
+                cargarVendedores();
             } else { window.location.href = "login.html"; }
         });
 
@@ -283,21 +286,19 @@
         const mostrarToast = (msg) => { const t = document.getElementById('toast'); document.getElementById('toast-mensaje').innerText = msg; t.classList.add('mostrar'); setTimeout(() => t.classList.remove('mostrar'), 3000); }
 
         window.cargarConfiguracion = function() {
-            get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
-                if(s.exists()) cfg = { ...cfg, ...s.val() };
+            return get(ref(db, 'empresas/' + propietarioUID + '/configuracion')).then((s) => {
+                if(s.exists()) {
+                    let val = s.val();
+                    // Combinación segura: Si falta un dato, se mantiene el valor por defecto
+                    for(let key in val) { if(val[key] !== undefined && val[key] !== "") cfg[key] = val[key]; }
+                }
+                
                 document.getElementById('config-nombre').value = cfg.nombreEmpresa || ""; document.getElementById('header-empresa').innerHTML = cfg.nombreEmpresa || "Turing";
                 document.getElementById('config-whatsapp').value = cfg.whatsapp || ""; document.getElementById('config-moneda').value = cfg.moneda || "Gs.";
                 
-                // CARGAR SELECTORES Y CHECKBOXES
+                // Actualizar los selectores con las ciudades del país correcto
                 document.getElementById('config-pais').value = cfg.pais || "Paraguay";
-                document.getElementById('config-ciudad').value = cfg.ciudad || "";
-                
-                // Marcar las casillas de cobertura guardadas
-                let coberturaCargada = cfg.cobertura || "";
-                let arrayCobertura = coberturaCargada.split(',');
-                document.querySelectorAll('#grid-cobertura input[type="checkbox"]').forEach(checkbox => {
-                    checkbox.checked = arrayCobertura.includes(checkbox.value);
-                });
+                actualizarCiudades(cfg.ciudad, cfg.cobertura);
 
                 document.getElementById('config-precio-llave').value = cfg.pLlave; document.getElementById('config-precio-envio').value = cfg.pEnvio; document.getElementById('config-precio-retiro').value = cfg.pRetiro; document.getElementById('config-precio-porton').value = cfg.pPorton;
                 document.getElementById('config-costo-fab').value = cfg.cFab; document.getElementById('config-costo-inst').value = cfg.cInst; 
@@ -312,17 +313,16 @@
             let ciudad = document.getElementById('config-ciudad').value;
             let nombreEmpresa = document.getElementById('config-nombre').value;
 
-            // Recolectar las casillas marcadas
             let checkboxesMarcados = document.querySelectorAll('#grid-cobertura input[type="checkbox"]:checked');
             let ciudadesArray = Array.from(checkboxesMarcados).map(cb => cb.value);
-            let coberturaFinal = ciudadesArray.join(','); // "itaugua,asuncion,capiata"
+            let coberturaFinal = ciudadesArray.join(',');
 
             if (!ciudad) { alert("Debes seleccionar una ciudad base (Fábrica)."); return; }
             if (ciudadesArray.length === 0) { alert("Debes marcar al menos una ciudad en tu zona de cobertura."); return; }
 
             cfg = {
                 nombreEmpresa: nombreEmpresa, whatsapp: document.getElementById('config-whatsapp').value, moneda: document.getElementById('config-moneda').value || "Gs.", 
-                pais: pais, ciudad: ciudad, cobertura: coberturaFinal, // Guarda la lista en el ERP
+                pais: pais, ciudad: ciudad, cobertura: coberturaFinal,
                 pLlave: Number(document.getElementById('config-precio-llave').value), pEnvio: Number(document.getElementById('config-precio-envio').value), pRetiro: Number(document.getElementById('config-precio-retiro').value), pPorton: Number(document.getElementById('config-precio-porton').value),
                 cFab: Number(document.getElementById('config-costo-fab').value), cInst: Number(document.getElementById('config-costo-inst').value), 
                 tipoLogistica: document.getElementById('config-tipo-logistica').value, cAlz: Number(document.getElementById('config-costo-alz').value), com: Number(document.getElementById('config-comision').value),
@@ -333,13 +333,15 @@
             set(ref(db, 'empresas/' + propietarioUID + '/configuracion'), cfg).then(() => { 
                 document.getElementById('header-empresa').innerHTML = nombreEmpresa; 
                 
-                // ACTUALIZAR MATCHMAKING AUTOMÁTICO
                 let paisLimpio = pais.toLowerCase().replace(/[^a-z0-9]/g, "");
                 ciudadesArray.forEach(ciudadVal => {
-                    set(ref(db, `sistema_matchmaking/${paisLimpio}/${ciudadVal}/${propietarioUID}`), { nombre: nombreEmpresa, activo: true });
+                    let ciudadLimpia = ciudadVal.toLowerCase().replace(/[^a-z0-9]/g, "");
+                    set(ref(db, `sistema_matchmaking/${paisLimpio}/${ciudadLimpia}/${propietarioUID}`), { nombre: nombreEmpresa, activo: true });
                 });
                 
                 mostrarToast("✅ ERP y Territorio Guardados"); 
+                // Recargamos las ventas por si los cálculos cambiaron
+                cargarVentas();
             });
         }
 
@@ -426,10 +428,7 @@
         
         window.abrirModalFlete = (key, fActual) => { currentVentaKeyForFlete = key; document.getElementById('input-flete-valor').value = fActual > 0 ? fActual : ''; document.getElementById('modal-flete').style.display = 'flex'; }
         window.cerrarModalFlete = () => { document.getElementById('modal-flete').style.display = 'none'; }
-        window.guardarFleteModal = () => {
-            let val = document.getElementById('input-flete-valor').value; let m = parseFloat(val.replace(/[^0-9]/g, ''));
-            if(!isNaN(m)) { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { cerrarModalFlete(); mostrarToast("🚚 Costo guardado"); listaVentasGlobal[currentIndexDesglose].v.fleteReal = m; abrirDesglose(currentIndexDesglose); }); } else { cerrarModalFlete(); }
-        }
+        window.guardarFleteModal = () => { let val = document.getElementById('input-flete-valor').value; let m = parseFloat(val.replace(/[^0-9]/g, '')); if(!isNaN(m)) { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { cerrarModalFlete(); mostrarToast("🚚 Costo guardado"); listaVentasGlobal[currentIndexDesglose].v.fleteReal = m; abrirDesglose(currentIndexDesglose); }); } else { cerrarModalFlete(); } }
         window.cerrarModal = () => document.getElementById('modal-desglose').style.display = 'none';
 
         let accionBorradoPendiente = null;
