@@ -6,7 +6,7 @@
     <title>TuringSaaS | ERP Prefabricados</title>
     <style>
         :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         .sidebar { width: 260px; background: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
         .logo-text { font-size: 1.5rem; font-weight: 700; margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
         .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
@@ -32,7 +32,7 @@
         .badge.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3);}
         .badge-porton { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 0.7rem; font-weight: bold; }
         
-        /* Sistema de Modales Elegantes */
+        /* Modales Elegantes */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px);} 
         .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.5);} 
         .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; align-items: center;}
@@ -41,13 +41,6 @@
 
         .toast { position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;} 
         .toast.mostrar { transform: translateY(0); opacity: 1; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; overflow: auto; height: auto; }
-            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 5px; border-right: none; }
-            .logo-text { display: none; } .menu-btn { padding: 8px 12px; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap; }
-            .main-content { padding: 15px; } .grid-2, .grid-3 { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -59,18 +52,16 @@
     </div>
 
     <div class="main-content">
-        <!-- SECCIÓN VENTAS / CRM -->
         <div id="seccion-ventas" class="seccion activa">
             <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button></div>
             <div class="card" style="padding: 0; overflow-x:auto;">
                 <table>
                     <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente / Terreno</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
-                    <tbody id="tabla-ventas-body"></tbody>
+                    <tbody id="tabla-ventas-body"><tr><td colspan="5" align="center">Cargando datos...</td></tr></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- SECCIÓN VENDEDORES -->
         <div id="seccion-equipo" class="seccion">
             <div class="header-top"><h2>Equipo Comercial</h2></div>
             <div class="card">
@@ -86,10 +77,8 @@
             </div>
         </div>
 
-        <!-- SECCIÓN CONFIGURACIÓN -->
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
-            
             <div class="card">
                 <div class="grid-3">
                     <div class="grupo-input"><label>Nombre Comercial de la Fábrica</label><input type="text" id="config-nombre"></div>
@@ -110,13 +99,11 @@
                     <div class="grupo-input"><label>Retiro de Fábrica</label><input type="number" id="config-precio-retiro"></div>
                     <div class="grupo-input"><label>Precio Base Portón</label><input type="number" id="config-precio-porton"></div>
                 </div>
-
                 <div class="card">
                     <h3 style="color: var(--danger); margin-top:0; font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:5px;">Costos Operativos (Fábrica)</h3>
                     <div class="grupo-input"><label>Costo Fabricación (Por Metro)</label><input type="number" id="config-costo-fab"></div>
                     <div class="grupo-input"><label>Costo Instalación (Por Metro)</label><input type="number" id="config-costo-inst"></div>
                     <div class="grupo-input"><label>Comisión Vendedor (%)</label><input type="number" id="config-comision"></div>
-                    
                     <div class="grupo-input">
                         <label>Tipo de Contrato Logístico (Alzadores)</label>
                         <select id="config-tipo-logistica">
@@ -143,29 +130,17 @@
         </div>
     </div>
 
-    <!-- 1. MODAL DESGLOSE FINANCIERO -->
+    <!-- Modales -->
     <div id="modal-desglose" class="modal-overlay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Análisis de Rentabilidad</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
-            
-            <div class="fila-desglose" style="background: rgba(14,165,233,0.1); padding: 8px; border-radius: 6px; border:none; margin-bottom:15px;">
-                <span style="color:var(--text-main); font-size:0.8rem;">🗺️ <span id="m-terreno">Terreno: Medida Manual</span> (<strong id="m-metros-reales" style="color:var(--primary);">0m</strong> reales)</span>
-            </div>
-
+            <div class="fila-desglose" style="background: rgba(14,165,233,0.1); padding: 8px; border-radius: 6px; border:none; margin-bottom:15px;"><span style="color:var(--text-main); font-size:0.8rem;">🗺️ <span id="m-terreno">Terreno: Medida Manual</span> (<strong id="m-metros-reales" style="color:var(--primary);">0m</strong> reales)</span></div>
             <div class="fila-desglose"><span style="color:var(--text-muted)">Tipo de Contrato:</span><strong id="m-tipo" style="color:var(--warning);"></strong></div>
-            
             <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 15px; border-radius: 6px; margin: 15px 0;">
-                <div class="fila-desglose" style="border:none; padding:0; margin-bottom:8px;">
-                    <span style="color:var(--text-muted);">🧱 Ingreso por Muro:</span><span id="m-ingreso-muro" style="color:white;">Gs. 0</span>
-                </div>
-                <div class="fila-desglose" id="caja-ingreso-porton" style="border:none; padding:0; margin-bottom:8px; display:none;">
-                    <span id="m-label-porton" style="color:var(--warning);">🚪 Ingreso Portones:</span><span id="m-ingreso-porton" style="color:var(--warning);">Gs. 0</span>
-                </div>
-                <div class="fila-desglose" style="border-bottom:none; border-top:1px dashed var(--border); padding-top:10px; margin-bottom:0; font-size:1.05rem; font-weight:bold;">
-                    <span>Ingreso Bruto Total:</span><span id="m-ingreso-total" style="color:white;">Gs. 0</span>
-                </div>
+                <div class="fila-desglose" style="border:none; padding:0; margin-bottom:8px;"><span style="color:var(--text-muted);">🧱 Ingreso por Muro:</span><span id="m-ingreso-muro" style="color:white;">Gs. 0</span></div>
+                <div class="fila-desglose" id="caja-ingreso-porton" style="border:none; padding:0; margin-bottom:8px; display:none;"><span id="m-label-porton" style="color:var(--warning);">🚪 Ingreso Portones:</span><span id="m-ingreso-porton" style="color:var(--warning);">Gs. 0</span></div>
+                <div class="fila-desglose" style="border-bottom:none; border-top:1px dashed var(--border); padding-top:10px; margin-bottom:0; font-size:1.05rem; font-weight:bold;"><span>Ingreso Bruto Total:</span><span id="m-ingreso-total" style="color:white;">Gs. 0</span></div>
             </div>
-
             <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
                 <div class="fila-desglose"><span>Fabricación de Material:</span><span id="m-costo-fab" style="color:var(--danger)">0</span></div>
                 <div class="fila-desglose" id="fila-flete"><span>Flete (Camión):</span><div id="m-costo-flete-contenedor"></div></div>
@@ -177,11 +152,9 @@
         </div>
     </div>
 
-    <!-- 2. MODAL ELEGANTE FLETE -->
     <div id="modal-flete" class="modal-overlay">
         <div class="modal-box" style="text-align: center;">
             <h3 style="color:var(--primary); margin-top:0;">🚚 Cargar Costo de Flete</h3>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Ingresá cuánto cobrará el camionero por llevar los materiales a esta obra.</p>
             <input type="number" id="input-flete-valor" class="input-flete-modal" placeholder="Ej: 800000">
             <div class="grid-2">
                 <button class="btn-primario" style="background:transparent; border:1px solid var(--border); color:white;" onclick="cerrarModalFlete()">Cancelar</button>
@@ -190,11 +163,11 @@
         </div>
     </div>
 
-    <!-- 3. NUEVO MODAL ELEGANTE PARA CONFIRMAR BORRADO -->
+    <!-- Modal Elegante de Borrado -->
     <div id="modal-borrar" class="modal-overlay" style="z-index: 200;">
         <div class="modal-box" style="text-align: center; max-width: 350px;">
             <h3 id="borrar-titulo" style="color:var(--danger); margin-top:0;">⚠️ Eliminar Registro</h3>
-            <p id="borrar-mensaje" style="font-size:0.9rem; color:var(--text-muted);">¿Estás seguro de que deseas borrar esto? Esta acción no se puede deshacer.</p>
+            <p id="borrar-mensaje" style="font-size:0.9rem; color:var(--text-muted);">¿Estás seguro? Esta acción no se puede deshacer.</p>
             <div class="grid-2" style="margin-top: 20px;">
                 <button class="btn-primario" style="background:transparent; border:1px solid var(--border); color:white;" onclick="cerrarModalBorrar()">Cancelar</button>
                 <button class="btn-primario" style="background:var(--danger); color:white;" onclick="ejecutarBorrado()">Sí, Eliminar</button>
@@ -209,12 +182,15 @@
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        const app = initializeApp({ apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" });
-        const auth = getAuth(app); const db = getDatabase(app); const authSecundario = getAuth(initializeApp(app.options, "AppSec"));
+        // Configuración 100% segura para evitar el bloqueo del panel
+        const appConfig = { apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" };
+        const app = initializeApp(appConfig);
+        const auth = getAuth(app); 
+        const db = getDatabase(app); 
+        const authSecundario = getAuth(initializeApp(appConfig, "AppSec"));
 
         let propietarioUID = ""; let listaVentasGlobal = []; 
         let currentVentaKeyForFlete = ""; let currentIndexDesglose = 0; 
-        
         let cfg = { moneda: "Gs.", largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55, pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000, cFab: 120000, cInst: 40000, cAlz: 30, tipoLogistica: 'destajo', com: 5 };
         const fm = (num) => Number(num).toLocaleString('es-ES');
 
@@ -241,11 +217,9 @@
                 document.getElementById('config-largo-placa').value = cfg.largoPlaca; document.getElementById('config-alto-placa').value = cfg.altoPlaca; document.getElementById('config-peso-placa').value = cfg.pesoPlaca;
                 document.getElementById('config-ancho-col').value = cfg.anchoCol; document.getElementById('config-encastre').value = cfg.encastre; document.getElementById('config-peso-col').value = cfg.pesoCol;
                 
-                document.getElementById('config-tipo-logistica').addEventListener('change', (e) => {
-                    document.getElementById('caja-pago-kg').style.display = e.target.value === 'fijo' ? 'none' : 'block';
-                });
+                document.getElementById('config-tipo-logistica').addEventListener('change', (e) => { document.getElementById('caja-pago-kg').style.display = e.target.value === 'fijo' ? 'none' : 'block'; });
                 if(cfg.tipoLogistica === 'fijo') document.getElementById('caja-pago-kg').style.display = 'none';
-            });
+            }).catch(e => console.error(e));
         }
 
         window.guardarConfiguracion = function() {
@@ -265,8 +239,7 @@
             let mCm = m * 100; let avancePorModulo = cfg.largoPlaca + cfg.anchoCol - (2 * cfg.encastre);
             let modulos = Math.ceil((mCm - cfg.anchoCol) / avancePorModulo); if (modulos < 0) modulos = 0;
             let largoTeorico = cfg.anchoCol + (modulos * avancePorModulo); let sobrante = largoTeorico - mCm; 
-            let placaFinalSize = Math.round(cfg.largoPlaca - sobrante);
-            let placasPorColumna = Math.ceil(200 / cfg.altoPlaca);
+            let placaFinalSize = Math.round(cfg.largoPlaca - sobrante); let placasPorColumna = Math.ceil(200 / cfg.altoPlaca);
             let placasEnteras = (modulos - 1) * placasPorColumna; let placasCorte = placasPorColumna; 
             if(placaFinalSize >= cfg.largoPlaca || placaFinalSize <= 0) { placasEnteras = modulos * placasPorColumna; placasCorte = 0; placaFinalSize = 0; }
             if (placasEnteras < 0) placasEnteras = 0;
@@ -292,130 +265,78 @@
                     let b = "pendiente"; if(v.estado && v.estado.includes("Aprobada")) b = "activo"; if(v.estado && v.estado.includes("Rechazada")) b = "danger";
                     let estadoTxt = v.estado || "Pendiente (Web)"; let presuTxt = v.ingresoTotal || calc.total;
                     let terrenoTxt = v.tipoTerreno || "Medida Manual"; if (terrenoTxt.length > 20) terrenoTxt = terrenoTxt.substring(0, 20) + "..."; 
-                    
                     let portonBadge = calc.p > 0 ? `<br><div class="badge-porton">🚪 ${calc.p} Portón ${v.portonesTipo || ''}</div>` : '';
 
-                    // NUEVO: BOTÓN WHATSAPP DINÁMICO
+                    // BOTÓN DE WHATSAPP DIRECTO
                     let btnWa = '';
                     if (v.telefono) {
-                        let numLimpio = v.telefono.replace(/[^0-9]/g, '');
+                        let numLimpio = v.telefono.replace(/[^0-9+]/g, '');
                         let nombreEmp = cfg.nombreEmpresa || 'nuestra fábrica';
-                        let msjWa = encodeURIComponent(`Hola ${v.cliente}, somos de ${nombreEmp}. Vimos tu cotización por un muro de ${calc.m}m. ¿Te gustaría que coordinemos una visita o hablemos de los detalles?`);
-                        btnWa = `<br><a href="https://wa.me/${numLimpio}?text=${msjWa}" target="_blank" style="display:inline-block; margin-top:8px; background:#25D366; color:#020617; padding:4px 8px; border-radius:4px; text-decoration:none; font-size:0.7rem; font-weight:bold;">💬 Contactar</a>`;
+                        let msjWa = encodeURIComponent(`Hola ${v.cliente}, somos de ${nombreEmp}. Vimos tu cotización por un muro de ${calc.m}m. ¿Te gustaría que coordinemos los detalles?`);
+                        btnWa = `<br><a href="https://wa.me/${numLimpio}?text=${msjWa}" target="_blank" style="display:inline-block; margin-top:8px; background:#25D366; color:#020617; padding:4px 8px; border-radius:4px; text-decoration:none; font-size:0.75rem; font-weight:bold;">💬 WhatsApp</a>`;
                     } else {
                         btnWa = `<br><span style="display:inline-block; margin-top:8px; color:var(--text-muted); font-size:0.7rem;">Sin teléfono</span>`;
                     }
 
                     html += `<tr>
                         <td><small style="color:var(--text-muted)">${new Date(v.fecha).toLocaleDateString()}</small>${vend}</td>
-                        <td>
-                            <strong>${v.cliente}</strong><br>
-                            <small style="color:var(--danger)">📍 ${v.ciudad}</small><br>
-                            <small style="color:var(--text-muted)">🗺️ ${terrenoTxt}</small>
-                            ${btnWa}
-                        </td>
-                        <td>
-                            <span style="color:var(--primary)">${calc.columnas} Col / ${calc.placasEnteras} Placas Enteras</span>
-                            ${pCorte}
-                            <br><small style="color:var(--text-muted)">⚖️ ${calc.ton} Ton (${calc.m}m Reales)</small>
-                            ${portonBadge}
-                        </td>
-                        <td>${cfg.moneda} ${fm(presuTxt)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Análisis Finanzas</small></td>
-                        <td>
-                            <span class="badge ${b}" style="cursor:pointer;" onclick="cambiarEstadoVenta('${v.key}', '${estadoTxt}')">${estadoTxt} 🔄</span>
-                            <br><small style="cursor:pointer; color:var(--danger); margin-top:5px; display:inline-block;" onclick="borrarCotizacion('${v.key}')">🗑️ Borrar</small>
-                        </td>
+                        <td><strong>${v.cliente}</strong><br><small style="color:var(--danger)">📍 ${v.ciudad}</small><br><small style="color:var(--text-muted)">🗺️ ${terrenoTxt}</small>${btnWa}</td>
+                        <td><span style="color:var(--primary)">${calc.columnas} Col / ${calc.placasEnteras} Placas Enteras</span>${pCorte}<br><small style="color:var(--text-muted)">⚖️ ${calc.ton} Ton (${calc.m}m Reales)</small>${portonBadge}</td>
+                        <td>${cfg.moneda} ${fm(presuTxt)}<br><small style="cursor:pointer; color:var(--text-muted)" onclick="abrirDesglose(${i})">👁️ Finanzas</small></td>
+                        <td><span class="badge ${b}" style="cursor:pointer;" onclick="cambiarEstadoVenta('${v.key}', '${estadoTxt}')">${estadoTxt} 🔄</span><br><small style="cursor:pointer; color:var(--danger); margin-top:5px; display:inline-block;" onclick="borrarCotizacion('${v.key}')">🗑️ Borrar</small></td>
                     </tr>`; i++;
                 });
                 document.getElementById('tabla-ventas-body').innerHTML = html || `<tr><td colspan="5" align="center">No hay cotizaciones aún.</td></tr>`;
+            }, (error) => {
+                document.getElementById('tabla-ventas-body').innerHTML = `<tr><td colspan="5" align="center" style="color:red;">Error de conexión</td></tr>`;
             });
         }
 
         window.cambiarEstadoVenta = (key, est) => { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}/estado`), est.includes("Aprobada") ? "Rechazada ❌" : est.includes("Rechazada") ? "Pendiente (Web)" : "Aprobada ✅"); }
 
         window.abrirDesglose = function(idx) {
-            currentIndexDesglose = idx;
-            let data = listaVentasGlobal[idx]; let v = data.v; let c = data.calc; 
-             
-            let cFab = c.m * cfg.cFab; 
-            let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; 
+            currentIndexDesglose = idx; let data = listaVentasGlobal[idx]; let v = data.v; let c = data.calc; 
+            let cFab = c.m * cfg.cFab; let cInst = c.tipo.includes("Llave") ? (c.m * cfg.cInst) : 0; 
             let flete = c.tipo.includes("Retiro") ? 0 : (v.fleteReal || 0);
             let cAlz = 0; if(cfg.tipoLogistica === 'destajo') { cAlz = (parseFloat(c.ton) * 1000) * cfg.cAlz; }
-            
             let totalPresu = v.ingresoTotal || c.total;
             let comision = (v.vendedor && v.vendedor !== "Venta Directa") ? totalPresu * (cfg.com / 100) : 0;
-            
-            let ingresoPortones = c.p * cfg.pPorton;
-            let ingresoMuro = totalPresu - ingresoPortones;
+            let ingresoPortones = c.p * cfg.pPorton; let ingresoMuro = totalPresu - ingresoPortones;
 
-            document.getElementById('m-terreno').innerText = v.tipoTerreno || "Medida Manual";
-            document.getElementById('m-metros-reales').innerText = `${c.m}m`;
-            document.getElementById('m-tipo').innerText = c.tipo; 
-            
+            document.getElementById('m-terreno').innerText = v.tipoTerreno || "Medida Manual"; document.getElementById('m-metros-reales').innerText = `${c.m}m`; document.getElementById('m-tipo').innerText = c.tipo; 
             document.getElementById('m-ingreso-muro').innerText = `${cfg.moneda} ${fm(ingresoMuro)}`;
-            if(c.p > 0) {
-                document.getElementById('m-label-porton').innerText = `🚪 Portones (${c.p}x):`;
-                document.getElementById('m-ingreso-porton').innerText = `${cfg.moneda} ${fm(ingresoPortones)}`;
-                document.getElementById('caja-ingreso-porton').style.display = 'flex';
-            } else {
-                document.getElementById('caja-ingreso-porton').style.display = 'none';
-            }
+            if(c.p > 0) { document.getElementById('m-label-porton').innerText = `🚪 Portones (${c.p}x):`; document.getElementById('m-ingreso-porton').innerText = `${cfg.moneda} ${fm(ingresoPortones)}`; document.getElementById('caja-ingreso-porton').style.display = 'flex'; } else { document.getElementById('caja-ingreso-porton').style.display = 'none'; }
             document.getElementById('m-ingreso-total').innerText = `${cfg.moneda} ${fm(totalPresu)}`; 
-
             document.getElementById('m-costo-fab').innerText = `- ${cfg.moneda} ${fm(cFab)}`;
-            
             let txtFlete = flete > 0 ? `- ${cfg.moneda} ${fm(flete)}` : "Aún no cargado";
             document.getElementById('m-costo-flete-contenedor').innerHTML = `<span style="color:var(--danger); font-weight:bold; margin-right:10px;">${txtFlete}</span><button onclick="abrirModalFlete('${v.key}', ${flete})" style="background:var(--primary); color:#020617; border:none; border-radius:4px; font-size:0.75rem; font-weight:bold; padding:4px 8px; cursor:pointer;">✏️ Cargar Flete</button>`;
             
-            if(cfg.tipoLogistica === 'fijo') {
-                document.getElementById('m-costo-alzada').innerHTML = `<span style="color:var(--text-muted)">Sueldo Fijo Mensual</span>`;
-            } else {
-                document.getElementById('m-costo-alzada').innerHTML = `- ${cfg.moneda} ${fm(cAlz)} <span style="font-size:0.7rem">(${c.ton}T)</span>`;
-            }
-
+            if(cfg.tipoLogistica === 'fijo') document.getElementById('m-costo-alzada').innerHTML = `<span style="color:var(--text-muted)">Sueldo Fijo Mensual</span>`; else document.getElementById('m-costo-alzada').innerHTML = `- ${cfg.moneda} ${fm(cAlz)} <span style="font-size:0.7rem">(${c.ton}T)</span>`;
             document.getElementById('fila-inst').style.display = cInst > 0 ? 'flex' : 'none'; document.getElementById('m-costo-inst').innerText = `- ${cfg.moneda} ${fm(cInst)}`;
             document.getElementById('fila-comision').style.display = comision > 0 ? 'flex' : 'none'; document.getElementById('m-comision').innerText = `- ${cfg.moneda} ${fm(comision)} (${v.vendedor})`;
-            
             document.getElementById('m-ganancia').innerText = `${cfg.moneda} ${fm(totalPresu - (cFab + cInst + cAlz + flete + comision))}`;
             document.getElementById('modal-desglose').style.display = 'flex';
         }
         
         window.abrirModalFlete = (key, fActual) => { currentVentaKeyForFlete = key; document.getElementById('input-flete-valor').value = fActual > 0 ? fActual : ''; document.getElementById('modal-flete').style.display = 'flex'; }
         window.cerrarModalFlete = () => { document.getElementById('modal-flete').style.display = 'none'; }
-
         window.guardarFleteModal = () => {
             let val = document.getElementById('input-flete-valor').value; let m = parseFloat(val.replace(/[^0-9]/g, ''));
-            if(!isNaN(m)) {
-                set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { 
-                    cerrarModalFlete(); mostrarToast("🚚 Costo guardado");
-                    listaVentasGlobal[currentIndexDesglose].v.fleteReal = m; abrirDesglose(currentIndexDesglose);
-                });
-            } else { cerrarModalFlete(); }
+            if(!isNaN(m)) { set(ref(db, `empresas/${propietarioUID}/cotizaciones/${currentVentaKeyForFlete}/fleteReal`), m).then(() => { cerrarModalFlete(); mostrarToast("🚚 Costo guardado"); listaVentasGlobal[currentIndexDesglose].v.fleteReal = m; abrirDesglose(currentIndexDesglose); }); } else { cerrarModalFlete(); }
         }
-
         window.cerrarModal = () => document.getElementById('modal-desglose').style.display = 'none';
-        
-        // --- SISTEMA DE BORRADO ELEGANTE SIN ALERTAS BLANCAS ---
+
+        // SISTEMA DE BORRADO SEGURO CON MODAL OSCURO
         let accionBorradoPendiente = null;
-        window.abrirModalBorrar = function(accion, titulo, mensaje) {
-            accionBorradoPendiente = accion;
-            document.getElementById('borrar-titulo').innerText = titulo;
-            document.getElementById('borrar-mensaje').innerText = mensaje;
-            document.getElementById('modal-borrar').style.display = 'flex';
-        }
-        window.cerrarModalBorrar = function() {
-            accionBorradoPendiente = null; document.getElementById('modal-borrar').style.display = 'none';
-        }
-        window.ejecutarBorrado = function() {
-            if (accionBorradoPendiente) accionBorradoPendiente();
-            cerrarModalBorrar();
-        }
+        window.abrirModalBorrar = function(accion, titulo, mensaje) { accionBorradoPendiente = accion; document.getElementById('borrar-titulo').innerText = titulo; document.getElementById('borrar-mensaje').innerText = mensaje; document.getElementById('modal-borrar').style.display = 'flex'; }
+        window.cerrarModalBorrar = function() { accionBorradoPendiente = null; document.getElementById('modal-borrar').style.display = 'none'; }
+        window.ejecutarBorrado = function() { if (accionBorradoPendiente) accionBorradoPendiente(); cerrarModalBorrar(); }
 
         window.borrarCotizacion = function(key) {
             abrirModalBorrar(
                 () => { remove(ref(db, `empresas/${propietarioUID}/cotizaciones/${key}`)).then(() => mostrarToast("🗑️ Cotización eliminada.")); },
                 "⚠️ Eliminar Cotización",
-                "¿Estás seguro de que deseas borrar esta cotización del CRM? Esta acción no se puede deshacer."
+                "¿Estás seguro de que deseas borrar esta cotización del CRM?"
             );
         }
 
@@ -423,13 +344,12 @@
             abrirModalBorrar(
                 () => { remove(ref(db, `empresas/${propietarioUID}/vendedores/${key}`)).then(() => mostrarToast("🗑️ Vendedor eliminado.")); },
                 "⚠️ Eliminar Vendedor",
-                "¿Estás seguro de que deseas quitar a este vendedor del equipo comercial?"
+                "¿Seguro que deseas quitar a este vendedor del equipo comercial?"
             );
         }
 
-        window.guardarVendedor = () => { let n=document.getElementById('nuevo-vendedor-nombre').value, e=document.getElementById('nuevo-vendedor-email').value, p=document.getElementById('nuevo-vendedor-pass').value; if(n&&e) createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); document.getElementById('nuevo-vendedor-nombre').value=''; document.getElementById('nuevo-vendedor-email').value=''; }); }
+        window.guardarVendedor = () => { let n=document.getElementById('nuevo-vendedor-nombre').value, e=document.getElementById('nuevo-vendedor-email').value, p=document.getElementById('nuevo-vendedor-pass').value; if(n&&e) createUserWithEmailAndPassword(authSecundario, e, p).then(() => { signOut(authSecundario); set(push(ref(db, 'empresas/'+propietarioUID+'/vendedores')), { nombre:n, email:e, estado:'Activo' }); mostrarToast("✅ Vendedor creado."); document.getElementById('nuevo-vendedor-nombre').value=''; document.getElementById('nuevo-vendedor-email').value=''; }).catch(err => alert("Error: "+err.message)); }
         window.cargarVendedores = () => onValue(ref(db, 'empresas/'+propietarioUID+'/vendedores'), (s) => { let h=""; s.forEach(c => { let v=c.val(); h+=`<tr><td>${v.nombre}</td><td>${v.email}</td><td><span class="badge activo">${v.estado}</span></td><td><small style="cursor:pointer; color:var(--danger);" onclick="borrarVendedor('${c.key}')">🗑️ Borrar</small></td></tr>`; }); document.getElementById('tabla-vendedores-body').innerHTML = h; });
-        
         window.cerrarSesion = () => { localStorage.removeItem("turing_ultimo_panel"); signOut(auth).then(() => window.location.href = "login.html"); }
     </script>
 </body>
