@@ -6,25 +6,32 @@
     <title>TuringSaaS | ERP Prefabricados</title>
     <style>
         :root { --bg-body: #0f172a; --bg-card: #1e293b; --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #38bdf8; --success: #10b981; --warning: #fbbf24; --danger: #ef4444; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; background: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
-        .logo-text { font-size: 1.5rem; font-weight: 700; margin: 0 0 30px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
-        .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; box-sizing: border-box; }
+        
+        /* SIDEBAR ADAPTABLE */
+        .sidebar { width: 260px; background: var(--bg-body); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; z-index: 10; flex-shrink: 0;}
+        .logo-text { font-size: 1.3rem; font-weight: 700; margin: 0 0 20px 0; } .logo-text span { color: var(--primary); font-weight: 400;}
+        .menu-btn { background: none; border: none; color: var(--text-muted); text-align: left; padding: 12px 15px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px; width: 100%;}
         .menu-btn:hover { background-color: rgba(56, 189, 248, 0.1); color: var(--primary); } .menu-btn.activo { background-color: var(--primary); color: #0f172a; font-weight: 600; }
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
-        .btn-logout { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;}
+        
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
+        .btn-logout { background: var(--danger); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;}
         .seccion { display: none; } .seccion.activa { display: block; }
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 20px;}
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 20px;}
         .grupo-input { margin-bottom: 15px; } .grupo-input label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); }
-        .grupo-input input, .grupo-input select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; box-sizing: border-box; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .btn-primario { background: var(--primary); color: #0f172a; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;}
+        .grupo-input input, .grupo-input select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .btn-primario { background: var(--primary); color: #020617; border: none; padding: 14px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s;}
         .btn-primario:hover { filter: brightness(1.1); }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 700px;} 
-        th { text-align: left; padding: 15px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border);} 
-        td { padding: 15px 12px; border-bottom: 1px solid var(--border); vertical-align: top;}
+        /* TABLAS OPTIMIZADAS CON SCROLL HORIZONTAL */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 650px;} 
+        th { text-align: left; padding: 12px 10px; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap;} 
+        td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top;}
         
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;} 
         .badge.pendiente { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251,191,36,0.3);} 
@@ -32,15 +39,25 @@
         .badge.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3);}
         .badge-porton { background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 0.7rem; font-weight: bold; }
         
-        /* Modales Elegantes */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px);} 
-        .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.5);} 
+        /* MODALES ADAPTABLES */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.85); z-index: 100; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px);} 
+        .modal-box { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 450px; border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;} 
         .fila-desglose { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; align-items: center;}
         
-        .input-flete-modal { width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--primary); background: #020617; color: white; margin-bottom: 15px; text-align: center; box-sizing: border-box;}
+        .input-flete-modal { width: 100%; padding: 14px; font-size: 1.2rem; border-radius: 8px; border: 1px solid var(--primary); background: #020617; color: white; margin-bottom: 15px; text-align: center; box-sizing: border-box;}
 
-        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;} 
-        .toast.mostrar { transform: translateY(0); opacity: 1; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: #000; padding: 12px 20px; border-radius: 8px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 1000; font-size: 0.9rem; white-space: nowrap;} 
+        .toast.mostrar { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 8px; gap: 5px; border-right: none; border-bottom: 1px solid var(--border); }
+            .logo-text { display: none; } 
+            .menu-btn { padding: 10px 14px; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap; justify-content: center; width: auto; flex: 1;}
+            .main-content { padding: 15px 10px; overflow: visible; } 
+            .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
+            .card { padding: 15px 12px; }
+        }
     </style>
 </head>
 <body>
@@ -52,16 +69,20 @@
     </div>
 
     <div class="main-content">
+        <!-- SECCIÓN VENTAS -->
         <div id="seccion-ventas" class="seccion activa">
             <div class="header-top"><h2>Obras y Cotizaciones</h2><button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button></div>
-            <div class="card" style="padding: 0; overflow-x:auto;">
-                <table>
-                    <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente / Terreno</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
-                    <tbody id="tabla-ventas-body"><tr><td colspan="5" align="center">Cargando datos...</td></tr></tbody>
-                </table>
+            <div class="card" style="padding: 0;">
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr style="background: rgba(0,0,0,0.2);"><th>Fecha</th><th>Cliente / Terreno</th><th>Plan de Producción</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                        <tbody id="tabla-ventas-body"><tr><td colspan="5" align="center">Cargando datos...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
+        <!-- SECCIÓN VENDEDORES -->
         <div id="seccion-equipo" class="seccion">
             <div class="header-top"><h2>Equipo Comercial</h2></div>
             <div class="card">
@@ -72,11 +93,14 @@
                 </div>
                 <button class="btn-primario" onclick="guardarVendedor()">Crear Cuenta para Vendedor</button>
             </div>
-            <div class="card" style="overflow-x:auto;">
-                <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
+            <div class="card" style="padding:0;">
+                <div class="table-responsive">
+                    <table><thead><tr><th>Nombre</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-vendedores-body"></tbody></table>
+                </div>
             </div>
         </div>
 
+        <!-- SECCIÓN CONFIGURACIÓN -->
         <div id="seccion-configuracion" class="seccion">
             <div class="header-top"><h2>Configuración Central (ERP)</h2></div>
             <div class="card">
@@ -86,8 +110,8 @@
                     <div class="grupo-input"><label>Moneda Local</label><input type="text" id="config-moneda" value="Gs."></div>
                 </div>
                 <div style="margin-top: 10px;">
-                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Tu Enlace de Ventas Exclusivo (Compartir en Redes):</label>
-                    <div style="background: rgba(56,189,248,0.1); padding: 10px; border-radius: 6px; margin-top:5px; font-family: monospace; color: var(--primary);" id="link-exclusivo">Cargando...</div>
+                    <label style="color:var(--success); font-size:0.85rem; font-weight:bold;">Tu Enlace de Ventas Exclusivo:</label>
+                    <div style="background: rgba(56,189,248,0.1); padding: 10px; border-radius: 6px; margin-top:5px; font-family: monospace; color: var(--primary); word-break: break-all;" id="link-exclusivo">Cargando...</div>
                 </div>
             </div>
 
@@ -108,7 +132,7 @@
                         <label>Tipo de Contrato Logístico (Alzadores)</label>
                         <select id="config-tipo-logistica">
                             <option value="destajo">A destajo (Pago por Kg alzado)</option>
-                            <option value="fijo">Personal Fijo Mensual (No descuenta por obra)</option>
+                            <option value="fijo">Personal Fijo Mensual</option>
                         </select>
                     </div>
                     <div class="grupo-input" id="caja-pago-kg"><label>Pago Alzador (Por Kg)</label><input type="number" id="config-costo-alz"></div>
@@ -130,7 +154,7 @@
         </div>
     </div>
 
-    <!-- Modales -->
+    <!-- MODAL DESGLOSE FINANCIERO -->
     <div id="modal-desglose" class="modal-overlay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3 style="margin:0; color:var(--primary);">Análisis de Rentabilidad</h3><button onclick="cerrarModal()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">×</button></div>
@@ -152,18 +176,19 @@
         </div>
     </div>
 
+    <!-- MODAL FLETE -->
     <div id="modal-flete" class="modal-overlay">
         <div class="modal-box" style="text-align: center;">
             <h3 style="color:var(--primary); margin-top:0;">🚚 Cargar Costo de Flete</h3>
             <input type="number" id="input-flete-valor" class="input-flete-modal" placeholder="Ej: 800000">
             <div class="grid-2">
                 <button class="btn-primario" style="background:transparent; border:1px solid var(--border); color:white;" onclick="cerrarModalFlete()">Cancelar</button>
-                <button class="btn-primario" onclick="guardarFleteModal()">Guardar Flete</button>
+                <button class="btn-primario" onclick="guardarFleteModal()">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Elegante de Borrado -->
+    <!-- MODAL BORRAR -->
     <div id="modal-borrar" class="modal-overlay" style="z-index: 200;">
         <div class="modal-box" style="text-align: center; max-width: 350px;">
             <h3 id="borrar-titulo" style="color:var(--danger); margin-top:0;">⚠️ Eliminar Registro</h3>
@@ -182,7 +207,6 @@
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        // Configuración 100% segura para evitar el bloqueo del panel
         const appConfig = { apiKey: "AIzaSyAg6rZnqUFgTcRiAHA0AWvYR-imovVb_0s", databaseURL: "https://gestorinmobiliario-d68b3-default-rtdb.firebaseio.com" };
         const app = initializeApp(appConfig);
         const auth = getAuth(app); 
@@ -267,7 +291,6 @@
                     let terrenoTxt = v.tipoTerreno || "Medida Manual"; if (terrenoTxt.length > 20) terrenoTxt = terrenoTxt.substring(0, 20) + "..."; 
                     let portonBadge = calc.p > 0 ? `<br><div class="badge-porton">🚪 ${calc.p} Portón ${v.portonesTipo || ''}</div>` : '';
 
-                    // BOTÓN DE WHATSAPP DIRECTO
                     let btnWa = '';
                     if (v.telefono) {
                         let numLimpio = v.telefono.replace(/[^0-9+]/g, '');
@@ -326,7 +349,6 @@
         }
         window.cerrarModal = () => document.getElementById('modal-desglose').style.display = 'none';
 
-        // SISTEMA DE BORRADO SEGURO CON MODAL OSCURO
         let accionBorradoPendiente = null;
         window.abrirModalBorrar = function(accion, titulo, mensaje) { accionBorradoPendiente = accion; document.getElementById('borrar-titulo').innerText = titulo; document.getElementById('borrar-mensaje').innerText = mensaje; document.getElementById('modal-borrar').style.display = 'flex'; }
         window.cerrarModalBorrar = function() { accionBorradoPendiente = null; document.getElementById('modal-borrar').style.display = 'none'; }
