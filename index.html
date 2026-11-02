@@ -8,62 +8,66 @@
         :root { --primary: #38bdf8; --bg-base: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155; --success: #10b981; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-base); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; align-items: center; justify-content: center;}
         
-        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; }
-        .card { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); text-align: center; }
+        .container { width: 100%; max-width: 480px; padding: 20px; box-sizing: border-box; }
+        .card { background: var(--bg-card); padding: 35px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.3); text-align: center; }
         
-        h1 { margin: 0 0 10px 0; font-size: 1.8rem; color: white;}
+        h1 { margin: 0 0 10px 0; font-size: 2rem; color: white; font-weight: 700; letter-spacing: -0.5px;}
         h1 span { color: var(--primary); font-weight: 400; }
-        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
+        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; }
 
-        .btn-opcion { background: #020617; border: 1px solid var(--border); color: white; padding: 18px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; text-decoration: none;}
-        .btn-opcion:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); transform: translateY(-2px); }
+        .btn-opcion { background: #020617; border: 1px solid var(--border); color: white; padding: 16px; border-radius: 8px; font-size: 1rem; font-weight: 600; width: 100%; cursor: pointer; margin-bottom: 12px; transition: 0.2s; text-decoration: none; display: block; box-sizing: border-box;}
+        .btn-opcion:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); }
         .btn-opcion.principal { background: var(--primary); color: #020617; border: none; }
-        .btn-opcion.principal:hover { filter: brightness(1.1); }
+        .btn-opcion.principal:hover { filter: brightness(1.1); background: var(--primary); }
+        .btn-secundario { background: transparent; color: var(--primary); border: 1px solid var(--primary); font-weight: 600; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; transition: 0.2s; text-decoration: none; display: block; box-sizing: border-box;}
+        .btn-secundario:hover { background: rgba(56, 189, 248, 0.1); }
 
-        /* Estilos del Cotizador (Oculto por defecto hasta que elijan cotizar) */
-        #vista-cotizador { display: none; width: 100%; max-width: 500px; text-align: left; }
-        .form-group { margin-bottom: 15px; }
+        /* Estilos de Módulos (Cotizador y Registro) */
+        .vista-modulo { display: none; width: 100%; max-width: 500px; text-align: left; padding: 20px; box-sizing: border-box; }
+        .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
-        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 1rem; box-sizing: border-box; outline: none; }
+        .form-group input, .form-group select { width: 100%; padding: 13px; border-radius: 8px; border: 1px solid var(--border); background: #020617; color: white; font-size: 0.95rem; box-sizing: border-box; outline: none; transition: border-color 0.2s;}
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-main { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-top: 10px;}
+        .btn-main { background: var(--primary); color: #020617; font-weight: bold; font-size: 1.05rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-top: 15px; transition: 0.2s;}
+        .btn-main:hover { filter: brightness(1.1); }
         
+        .header-modulo { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px; }
+        .header-modulo h3 { margin:0; font-size:1.2rem; color:white; }
+        .btn-volver { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem; font-weight:600; padding:0; }
+        .btn-volver:hover { color:white; }
+
         /* Modal y Pantalla de Éxito */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.9); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; backdrop-filter: blur(5px);}
-        .modal-card { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--primary); }
-        .precio-final { font-size: 2.2rem; font-weight: bold; color: var(--success); margin: 20px 0; }
-        .btn-confirmar { background: var(--success); color: #000; font-weight: bold; font-size: 1.1rem; border: none; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px;}
-        .btn-cancelar { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-weight: bold; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer;}
-        .pantalla-exito { display: none; flex-direction: column; align-items: center; text-align: center; padding: 40px 20px; }
-
-        /* Estilo para el formulario de registro integrado */
-        #vista-registro { display: none; width: 100%; max-width: 450px; text-align: left; }
+        .precio-final { font-size: 2.4rem; font-weight: 700; color: var(--success); margin: 20px 0; letter-spacing: -1px;}
+        .pantalla-exito { display: none; text-align: center; }
+        .badge-exito { display: inline-block; background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 15px 25px; border-radius: 50px; font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; border: 1px solid rgba(16,185,129,0.3);}
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE INICIO (PREGUNTA QUÉ DESEA HACER) -->
+    <!-- PANTALLA DE INICIO PROFESIONAL -->
     <div class="container" id="vista-eleccion">
         <div class="card">
             <h1>Turing<span>SaaS</span></h1>
-            <p>Selecciona qué deseas hacer en la plataforma</p>
+            <p>Plataforma Global de Prefabricados</p>
             
-            <button class="btn-opcion principal" onclick="irACotizar()">
-                🏗️ Cotizar un Muro o Cerca
-            </button>
+            <button class="btn-opcion principal" onclick="irACotizar()">Cotizar un Proyecto</button>
+            <button class="btn-opcion" onclick="irARegistro()">Registrar Fábrica (SaaS)</button>
             
-            <button class="btn-opcion" onclick="irARegistro()">
-                🏭 Registrar mi Fábrica de Prefabricados
-            </button>
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <p style="font-size: 0.85rem; margin-bottom: 15px;">¿Ya estás registrado en la red?</p>
+                <a href="login.html" class="btn-secundario">Acceder al ERP</a>
+            </div>
         </div>
     </div>
 
-    <!-- COTIZADOR PÚBLICO (Se abre al elegir cotizar) -->
-    <div class="container" id="vista-cotizador">
+    <!-- COTIZADOR PÚBLICO (CON SELECTORES GEOGRÁFICOS) -->
+    <div class="vista-modulo" id="vista-cotizador">
         <div class="card" style="text-align: left;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-                <h3 id="titulo-empresa" style="margin:0; font-size:1.1rem; color:var(--primary);">Cotizador Inteligente</h3>
-                <button onclick="volverInicio()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">← Volver</button>
+            <div class="header-modulo">
+                <h3 id="titulo-empresa">Cotizador Inteligente</h3>
+                <button class="btn-volver" onclick="volverInicio()">Volver</button>
             </div>
             
             <div class="form-group">
@@ -97,22 +101,33 @@
                 </select>
             </div>
 
+            <!-- NUEVO: SELECTORES EN CASCADA PARA EVITAR ERRORES DE TIPO -->
+            <div class="form-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border);">
+                <label>País de la Obra</label>
+                <select id="inp-pais" onchange="actualizarDepartamentos()">
+                    <option value="Paraguay">Paraguay</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Bolivia">Bolivia</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Mexico">México</option>
+                </select>
+            </div>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>País de la Obra</label>
-                    <input type="text" id="inp-pais" placeholder="Ej: Paraguay" required>
+                    <label>Departamento</label>
+                    <select id="inp-departamento" onchange="actualizarCiudades()"></select>
                 </div>
                 <div class="form-group">
-                    <label>Ciudad de la Obra</label>
-                    <input type="text" id="inp-ciudad" placeholder="Ej: Itaugua" required>
+                    <label>Ciudad</label>
+                    <select id="inp-ciudad"></select>
                 </div>
             </div>
 
-            <h3 style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1rem;">Tus Datos de Contacto</h3>
+            <h3 style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:10px; font-size:1rem; color:white;">Datos de Contacto</h3>
             
             <div class="form-group">
                 <label>Nombre Completo</label>
-                <input type="text" id="inp-cliente" placeholder="Ej: Juan Pérez" required>
+                <input type="text" id="inp-cliente" placeholder="Nombre y Apellido" required>
             </div>
             
             <div class="form-group">
@@ -124,50 +139,50 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE REGISTRO INTEGRADA (Se abre al elegir registrar fábrica) -->
-    <div class="container" id="vista-registro">
+    <!-- REGISTRO DE FÁBRICA -->
+    <div class="vista-modulo" id="vista-registro">
         <div class="card" style="text-align: left;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-                <h3 style="margin:0; font-size:1.1rem; color:var(--primary);">Registro de Fábrica</h3>
-                <button onclick="volverInicio()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">← Volver</button>
+            <div class="header-modulo">
+                <h3>Registro de Fábrica</h3>
+                <button class="btn-volver" onclick="volverInicio()">Volver</button>
             </div>
             
             <div class="form-group">
-                <label>Nombre Comercial de la Fábrica</label>
-                <input type="text" id="reg-nombre" placeholder="Ej: Prefabricados G.H. Mix" required>
+                <label>Nombre Comercial</label>
+                <input type="text" id="reg-nombre" placeholder="Ej: Prefabricados Central" required>
             </div>
             <div class="form-group">
-                <label>Correo Electrónico (Para el Panel)</label>
+                <label>Correo Electrónico Corporativo</label>
                 <input type="email" id="reg-email" placeholder="fabrica@correo.com" required>
             </div>
             <div class="form-group">
-                <label>Contraseña de Acceso</label>
+                <label>Contraseña de Seguridad</label>
                 <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" required>
             </div>
-            <button class="btn-main" onclick="registrarFabricaSaaS()">Crear Cuenta y Acceder</button>
+            <button class="btn-main" onclick="registrarFabricaSaaS()">Crear Cuenta</button>
         </div>
     </div>
 
     <!-- PANTALLA DE ÉXITO COTIZACIÓN -->
     <div class="container pantalla-exito" id="pantalla-exito">
         <div class="card">
-            <div style="font-size:3.5rem; margin-bottom:15px;">✅</div>
-            <h2 style="color:var(--success); margin-top:0;">¡Cotización Enviada!</h2>
-            <p>Las fábricas disponibles en tu zona acaban de recibir tu presupuesto. Te contactarán por WhatsApp en breve para coordinar los detalles.</p>
-            <button class="btn-cancelar" style="margin-top:20px;" onclick="location.reload()">Hacer otra cotización</button>
+            <div class="badge-exito">Operación Exitosa</div>
+            <h2 style="color:var(--text-main); margin-top:0;">Presupuesto Procesado</h2>
+            <p>Las fábricas de nuestra red que cubren tu zona han recibido la solicitud. Un asesor se comunicará contigo vía WhatsApp a la brevedad.</p>
+            <button class="btn-secundario" style="margin-top:20px;" onclick="location.reload()">Realizar nueva cotización</button>
         </div>
     </div>
 
-    <!-- MODAL DE COTIZACIÓN -->
+    <!-- MODAL DE CONFIRMACIÓN -->
     <div class="modal-overlay" id="modal-cotizacion">
-        <div class="modal-card">
-            <h2 style="margin-top:0; color:var(--primary);">Estimación de Inversión</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem;">El valor aproximado de tu obra es de:</p>
+        <div class="card" style="max-width: 400px; text-align: center;">
+            <h2 style="margin-top:0; color:white; font-size:1.3rem;">Estimación de Inversión</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">El valor aproximado de la obra es:</p>
             <div class="precio-final" id="precio-pantalla">Gs. 0</div>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:20px;">*Sujeto a verificación técnica en el terreno.</p>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:25px;">*Valor referencial sujeto a verificación técnica del terreno.</p>
             
-            <button class="btn-confirmar" id="btn-registrar" onclick="registrarBD()">Enviar y Solicitar Visita</button>
-            <button class="btn-cancelar" onclick="cerrarModal()">Corregir datos</button>
+            <button class="btn-main" style="background:var(--success); color:#000; margin-bottom:12px; margin-top:0;" id="btn-registrar" onclick="registrarBD()">Confirmar y Enviar a Fábricas</button>
+            <button class="btn-secundario" style="border:none;" onclick="cerrarModal()">Cancelar</button>
         </div>
     </div>
 
@@ -184,7 +199,57 @@
         let uidEmpresa = null; 
         let cotizacionActual = {};
 
-        // Si entra por link exclusivo de fábrica, salta directo al cotizador con la marca de la fábrica
+        // DICCIONARIO GEOGRÁFICO UNIFICADO (Idéntico al panel_fabrica.html)
+        const locaciones = {
+            "Paraguay": {
+                "Central": ["Areguá", "Capiatá", "Fernando de la Mora", "Guarambaré", "Itá", "Itauguá", "J. Augusto Saldívar", "Lambaré", "Limpio", "Luque", "Mariano Roque Alonso", "Nueva Italia", "Ñemby", "San Antonio", "San Lorenzo", "Villa Elisa", "Villeta", "Ypacaraí", "Ypané"],
+                "Asunción (Capital)": ["Asunción"],
+                "Cordillera": ["Caacupé", "Altos", "Arroyos y Esteros", "Atyrá", "Caraguatay", "Emboscada", "Eusebio Ayala", "Isla Pucú", "Itacurubí de la Cord.", "Juan de Mena", "Loma Grande", "Mbocayaty del Yhaguy", "Nueva Colombia", "Piribebuy", "1ro de Marzo", "San Bernardino", "Santa Elena", "Tobatí", "Valenzuela", "San José Obrero"],
+                "Paraguarí": ["Paraguarí", "Acahay", "Caapucú", "Carapeguá", "Escobar", "Gral. Bernardino Caballero", "La Colmena", "Mbuyapey", "Pirayú", "Quiindy", "Quyquyhó", "San Roque González", "Sapucai", "Tebicuarymí", "Yaguarón", "Ybycuí", "Ybytymí", "María Antonia"],
+                "Caaguazú": ["Coronel Oviedo", "Caaguazú", "Carayaó", "Dr. Cecilio Báez", "Santa Rosa del Mbutuy", "Dr. Juan M. Frutos", "Repatriación", "Nueva Londres", "San Joaquín", "San José de los Arroyos", "Yhú", "Dr. J. Eulogio Estigarribia", "R.I. 3 Corrales", "Raúl A. Oviedo", "José D. Ocampos", "Mcal. López", "La Pastora", "3 de Febrero", "Simón Bolívar", "Vaquería", "Tembiaporá"],
+                "Alto Paraná": ["Ciudad del Este", "Presidente Franco", "Domingo M. de Irala", "Dr. J.L. Mallorquín", "Hernandarias", "Itakyry", "Juan E. O'Leary", "Los Cedrales", "Mbaracayú", "Minga Guazú", "Minga Porá", "Naranjal", "Ñacunday", "San Alberto", "San Cristóbal", "Santa Fe del Paraná", "Santa Rita", "Santa Rosa del Monday", "Tavapy"],
+                "Itapúa": ["Encarnación", "Alto Verá", "Bella Vista", "Cambyretá", "Capitán Meza", "Capitán Miranda", "Carlos A. López", "Carmen del Paraná", "Coronel Bogado", "Edelira", "Fram", "Gral. Artigas", "Gral. Delgado", "Hohenau", "Itapúa Poty", "Jesús", "La Paz", "Mayor Otaño", "Natalio", "Nueva Alborada", "Obligado", "San Cosme y Damián", "San Juan del Paraná", "San Pedro del Paraná", "Santa Rita", "Tomás R. Pereira", "Trinidad", "Yatytay"],
+                "Guairá": ["Villarrica", "Borja", "Cap. Mauricio J. Troche", "Cnel. Martínez", "Félix Pérez Cardozo", "Gral. Eugenio A. Garay", "Independencia", "Itapé", "Iturbe", "José Fassardi", "Mbocayaty", "Natalicio Talavera", "Ñumí", "San Salvador", "Yataity", "Dr. Botrell", "Paso Yobái", "Tebicuary"],
+                "Caazapá": ["Caazapá", "Abaí", "Buena Vista", "Dr. Moisés Bertoni", "Gral. Higinio Morínigo", "Maciel", "San Juan Nepomuceno", "Tavai", "Yuty", "3 de Mayo", "Fulgencio Yegros"],
+                "Misiones": ["San Juan Bautista", "Ayolas", "San Ignacio", "Santa María", "Santa Rosa", "Santiago", "Villa Florida", "Yabebyry", "San Patricio", "San Miguel"],
+                "Concepción": ["Concepción", "Belén", "Horqueta", "Loreto", "San Lázaro", "Yby Yaú", "Sgt. José F. López", "San Alfredo", "Paso Barreto", "Azotey", "Arroyito", "Itacuá"],
+                "San Pedro": ["San Pedro de Ycuamandiyú", "Antequera", "Choré", "Gral. Aquino", "Itacurubí del Rosario", "Lima", "Nueva Germania", "San Estanislao", "San Pablo", "Tacuatí", "Unión", "25 de Diciembre", "Villa del Rosario", "Gral. Resquín", "Yataity del Norte", "Guayaibí", "Capiibary", "Santa Rosa del Aguaray", "Yrybucuá", "San Vicente Pancholo"],
+                "Ñeembucú": ["Pilar", "Alberdi", "Cerrito", "Desmochados", "Gral. Díaz", "Guazú Cuá", "Humaitá", "Isla Umbú", "Laureles", "Mayor Martínez", "Paso de Patria", "San Juan Bautista de Ñ.", "Tacuaras", "Villa Franca", "Villalbín", "Zampedri"],
+                "Amambay": ["Pedro Juan Caballero", "Bella Vista Norte", "Capitán Bado", "Zanja Pytá", "Karapaí"],
+                "Canindeyú": ["Salto del Guairá", "Corpus Christi", "Curuguaty", "Villa Ygatimí", "Itanará", "Ypejhú", "Katueté", "La Paloma", "Nueva Esperanza", "Yasy Cañy", "Ybyrarobaná", "Yby Pytá"],
+                "Presidente Hayes": ["Villa Hayes", "Benjamín Aceval", "José Falcón", "Nanawa", "Puerto Pinasco", "Tte. Irala Fernández", "Tte. Esteban Martínez", "Gral. Bruguez", "Nueva Asunción"],
+                "Boquerón": ["Filadelfia", "Loma Plata", "Mcal. Estigarribia", "Boquerón (Neuland)"],
+                "Alto Paraguay": ["Fuerte Olimpo", "Bahía Negra", "Capitán Carmelo Peralta", "Puerto Casado"]
+            },
+            "Argentina": { "Buenos Aires": ["CABA", "La Plata", "Mar del Plata"], "Córdoba": ["Córdoba Capital", "Río Cuarto"] },
+            "Bolivia": { "Santa Cruz": ["Santa Cruz de la Sierra"], "La Paz": ["La Paz", "El Alto"] },
+            "Chile": { "Metropolitana": ["Santiago"], "Valparaíso": ["Valparaíso", "Viña del Mar"] },
+            "Mexico": { "CDMX": ["Ciudad de México"], "Nuevo León": ["Monterrey"] }
+        };
+
+        window.actualizarDepartamentos = function() {
+            let pais = document.getElementById('inp-pais').value;
+            let deptosDelPais = locaciones[pais] || {};
+            let htmlDepto = '';
+            for(let depto in deptosDelPais) { htmlDepto += `<option value="${depto}">${depto}</option>`; }
+            document.getElementById('inp-departamento').innerHTML = htmlDepto;
+            actualizarCiudades();
+        }
+
+        window.actualizarCiudades = function() {
+            let pais = document.getElementById('inp-pais').value;
+            let depto = document.getElementById('inp-departamento').value;
+            let ciudades = (locaciones[pais] && locaciones[pais][depto]) ? locaciones[pais][depto] : [];
+            let htmlCiudad = '';
+            ciudades.forEach(c => { htmlCiudad += `<option value="${c}">${c}</option>`; });
+            document.getElementById('inp-ciudad').innerHTML = htmlCiudad;
+        }
+
+        // Inicializar selectores al cargar la página
+        window.onload = function() {
+            actualizarDepartamentos();
+        };
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('empresa')) {
             uidEmpresa = urlParams.get('empresa');
@@ -196,7 +261,7 @@
                     let c = snap.val();
                     configBase.pLlave = c.pLlave; configBase.pEnvio = c.pEnvio; configBase.pRetiro = c.pRetiro; configBase.pPorton = c.pPorton;
                     configBase.moneda = c.moneda || "Gs.";
-                    document.getElementById('titulo-empresa').innerText = c.nombreEmpresa || "Cotizador Directo";
+                    document.getElementById('titulo-empresa').innerText = c.nombreEmpresa || "Cotización Directa";
                 }
             });
         }
@@ -227,20 +292,16 @@
             createUserWithEmailAndPassword(auth, email, pass).then((userCredential) => {
                 let newUid = userCredential.user.uid;
                 set(ref(db, `empresas/${newUid}/configuracion`), {
-                    nombreEmpresa: nombre,
-                    pais: "Paraguay",
-                    ciudad: "Itauguá",
-                    cobertura: "Itauguá, Capiatá, Asunción, Luque",
+                    nombreEmpresa: nombre, pais: "Paraguay", departamento: "Central", ciudad: "Itauguá",
+                    cobertura: "Itauguá,Capiatá,Asunción,Luque",
                     pLlave: 340000, pEnvio: 250000, pRetiro: 180000, pPorton: 3850000,
                     cFab: 120000, cInst: 40000, cAlz: 30, com: 5,
                     largoPlaca: 160, altoPlaca: 40, pesoPlaca: 64, anchoCol: 15, encastre: 5, pesoCol: 55
                 }).then(() => {
-                    alert("¡Fábrica registrada con éxito! Entrando al panel...");
+                    alert("Fábrica registrada con éxito. Redirigiendo al ERP...");
                     window.location.href = "panel_fabrica.html";
                 });
-            }).catch(error => {
-                alert("Error al registrar: " + error.message);
-            });
+            }).catch(error => { alert("Error: " + error.message); });
         }
 
         const fm = (num) => Number(num).toLocaleString('es-ES');
@@ -268,8 +329,7 @@
             let telefono = document.getElementById('inp-telefono').value;
 
             if(!metros || !pais || !ciudad || !cliente || !telefono) {
-                alert("Por favor, completa todos los campos del formulario.");
-                return;
+                alert("Completa todos los campos."); return;
             }
 
             let precioMetro = configBase.pLlave;
