@@ -91,19 +91,16 @@
                 </div>
                 <div class="form-group">
                     <label>Portones (Cantidad)</label>
-                    <!-- Al escribir 1 o más aquí, se ejecuta la función que muestra el tipo de portón -->
                     <input type="number" id="inp-portones" placeholder="Ej: 1" value="0" min="0" oninput="toggleTipoPorton()" onchange="toggleTipoPorton()">
                 </div>
             </div>
 
-            <!-- DESPLEGABLE DINÁMICO DEL TIPO DE PORTÓN -->
+            <!-- DESPLEGABLE DINÁMICO DEL TIPO DE PORTÓN (SOLO CORREDIZO Y BASCULANTE) -->
             <div class="form-group" id="caja-tipo-porton">
                 <label style="color: var(--primary);">Seleccione el Tipo de Portón</label>
                 <select id="inp-tipo-porton">
                     <option value="Corredizo (Estándar)">Corredizo (Estándar)</option>
                     <option value="Basculante">Basculante</option>
-                    <option value="Pivotante (2 Hojas)">Pivotante (2 Hojas)</option>
-                    <option value="Solo Peatonal">Solo Puerta Peatonal</option>
                 </select>
             </div>
 
@@ -278,7 +275,6 @@
             document.getElementById('vista-eleccion').style.display = 'block';
         }
 
-        // REFORZADO: Función que muestra/oculta el tipo de portón
         window.toggleTipoPorton = function() {
             let inpPortones = document.getElementById('inp-portones');
             let cajaTipo = document.getElementById('caja-tipo-porton');
@@ -289,7 +285,7 @@
                     cajaTipo.style.display = 'block';
                 } else {
                     cajaTipo.style.display = 'none';
-                    document.getElementById('inp-tipo-porton').value = "Corredizo (Estándar)"; // Reinicia el valor
+                    document.getElementById('inp-tipo-porton').value = "Corredizo (Estándar)";
                 }
             }
         }
@@ -339,7 +335,7 @@
                 inpMetros.value = ''; inpMetros.disabled = false; inpPortones.value = 0; inpMetros.focus(); 
             }
             
-            toggleTipoPorton(); // Ejecutamos la verificación para ocultar el cuadro si vuelve a cero
+            toggleTipoPorton(); 
         }
 
         window.calcularPresupuesto = function() {
